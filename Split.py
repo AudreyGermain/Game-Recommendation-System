@@ -1,17 +1,20 @@
 import pandas as pd
 import numpy as np
 import csv
-steam = pd.read_csv('C:\Python\steam.csv',header=None,names=['user', 'game', 'purchase_play', 'hrs'])
+steam = pd.read_csv('C:\Python\steam-200k.csv',header=None,names=['user', 'game', 'purchase_play', 'hrs'])
 
-#split purchase and calculate time
+#Split purchase and calculate time
 steam['purchase']=1
 steam['hrs']=steam['hrs']-steam['purchase']
 
-#split play
+#Split play
 steam['play']=np.where(steam['purchase_play']=='play',1,0)
 
-#clean own/play
+#Clean dataset
 clean_steam=steam.drop_duplicates(subset=['user','game'],keep='last')
+clean_steam=clean_steam.drop(columns=['purchase_play'])
 
-print(clean_steam)
+#Export to csv
+clean_steam.to_csv(r'C:\Python\purchase_play.csv',index=None)
+
 
