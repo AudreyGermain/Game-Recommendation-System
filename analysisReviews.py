@@ -1,9 +1,9 @@
 from pandas import read_csv
-import sys
 import re
+import pathlib
 
 # Get data from CSV
-locationGamesFile = str(sys.argv[1])
+locationGamesFile = pathlib.Path(r'data/steam_games.csv')
 dataGames = read_csv(locationGamesFile)
 
 # add and initialize new columns
@@ -30,5 +30,6 @@ possibleReview = dataGames["review_qualification"].unique()
 print(possibleReview)
 
 # print csv of reviews
-dataGames.to_csv(sys.argv[2], columns=["name", "percentage_positive_review", "review_qualification", "all_reviews"],
+dataGames.to_csv(pathlib.Path(r'data/steam_games_reviews.csv'),
+                 columns=["name", "percentage_positive_review", "review_qualification", "all_reviews"],
                  index=False)
