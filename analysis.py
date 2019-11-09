@@ -1,13 +1,11 @@
 from pandas import read_csv
-import sys
 import random
+import pathlib
 
 # Get data from CSV
-locationUsersFile = str(sys.argv[1])
-locationGamesFile = str(sys.argv[2])
+locationUsersFile = pathlib.Path(r'data/steam-200k.csv')
 dataUsers = read_csv(locationUsersFile, header=None, usecols=[0, 1, 2, 3],
                      names=["user_id", "game_name", "behavior", "hours"])
-dataGames = read_csv(locationGamesFile)
 
 # get list of all users
 userArray = dataUsers["user_id"].unique()
@@ -21,6 +19,6 @@ testUsers = random.sample(list(userArray), testUserCount)
 criteriaTest = dataUsers['user_id'].isin(testUsers)
 trainDataset = dataUsers[~criteriaTest]
 testDataset = dataUsers[criteriaTest]
-testDataset.to_csv(sys.argv[3], columns=["user_id", "game_name", "behavior", "hours"], index=False)
-trainDataset.to_csv(sys.argv[4], columns=["user_id", "game_name", "behavior", "hours"], index=False)
+testDataset.to_csv(pathlib.Path(r'data/steam_user_test.csv'), columns=["user_id", "game_name", "behavior", "hours"], index=False)
+trainDataset.to_csv(pathlib.Path(r'data/steam_user_train.csv'), columns=["user_id", "game_name", "behavior", "hours"], index=False)
 
