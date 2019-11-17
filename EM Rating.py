@@ -1,3 +1,8 @@
+import pandas as pd
+import pathlib
+locationUsersFile = pathlib.Path(r'data/purchase_play.csv')
+steam = pd.read_csv(locationUsersFile,header=0)
+
 # create a rating based on time played
 game_hrs_density <- function(GAME, nclass, print_vals = TRUE){
     # subsetting data
