@@ -33,4 +33,6 @@ usedGames['popular_tags'] = usedGames['popular_tags'].apply(clean_data)
 usedGames['publisher'] = usedGames['publisher'].apply(clean_data)
 usedGames['developer'] = usedGames['developer'].apply(clean_data)
 
+usedGames.drop_duplicates("name")
+
 usedGames.to_csv(pathlib.Path(r'data/processed_games_for_content-based.csv'), index=False)
