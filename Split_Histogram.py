@@ -3,7 +3,6 @@ import numpy as np
 import pathlib
 from plotnine import *
 from plotnine.data import *
-from pandas.api.types import CategoricalDtype
 import seaborn as sns
 import matplotlib.pyplot as plt
 
