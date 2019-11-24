@@ -1,8 +1,8 @@
 import pandas as pd
 import pathlib
 import numpy as np
-locationUsersFile = pathlib.Path(r'data/purchase_play.csv')
-data = pd.read_csv(locationUsersFile,header=0)
+import ggplot
+
 
 def Generate_EM(game,rating,print_vals=TRUE):
   gdata=data[game,data.hrs>2]
@@ -55,4 +55,17 @@ def EM(data,k,mu,sigma,steps=1000):
     return k, mu, sigma, gama, record
 
 def main():
-    
+  locationUsersFile = pathlib.Path(r'data/purchase_play.csv')
+  data = pd.read_csv(locationUsersFile,header=0)
+  Generate_EM(data,5)
+  dens = data.frame(x = x)
+  for(k in 1:nclass){
+        dens[,paste0('y', k)] <- EM.lambda[k]*dnorm(x, EM.mu[k], EM.sigma[k])
+    }
+  dens <- melt(dens, 'x', variable.name = 'gaussian')
+  print(ggplot(game_data, aes(x = loghrs)) +
+  geom_histogram(aes(y = ..density..), bins = 25, colour = "black", alpha = 0.7, size = 0.1) +
+  geom_area(data = dens, aes(x = x, y = value, fill = gaussian), alpha = 0.5, position = position_dodge()) +
+  geom_density(linetype = 2, size = 0.1) +
+  ggtitle(game_data$game[1]))
+  //SVD
