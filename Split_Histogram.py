@@ -8,8 +8,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-locationUsersFile = pathlib.Path(r'data/steam_user_train.csv')
-steam = pd.read_csv(locationUsersFile,header=0)
+locationUsersFile = pathlib.Path(r'data/steam-200k.csv')
+steam = pd.read_csv(locationUsersFile, header=None, usecols=[0, 1, 2, 3],
+                    names=["user_id", "game_name", "behavior", "hours"])
 #print(steam)  for check
 
 #Split purchase and calculate time
