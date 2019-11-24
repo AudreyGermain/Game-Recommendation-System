@@ -1,10 +1,9 @@
-# Recommendation System for Steam Game Store
-## An overview of recommender systems
+# Recommendation System for Steam Game Store: An overview of recommender systems
 
-## Written by:
-## Doo Hyodan, Department Of Information System, Hanyang University, ammissyouyou@gmail.com
-## Audrey Germain, Computer Engineering, Department of Software Engineering and Computer Engineering, Polytechnique Montreal
-## Geordan Jove, Aerospace Engineering, Department of Mechanical Engineering, Polytechnique Montreal
+Written by:
+Doo Hyodan, Department Of Information System, Hanyang University, ammissyouyou@gmail.com
+Audrey Germain, Computer Engineering, Department of Software Engineering and Computer Engineering, Polytechnique Montreal
+Geordan Jove, Aerospace Engineering, Department of Mechanical Engineering, Polytechnique Montreal
 
 ## I. Introduction
 Like many young people, all member of this team have an interest in video games, more particularly in computer games. Therefore, this project has for goal to build a recommender system for computer game.
@@ -95,6 +94,6 @@ All the dataframe rows produced by this functions are combine and are printed in
 
 ## IV. Evaluation & Analysis
 ## V. Related Work
-For the content-based recommender system we used the some code from the blog post [Recommender Systems in Python: Beginner Tutorial] (https://www.datacamp.com/community/tutorials/recommender-systems-python?fbclid=IwAR1fz9YLOgZ95KHwoLpgb-hTdV2MekujDGBngRTG3kYmBJYxwSK3UWvNJDg) to implement the function that give the recommendation for each games.
+For the content-based recommender system we used the some code from the blog post [Recommender Systems in Python: Beginner Tutorial](https://www.datacamp.com/community/tutorials/recommender-systems-python?fbclid=IwAR1fz9YLOgZ95KHwoLpgb-hTdV2MekujDGBngRTG3kYmBJYxwSK3UWvNJDg) to implement the function that give the recommendation for each games.
 ## VI. Conclusion: Discussion
 
