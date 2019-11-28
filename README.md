@@ -58,8 +58,16 @@ In order to generate recommendations, the class ImplicitCollaborativeRecommender
 <script src="https://gist.github.com/g30rdan/d992457bf34607493c19341c96761387.js"></script>
 
 
-### Collaborative recommender with EM
+### Collaborative recommender with EM and SVD
 
+Becaused our recommendation system should take consideration the games hasn't been played. We could create a rating system for games based on distribution of playing hours. Such like hours of some free bad games could have a distribution under 2 hours. As following, We use the EM algorithm rather than percentiles to present the distribution. In the EM algorithm, We use 5 groups as 5 stars to distinguish the good from the bad.
+
+![Image text](https://raw.githubusercontent.com/AudreyGermain/Game-Recommendation-System/master/plots/EM%20plot.png?token=AKJKIZO5MDSWOLNZU7P6S2S55BWKU)
+
+According to the plot, we could see the there are most of the users of Witcher 3 distribute in 4-5 groups. However there are a few users quickly lost their interests. It make sense to request a refund for the game that have benn played less than 2 hours. As you can see EM algorithm does a great job finding the groups of people with similar gaming habits and would potentially rate the game in a similar way. It does have some trouble converging which isn't surprising however the resulting distributions look very reasonable. 
+
+
+ 
 ### Content-based recommender
 
 To generate the recommendation for each game, the following function is used. The input of the function is the title of
@@ -159,7 +167,10 @@ All the dataframe rows produced by this functions are combine and are printed in
 
 For the content-based recommender system we used the some code from the blog post
 [Recommender Systems in Python: Beginner Tutorial](https://www.datacamp.com/community/tutorials/recommender-systems-python?fbclid=IwAR1fz9YLOgZ95KHwoLpgb-hTdV2MekujDGBngRTG3kYmBJYxwSK3UWvNJDg)
-to implement the function that give the recommendation for each games.<br/>
+to implement the function that give the recommendation for each games.
+
+For EM algorithm 
+[Machine Learning with Python: Exception Maximization and Gussian Mixture Models in Python](https://www.python-course.eu/expectation_maximization_and_gaussian_mixture_models.php)<br/>
 
 ## VI. Conclusion: Discussion
 
