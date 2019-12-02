@@ -222,6 +222,6 @@ for idx, user in tqdm(enumerate(users['user'].values)):
 df = pd.DataFrame(result)
 columns = ['user'] + ['top_{}'.format(i) for i in range(top_N)]
 df.columns = columns
-df.to_csv('./data/result.csv', index=None)
+df.to_csv('./data/output_data/Collaborative_EM_output.csv', index=None)
 
 
