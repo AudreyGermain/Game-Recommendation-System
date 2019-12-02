@@ -88,7 +88,7 @@ class ImplicitCollaborativeRecommender:
         # Create lookup tables for 'user_id - user' and 'item_id - item'.
         lookup_user = df_data[[col_user_intl, col_user]].drop_duplicates()
         lookup_user[col_user_intl] = lookup_user[col_user_intl].astype(str)
-        lookup_user[col_user] = lookup_user[col_user].astype(str)
+        lookup_user[col_user] = lookup_user[col_user].astype(int).astype(str)
         lookup_game = df_data[[col_item_intl, col_item]].drop_duplicates()
         lookup_game[col_item_intl] = lookup_game[col_item_intl].astype(str)
 
@@ -187,16 +187,20 @@ class ImplicitCollaborativeRecommender:
         output = []
         for item in items:
             item_id = lookup_items[col_item_intl]. \
-                loc[lookup_items[col_item_o] == str(item)]. \
-                to_string(index=False).strip()
-            similar = model.similar_items(int(item_id), n_similar)
+                loc[lookup_items[col_item_o] == str(item)]
 
-            item_names = []
-            for item_id_r, score in similar:
-                item_name = lookup_items[col_item_o]. \
-                    loc[lookup_items[col_item_intl] == str(item_id_r)]. \
-                    to_string(index=False).strip()
-                item_names.append(item_name)
+            if item_id.empty:
+                item_names = [-999] * n_similar
+            else:
+                item_id = item_id.to_string(index=False).strip()
+                similar = model.similar_items(int(item_id), n_similar)
+
+                item_names = []
+                for item_id_r, score in similar:
+                    item_name = lookup_items[col_item_o]. \
+                        loc[lookup_items[col_item_intl] == str(item_id_r)]. \
+                        to_string(index=False).strip()
+                    item_names.append(item_name)
 
             output.append(item_names)
 
@@ -228,18 +232,23 @@ class ImplicitCollaborativeRecommender:
         output = []
         for user in users:
             user_id = lookup_users[col_user_intl]. \
-                loc[lookup_users[col_user_o] == str(user)]. \
-                to_string(index=False).strip()
-            recommended = model.recommend(int(user_id),
-                                          self.__m_user_item,
-                                          n_recommendation)
+                loc[lookup_users[col_user_o] == str(user)]
 
-            item_names = []
-            for item_id, score in recommended:
-                item_name = lookup_items[col_item_o]. \
-                    loc[lookup_items[col_item_intl] == str(item_id)]. \
-                    to_string(index=False).strip()
-                item_names.append(item_name)
+            if user_id.empty:
+                item_names = [-999] * n_recommendation
+            else:
+                user_id = user_id.to_string(index=False).strip()
+                recommended = model.recommend(int(user_id),
+                                              self.__m_user_item,
+                                              n_recommendation,
+                                              False)
+
+                item_names = []
+                for item_id, score in recommended:
+                    item_name = lookup_items[col_item_o]. \
+                        loc[lookup_items[col_item_intl] == str(item_id)]. \
+                        to_string(index=False).strip()
+                    item_names.append(item_name)
 
             output.append([user, *item_names])
 
@@ -252,7 +261,15 @@ class ImplicitCollaborativeRecommender:
 
 
 if __name__ == "__main__":
-    csv_location = r'data/purchase_play.csv'
-    f_implicit = ImplicitCollaborativeRecommender(csv_location)
-    df_sim = f_implicit.similar_items(['Dota 2', 'Fallout 4', 'Left 4 Dead 2'], 10)
-    df_rec = f_implicit.recommend([59945701, 297811211, 151603712], 10)
+    # Get users from test data for which recommendations will be generated.
+    test_location = r'../../data/model_data/steam_user_test.csv'
+    df_test = pd.read_csv(test_location)
+    list_users = df_test['user_id'].to_list()
+
+    # Create collaborative recommender model (ALS).
+    train_location = r'../../data/model_data/steam_user_train.csv'
+    f_implicit = ImplicitCollaborativeRecommender(train_location)
+    # df_sim = f_implicit.similar_items(['Dota 2', 'xxxxx', 'Fallout 4', 'Left 4 Dead 2'], 20)
+    df_rec = f_implicit.recommend(list_users, 20)
+    df_rec.to_csv(r'../../data/output_data/Collaborative_recommender_als_output.csv',
+                  index=False)
