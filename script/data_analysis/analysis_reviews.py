@@ -3,7 +3,7 @@ import re
 import pathlib
 
 # Get data from CSV
-locationGamesFile = pathlib.Path(r'data/steam_games.csv')
+locationGamesFile = pathlib.Path(r'../../data/raw_data/steam_games.csv')
 dataGames = read_csv(locationGamesFile)
 
 # add and initialize new columns
@@ -30,6 +30,6 @@ possibleReview = dataGames["review_qualification"].unique()
 print(possibleReview)
 
 # print csv of reviews
-dataGames.to_csv(pathlib.Path(r'data/steam_games_reviews.csv'),
+dataGames.to_csv(pathlib.Path(r'../../data/intermediate_data/steam_games_reviews.csv'),
                  columns=["name", "percentage_positive_review", "review_qualification", "all_reviews"],
                  index=False)
