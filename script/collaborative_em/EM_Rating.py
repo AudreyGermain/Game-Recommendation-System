@@ -96,6 +96,7 @@ def rmse(pred, test, data_frame=False):
 print("Dimensions of training user-item matrix:", ui_train.shape)
 
 
+
 # Basic svd
 Y = pd.DataFrame(ui_train).copy()
 
@@ -113,7 +114,7 @@ ggplot(p_df, aes(x='x', y='y')) + \
 lc = 60
 pred = np.dot(np.dot(U[:, :lc], np.diag(D[:lc])), V[:lc, :])
 
-print(rmse(pred, test))
+#print(rmse(pred, test))
 rmse(pred, test, True).head()
 
 # SVD via gradient descent
@@ -153,7 +154,7 @@ fojb = np.array(fobj)
 rmsej = np.array(rmsej)
 path1 = pd.DataFrame({'itr': range(1, N+2), 'fobj': fobj, 'fobjp': fobj/max(fobj), 'rmse': rmsej, 'rmsep': rmsej/max(rmsej)})
 path1gg = pd.melt(path1[["itr", "fobjp", "rmsep"]], id_vars=['itr'])
-print(path1.tail(1))
+#print(path1.tail(1))
 
 
 ggplot(path1gg, aes('itr', 'value', color = 'variable')) + geom_line()
@@ -213,13 +214,14 @@ def top(n, user, print_value=True):
     
 top_N = 10
 result = []
+
 for idx, user in tqdm(enumerate(users['user'].values)):
     result.append(top(top_N, user, False))
-    #if idx > 10:
-    #     break
+    if idx > 8000:
+      break
 df = pd.DataFrame(result)
 columns = ['user'] + ['top_{}'.format(i) for i in range(top_N)]
 df.columns = columns
-df.to_csv('./data/result.csv', index=None)
+df.to_csv('./data/output_data/Collaborative_EM_output.csv', index=None)
 
 
