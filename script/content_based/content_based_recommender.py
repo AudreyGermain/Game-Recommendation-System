@@ -7,7 +7,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 n_recommendation = 20
 
 # Get games data from CSV
-locationGamesFile = pathlib.Path(r'data/processed_games_for_content-based.csv')
+locationGamesFile = pathlib.Path(r'../../data/intermediate_data/processed_games_for_content-based.csv')
 dataGames = read_csv(locationGamesFile)
 
 # need to do some modification on data to make sure there is no NaN in column
@@ -67,7 +67,7 @@ col_names = ["user_id"] + col_names
 recommendationByUserData = DataFrame(columns=col_names)
 
 # get review info from csv
-locationReviewFile = pathlib.Path(r'data/steam_games_reviews.csv')
+locationReviewFile = pathlib.Path(r'../../data/intermediate_data/steam_games_reviews.csv')
 dataReviews = read_csv(locationReviewFile, usecols=["name", "percentage_positive_review"],)
 
 
@@ -110,7 +110,7 @@ def make_recommendation_for_user(user_id, game_list, game_user_have):
 # print(get_recommendations('Dota 2', cosine_sim_matrix_genre))
 
 # Get users data from CSV
-locationUsersFile = pathlib.Path(r'data/purchase_play.csv')   # data/purchase_play
+locationUsersFile = pathlib.Path(r'../../data/model_data/steam_user_train.csv')   # data/purchase_play
 dataUsers = read_csv(locationUsersFile)
 
 previousId = ""
@@ -134,7 +134,7 @@ recommendationByUserData = concat([recommendationByUserData,
                                    make_recommendation_for_user(previousId, listSuggestion, listGamesUserHas)],
                                   ignore_index=True)
 
-locationOutputFile = pathlib.Path(r'data/Content-based-recommender-output.csv')
+locationOutputFile = pathlib.Path(r'../../data/output_data/content_based_recommender_output.csv')
 recommendationByUserData.to_csv(locationOutputFile, index=False)
 
 
