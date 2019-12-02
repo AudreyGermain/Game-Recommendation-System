@@ -2,11 +2,11 @@ from pandas import read_csv
 import pathlib
 
 # Get games data from CSV
-locationGamesFile = pathlib.Path(r'data/games_used.csv')
+locationGamesFile = pathlib.Path(r'../../data/intermediate_data/games_used.csv')
 dataGames = read_csv(locationGamesFile,
                      usecols=["name", "genre", "game_details", "popular_tags", "publisher", "developer"])
 
-locationIDFile = pathlib.Path(r'data/games_ID_name_corresponding_table.csv')
+locationIDFile = pathlib.Path(r'../../data/intermediate_data/games_ID_name_corresponding_table.csv')
 dataUsersGames = read_csv(locationIDFile)
 usedGames = dataGames
 
@@ -35,4 +35,4 @@ usedGames['developer'] = usedGames['developer'].apply(clean_data)
 
 usedGames.drop_duplicates("name")
 
-usedGames.to_csv(pathlib.Path(r'data/processed_games_for_content-based.csv'), index=False)
+usedGames.to_csv(pathlib.Path(r'../../data/intermediate_data/processed_games_for_content-based.csv'), index=False)
