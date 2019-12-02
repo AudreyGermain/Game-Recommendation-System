@@ -3,11 +3,11 @@ from pandas import read_csv
 import pathlib
 
 # Get games data from CSV
-locationGamesFile = pathlib.Path(r'data/steam_games.csv')
+locationGamesFile = pathlib.Path(r'../../data/raw_data/steam_games.csv')
 dataGames = read_csv(locationGamesFile,
                      usecols=["name"])
 
-locationUsersFile = pathlib.Path(r'data/steam-200k.csv')
+locationUsersFile = pathlib.Path(r'../../data/raw_data/steam_users.csv')
 dataUsers = read_csv(locationUsersFile, header=None, usecols=[0, 1, 2, 3],
                      names=["user_id", "game_name", "behavior", "hours"])
 
@@ -29,5 +29,5 @@ for i, row in dataUsers.iterrows():
 print(dataGames['ID'])
 print(dataUsers['ID'])
 
-dataUsers.to_csv(pathlib.Path(r'data/usersWithID.csv'), index=False)
-dataGames.to_csv(pathlib.Path(r'data/gamesWithID.csv'), index=False)
+dataUsers.to_csv(pathlib.Path(r'../../data/intermediate_data/usersWithID.csv'), index=False)
+dataGames.to_csv(pathlib.Path(r'../../data/intermediate_data/gamesWithID.csv'), index=False)
