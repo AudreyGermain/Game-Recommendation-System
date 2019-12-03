@@ -10,25 +10,23 @@ n_recommendation = 20
 locationGamesFile = pathlib.Path(r'../../data/intermediate_data/processed_games_for_content-based.csv')
 dataGames = read_csv(locationGamesFile)
 
-# need to do some modification on data to make sure there is no NaN in column
-dataGames['popular_tags'] = dataGames['popular_tags'].fillna('')
-# Compute the Cosine Similarity matrix using the popular tags column
-count = CountVectorizer(stop_words='english')
-count_matrix_popular_tags = count.fit_transform(dataGames['popular_tags'])
-cosine_sim_matrix_popular_tags = cosine_similarity(count_matrix_popular_tags, count_matrix_popular_tags)
+# Get users data from CSV
+locationUsersFile = pathlib.Path(r'../../data/model_data/steam_user_train.csv')   # data/purchase_play
+dataUsers = read_csv(locationUsersFile)
 
-# need to do some modification on data to make sure there is no NaN
-dataGames['genre'] = dataGames['genre'].fillna('')
-# Compute the Cosine Similarity matrix using the genre column
-count = CountVectorizer(stop_words='english')
-count_matrix_genre = count.fit_transform(dataGames['genre'])
-cosine_sim_matrix_genre = cosine_similarity(count_matrix_genre, count_matrix_genre)
+# get review info from csv
+locationReviewFile = pathlib.Path(r'../../data/intermediate_data/steam_games_reviews.csv')
+dataReviews = read_csv(locationReviewFile, usecols=["name", "percentage_positive_review"],)
 
 # Construct a reverse map of indices and game names
 indices = Series(dataGames.index, index=dataGames['name']).drop_duplicates()
 
 # get list of games we have info about
 listGames = dataGames['name'].unique()
+
+# create dataframe for recommendations
+col_names = list(map(str, range(1, n_recommendation + 1)))
+col_names = ["user_id"] + col_names
 
 
 # Function that takes in game name and Cosine Similarity matrix as input and outputs most similar games
@@ -61,16 +59,6 @@ def get_recommendations(title, cosine_sim):
     return dataGames['name'].iloc[movie_indices].tolist()
 
 
-# create dataframe for recommendations
-col_names = list(map(str, range(1, n_recommendation + 1)))
-col_names = ["user_id"] + col_names
-recommendationByUserData = DataFrame(columns=col_names)
-
-# get review info from csv
-locationReviewFile = pathlib.Path(r'../../data/intermediate_data/steam_games_reviews.csv')
-dataReviews = read_csv(locationReviewFile, usecols=["name", "percentage_positive_review"],)
-
-
 def make_recommendation_for_user(user_id, game_list, game_user_have):
     if type(game_list) is not list or len(game_list) == 0:
         # return empty one
@@ -90,52 +78,39 @@ def make_recommendation_for_user(user_id, game_list, game_user_have):
                          columns=col_names)
 
 
-# exemple of recommendation
-# print("example with game TERA:")
-# print("recommendation by popular tags:")
-# print(get_recommendations('TERA', cosine_sim_matrix_popular_tags))
-# print("recommendation by genre:")
-# print(get_recommendations('TERA', cosine_sim_matrix_genre))
-#
-# print("example with game DOOM:")
-# print("recommendation by popular tags:")
-# print(get_recommendations('DOOM', cosine_sim_matrix_popular_tags))
-# print("recommendation by genre:")
-# print(get_recommendations('DOOM', cosine_sim_matrix_genre))
-#
-# print("example with game Dota 2:")
-# print("recommendation by popular tags:")
-# print(get_recommendations('Dota 2', cosine_sim_matrix_popular_tags))
-# print("recommendation by genre:")
-# print(get_recommendations('Dota 2', cosine_sim_matrix_genre))
+def generate_recommendation_output(column_name, location_output_file):
+    recommendationByUserData = DataFrame(columns=col_names)
 
-# Get users data from CSV
-locationUsersFile = pathlib.Path(r'../../data/model_data/steam_user_train.csv')   # data/purchase_play
-dataUsers = read_csv(locationUsersFile)
+    # need to do some modification on data to make sure there is no NaN in column
+    dataGames[column_name] = dataGames[column_name].fillna('')
+    # Compute the Cosine Similarity matrix using the popular tags column
+    count = CountVectorizer(stop_words='english')
+    count_matrix_popular_tags = count.fit_transform(dataGames[column_name])
+    cosine_sim_matrix_popular_tags = cosine_similarity(count_matrix_popular_tags, count_matrix_popular_tags)
 
-previousId = ""
-listSuggestion = list()
-listGamesUserHas = list()
+    previousId = ""
+    listSuggestion = list()
+    listGamesUserHas = list()
 
-# loop on all row and get recommendations for user
-for j, row in dataUsers.iterrows():
-    if previousId != row["user_id"]:
-        recommendationByUserData = concat([recommendationByUserData,
-                                           make_recommendation_for_user(previousId, listSuggestion, listGamesUserHas)],
-                                          ignore_index=True)
-        previousId = row["user_id"]
-        listSuggestion = list()
-        listGamesUserHas = list()
-    listGamesUserHas.extend([row["game_name"]])
-    listSuggestion.extend(get_recommendations(row["game_name"], cosine_sim_matrix_popular_tags))
+    # loop on all row and get recommendations for user
+    for j, row in dataUsers.iterrows():
+        if previousId != row["user_id"]:
+            recommendationByUserData = concat([recommendationByUserData,
+                                               make_recommendation_for_user(previousId, listSuggestion, listGamesUserHas)],
+                                              ignore_index=True)
+            previousId = row["user_id"]
+            listSuggestion = list()
+            listGamesUserHas = list()
+        listGamesUserHas.extend([row["game_name"]])
+        listSuggestion.extend(get_recommendations(row["game_name"], cosine_sim_matrix_popular_tags))
 
-# add the last element for the last user
-recommendationByUserData = concat([recommendationByUserData,
-                                   make_recommendation_for_user(previousId, listSuggestion, listGamesUserHas)],
-                                  ignore_index=True)
+    # add the last element for the last user
+    recommendationByUserData = concat([recommendationByUserData,
+                                       make_recommendation_for_user(previousId, listSuggestion, listGamesUserHas)],
+                                      ignore_index=True)
 
-locationOutputFile = pathlib.Path(r'../../data/output_data/content_based_recommender_output.csv')
-recommendationByUserData.to_csv(locationOutputFile, index=False)
+    recommendationByUserData.to_csv(location_output_file, index=False)
 
 
-
+generate_recommendation_output('popular_tags',
+                               pathlib.Path(r'../../data/output_data/content_based_recommender_output.csv'))
