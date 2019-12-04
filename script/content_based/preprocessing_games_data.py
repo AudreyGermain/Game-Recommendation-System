@@ -58,6 +58,11 @@ usedGames.loc[:, 'popular_tags'] = usedGames['popular_tags'].apply(clean_data)
 usedGames.loc[:, 'publisher'] = usedGames['publisher'].apply(clean_data)
 usedGames.loc[:, 'developer'] = usedGames['developer'].apply(clean_data)
 
+# create some column containing a mix of different information
+usedGames["genre_publisher_developer"] = usedGames['genre'] + usedGames['publisher'] + usedGames['developer']
+usedGames["genre_popular_tags_developer"] = usedGames['genre'] + usedGames['popular_tags'] + usedGames['developer']
+usedGames["genre_popular_tags_game_details"] = usedGames['genre'] + usedGames['popular_tags'] + usedGames['game_details']
+
 usedGames.drop_duplicates("name")
 usedGames.to_csv(pathlib.Path(r'../../data/intermediate_data/processed_games_for_content-based.csv'), index=False)
 

@@ -3,7 +3,7 @@ import pathlib
 
 n_recommendation = 20
 
-locationAlgoOutputFile = pathlib.Path(r'../data/output_data/Content_based_recommender_output.csv')
+locationAlgoOutputFile = pathlib.Path(r'../data/output_data/content_based_recommender_output_genre_publisher_developer.csv')
 dataOutputs = read_csv(locationAlgoOutputFile)
 
 locationTestFile = pathlib.Path(r'../data/model_data/steam_user_test.csv')
@@ -27,5 +27,5 @@ for i, row in dataOutputs.iterrows():
 print(dataOutputs["ratio"].describe(include=[float]))
 print(dataOutputs["numberRecommendationUserHas"].describe(include=[float]))
 print(dataOutputs["numberGamesUserHasInTest"].describe(include=[float]))
-dataOutputs.to_csv(pathlib.Path(r'../data/evaluation_data/Content-based-evaluation.csv'),
+dataOutputs.to_csv(pathlib.Path(r'../data/evaluation_data/Content_based_evaluation_genre_publisher_developer.csv'),
                    columns=["user_id", "ratio", "numberRecommendationUserHas", "numberGamesUserHasInTest"], index=False)
