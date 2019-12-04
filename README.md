@@ -16,6 +16,25 @@ The primary focus of this project is to build a recommendation system that will 
 their preferences and gaming habits. In order to make our recommendation system the best possible, multiple algorithms
 will be implemented and compared to make the recommendation the most relevant possible for each users.<br/>
 
+There are three main types of recommendation system: collaborative filtering, content-based filtering and hybrid recommendation system. 
+The collaborative filtering is based on the principle that if two people liked the same things in the past, 
+if one of them like something the other is likely to like it too. 
+The advantage of this filtering method is that the algorithm doesn’t need to understand or process the content 
+of the items it recommends. The content-based filtering is based on the description of the items to recommend 
+similar items and recommend items similar to what a user likes. 
+Finally, the hybrid recommendation system consists of combining content based and collaborative filtering, 
+either by using an algorithm that uses both or by combining the recommendation found by both methods. 
+According to research combining both results is a better recommendation than using only one of them. <br/>
+
+The data used for a recommendation system can be explicit, such as comment or rating, 
+or implicit, such as behavior and events like order history, search logs, clicks, etc. 
+The implicit data is harder to process because it’s hard to determine which information is useful and useless, 
+but it’s easier to acquire than explicit data because the user doesn’t need to do anything more than 
+using the website or app as usual. <br/>
+
+In this project we implemented 2 collaboratives and 1 content based algorithm. 
+We used implicite data from the users to implement them.
+
 ## II. Datasets
 For this project, 2 differents datasets are used. Both dataset are available for free on kaggle and are extracted from Steam.<br/>
 
@@ -162,6 +181,32 @@ ordered from the best review to the worst. If there is less recommendations then
 All the dataframe rows produced by this functions are combine and are printed in a CSV file.<br/>
 
 ## IV. Evaluation & Analysis
+
+To compare the different algorithms we created a script that calculate the ratio of games the user has 
+(in the test dataset) that are in the top 20 recommendations and the amount of games the user has in the
+test dataset. The mean of the ratio for all users is the calculated. The ratio is a bit low because for some
+user in the training dataset it was not possible to get the recommendations and some user don't have games
+in the test dataset, in those cases the ratio will be 0. <br>
+
+First of all, we compared the content based algorithm with different input. 
+Those input are either column from the original dataset or a combination of different columns. 
+In the following table we ca see the ratio for the different inputs. 
+As we can see, the best algorithm is the one that uses the genre, publisher and developer of the game as input.
+This version will be used to compare the other 2 algorithms.
+
+Algorithm| Ratio
+------------ | -------------
+Popular tags| 0.6455%
+Genre | 1.1295%
+Genre, popular tags & developer | 0.6992%
+Genre, popular tags & game details | 0.9234%
+Genre, publisher & developer | 1.8377%
+
+Algorithm| Ratio
+------------ | -------------
+Collaborative with ALS| %
+Collaborative with EM and SVD | %
+Content-based (Genre, publisher & developer) | 1.8377%
 
 ## V. Related Work
 
