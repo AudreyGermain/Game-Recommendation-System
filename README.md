@@ -9,7 +9,9 @@
 Like many young people, all member of this team have an interest in video games, more particularly in computer games.
 Therefore, this project has for goal to build a recommender system for computer game.<br/>
 
-For this project we are using the data from the Steam the biggest video game digital distribution service for computer games.
+This project was implemented as our final project for the course Introduction to Artificial Intelligence (ITE351) at Hanyang University.<br/>
+
+For this project we are using the data from Steam the biggest video game digital distribution service for computer games.
 We will be using some user data and game data, the datasets used will be explained in detail further in this blog.<br/>
 
 The primary focus of this project is to build a recommendation system that will recommend games for each user based on
@@ -38,7 +40,7 @@ We used implicite data from the users to implement them.
 ## II. Datasets
 For this project, 2 differents datasets are used. Both dataset are available for free on kaggle and are extracted from Steam.<br/>
 
-The first dataset is the user dataset. It contains the user id, the game, the behavior and the amount of hours played.
+The first dataset is the [user](https://www.kaggle.com/tamber/steam-video-games) dataset. It contains the user id, the game, the behavior and the amount of hours played.
 So each row of the dataset represent the behavior (play or purchase) of a user towards a game.
 The amount of hours played is also specify, the column contains 1 if it's a purchase.
 The dataset contains a total of 200000 rows, including 5155 different games and 12393 different users.
@@ -47,7 +49,7 @@ in this new form, the columns are user ID, name of the game, amount of hours of 
 and 1 if played) and purchase (technically always 1), this created a total of 128804 rows. Then we extracted 20% of
 all the rows (25761 rows) for the test dataset and kept the rest  (103043 rows) for the training dataset.<br/>
 
-The second dataset contains a list of games and their descriptions. It contains the url (directed to Steam store),
+The second dataset contains a list of [games](https://www.kaggle.com/trolukovich/steam-games-complete-dataset/version/1) and their descriptions. It contains the url (directed to Steam store),
 the type of package (app, bundle…), the name of the game, a short description, recent reviews, all reviews, release date,
 developper, publisher, popular tags (Gore, Action, Shooter, PvP…), game detail (Multi-player, Single-player, Full controller support…),
 languages, achievements, genre (Action, Adventure, RPG, Strategy…), game description, description of mature content,
@@ -57,7 +59,7 @@ There is a total of 51920 games in the dataset.<br/>
 ## III. Methodology
 
 We decided to use 3 differents algorithms to generate recommendation by user. We use 2 collaborative algorithm,
-one using the ALS and one using the EM algorithm and we use one content-based algorithm.<br/>
+one using the ALS and one using the EM and SVD algorithms and we use one content-based algorithm.<br/>
 
 ### Collaborative recommender with ALS
 This section describes a simple implementation of a collaborative filtering recommendation algorithm using matrix factorization with implicit data.
@@ -204,18 +206,22 @@ Genre, publisher & developer | 1.8377%
 
 Algorithm| Ratio
 ------------ | -------------
-Collaborative with ALS| %
+Collaborative with ALS| 2.6707%
 Collaborative with EM and SVD | %
 Content-based (Genre, publisher & developer) | 1.8377%
 
 ## V. Related Work
 
+To understand what a recommender system is and the different types, we used [this article](https://marutitech.com/recommendation-engine-benefits/).<br/>
+
+To manipulate the datasets, we used the [pandas](https://pandas.pydata.org/) library.<br/>
+
 For the content-based recommender system we used the some code from the blog post
 [Recommender Systems in Python: Beginner Tutorial](https://www.datacamp.com/community/tutorials/recommender-systems-python?fbclid=IwAR1fz9YLOgZ95KHwoLpgb-hTdV2MekujDGBngRTG3kYmBJYxwSK3UWvNJDg)
-to implement the function that give the recommendation for each games.
+to implement the function that give the recommendation for each games.<br/>
 
-For EM algorithm 
-[Machine Learning with Python: Exception Maximization and Gussian Mixture Models in Python](https://www.python-course.eu/expectation_maximization_and_gaussian_mixture_models.php)<br/>
+For the EM algorithm we used the article
+[Machine Learning with Python: Exception Maximization and Gaussian Mixture Models in Python](https://www.python-course.eu/expectation_maximization_and_gaussian_mixture_models.php).<br/>
 
 ## VI. Conclusion: Discussion
 
