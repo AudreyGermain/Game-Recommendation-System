@@ -122,6 +122,8 @@ generate_recommendation_output('genre_popular_tags_developer',
                                pathlib.Path(r'../../data/output_data/content_based_recommender_output_genre_popular_tags_developer.csv'))
 generate_recommendation_output('genre_popular_tags_game_details',
                                pathlib.Path(r'../../data/output_data/content_based_recommender_output_genre_popular_tags_game_details.csv'))
+generate_recommendation_output('genre_publisher_developer_game_details',
+                               pathlib.Path(r'../../data/output_data/content_based_recommender_output_genre_publisher_developer_game_details.csv'))
 
 
 # name,developer,publisher,popular_tags,game_details,genre,ID,genre_publisher_developer,genre_popular_tags_developer,genre_popular_tags_game_details
