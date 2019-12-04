@@ -12,7 +12,7 @@ from sklearn.mixture import GaussianMixture
 from sklearn.model_selection import train_test_split
 from math import sqrt
 
-locationUsersFile=pathlib.Path(r'data/steam-200k.csv')
+locationUsersFile=pathlib.Path(r'C:\Users\ammis\IdeaProjects\Game-Recommendation-System\data\raw_data\steam_users.csv')
 steam = pd.read_csv(locationUsersFile, header=None, names=['user', 'game', 'purchase_play', 'hrs', 'tmp'])
 steam.drop('tmp', inplace=True, axis=1)
 steam_clean = steam
@@ -201,7 +201,7 @@ def top(n, user, print_value=True):
     t_user = user
     user = user_dict[user]
     top_games = (pred*not_purchased).iloc[user]
-    top_games = list(top_games.sort_values(ascending=False)[:10].index)
+    top_games = list(top_games.sort_values(ascending=False)[:20].index)
     if print_value:
         print('top {} recommended games for user {}: '.format(n, t_user))
         for i in range(n):
@@ -212,16 +212,16 @@ def top(n, user, print_value=True):
             result.append(reverse_game_dict[top_games[i]])
         return result
     
-top_N = 10
+top_N = 20
 result = []
 
 for idx, user in tqdm(enumerate(users['user'].values)):
     result.append(top(top_N, user, False))
-    if idx > 8000:
+    if idx ==8212:
       break
 df = pd.DataFrame(result)
-columns = ['user'] + ['top_{}'.format(i) for i in range(top_N)]
+columns = ['user'] + ['top_{}'.format(i+1) for i in range(top_N)]
 df.columns = columns
-df.to_csv('./data/output_data/Collaborative_EM_output.csv', index=None)
+df.to_csv('./output.csv', index=None)
 
 
