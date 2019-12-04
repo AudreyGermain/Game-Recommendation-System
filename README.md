@@ -203,11 +203,16 @@ Genre | 1.1295%
 Genre, popular tags & developer | 0.6992%
 Genre, popular tags & game details | 0.9234%
 Genre, publisher & developer | 1.8377%
+Genre, publisher, developer & game details | 1.6943%
+
+We calculated the ratio in the same way for both of the collaborative algorithm, the result are in the following table.
+As we can see, the collaborative recommender with ALS is the best one, followed by the content based recommender.
+The performance of the collaborative recommendation system with EM and SVD is far behind the other 2.
 
 Algorithm| Ratio
 ------------ | -------------
 Collaborative with ALS| 2.6707%
-Collaborative with EM and SVD | %
+Collaborative with EM and SVD | 0.2557%
 Content-based (Genre, publisher & developer) | 1.8377%
 
 ## V. Related Work
@@ -225,3 +230,6 @@ For the EM algorithm we used the article
 
 ## VI. Conclusion: Discussion
 
+It would be interesting to create an hybrid recommender system using the collaborative recommender with the ALS 
+algorithm and the content based algorithm using the genre, publisher and developer as input to see if we can make 
+a recommender system even more effective then the 2 on their own.
