@@ -78,12 +78,11 @@ As you can see Dota 2 has the highest number of players and the highest number o
 
 [//]: # (Histogram 1: all users: play + purchase)
 Then we count the number of users for each games, and output a histograph to make the data visualization. 
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_AllUsersHrs.png?raw=true)
-
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_AllUsersHrs.png)
 
 [//]: # (Histogram 2: only users: play)
 After we removed the users who just purchased the games but hasn't played. Some games fell from the top 20.
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_UsersHrs.png?raw=true)
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_UsersHrs.png)
 Some Games like these add noise to the dataset. So that's one of the reasons we use EM algorithms to create rating system for the games.
 
 [//]: # (Box plot)
@@ -135,9 +134,9 @@ In order to generate recommendations, the class ImplicitCollaborativeRecommender
 
 Becaused our recommendation system should take consideration the games hasn't been played. We could create a rating system for games based on distribution of playing hours. Such like hours of some free bad games could have a distribution under 2 hours. As following, We use the EM algorithm rather than percentiles to present the distribution. In the EM algorithm, We use 5 groups as 5 stars to distinguish the good from the bad.
 
-![Image text](https://raw.githubusercontent.com/AudreyGermain/Game-Recommendation-System/master/plots/EM%20plot.png?token=AKJKIZO5MDSWOLNZU7P6S2S55BWKU)
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/EM_SingleAnalysis.png)
 
-According to the plot, we could see the there are most of the users of Witcher 3 distribute in 4-5 groups. However there are a few users quickly lost their interests. It make sense to request a refund for the game that have benn played less than 2 hours. As you can see EM algorithm does a great job finding the groups of people with similar gaming habits and would potentially rate the game in a similar way. 
+According to the plot, we could see the there are most of the users of Fallout 4 distribute in 4-5 groups. However there are a few users quickly lost their interests. It make sense to request a refund for the game that have benn played less than 2 hours. As you can see EM algorithm does a great job finding the groups of people with similar gaming habits and would potentially rate the game in a similar way. 
 
 It does have some trouble converging which iThis example will use a gradient descent approach to find optimal U and V matrices which retain the actual observations with predict the missing values by drawing on the information between similar users and games. I have chosen a learning rate of 0.001 and will run for 200 iterations tracking the RMSE. The objective function is the squared error between the actual observed values and the predicted values. The U and V matrices are initialised with a random draw from a ~N(0, 0.01) distibution. This may take a few minutes to run.sn't surprising however the resulting distributions look very reasonable. 
 
