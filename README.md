@@ -40,15 +40,30 @@ We used implicite data from the users to implement them.
 ## II. Datasets
 For this project, 2 differents datasets are used. Both dataset are available for free on kaggle and are extracted from Steam.<br/>
 
+### a. User Dataset
+
+[//]: # (User Dataset description)
 The first dataset is the [user](https://www.kaggle.com/tamber/steam-video-games) dataset. It contains the user id, the game, the behavior and the amount of hours played.
 So each row of the dataset represent the behavior (play or purchase) of a user towards a game.
 The amount of hours played is also specify, the column contains 1 if it's a purchase.
 The dataset contains a total of 200000 rows, including 5155 different games and 12393 different users.
-To create a training and testing dataset, we started by combining the information about play and purchase in a single row,
-in this new form, the columns are user ID, name of the game, amount of hours of play time, play (0 if never played
-and 1 if played) and purchase (technically always 1), this created a total of 128804 rows. Then we extracted 20% of
-all the rows (25761 rows) for the test dataset and kept the rest  (103043 rows) for the training dataset.<br/>
 
+[//]: # (Reformat with purchase/play columns)
+The third dataset is a list we split out the purchase/play column into two columns. Because The raw 'purchase' row records 1 hour, Clearly this doesn't make any sense so we remove it during the process of splitting the column and calculate the correct 'play' hours.
+
+[//]: # (Histogram 1: all users: play + purchase)
+Then we count the number of users for each games, and output a histograph to make the data visualization. 
+
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_AllUsersHrs.png?raw=true)
+
+As you can see Dota 2 has the highest number of players and the highest number of total hours played so undeniably the most popular game. Where as other games such as "Half-Life 2 Lost Coast" have 981 users but a total of 184.4 hours played. I expect this game is in most cases a free bundle game. Some Games like these add noise to the dataset. So that's one of the reasons we use EM algorithms to create rating system for the games.
+
+[//]: # (Histogram 2: only users: play)
+
+[//]: # (Box plot)
+
+### b. Game Dataset
+[//]: # (Game Dataset description)
 The second dataset contains a list of [games](https://www.kaggle.com/trolukovich/steam-games-complete-dataset/version/1) and their descriptions. It contains the url (directed to Steam store),
 the type of package (app, bundle…), the name of the game, a short description, recent reviews, all reviews, release date,
 developper, publisher, popular tags (Gore, Action, Shooter, PvP…), game detail (Multi-player, Single-player, Full controller support…),
@@ -56,20 +71,21 @@ languages, achievements, genre (Action, Adventure, RPG, Strategy…), game descr
 minimum requirement to run the game, recommended requirement, original price and price with discount.
 There is a total of 51920 games in the dataset.<br/>
 
-The third dataset is a list we split out the purchase/play column into two columns. Because The raw 'purchase' row records 1 hour, Clearly this doesn't make any sense so we remove it during the process of splitting the column and calculate the correct 'play' hours.
-Then we count the number of users for each games, and output a histograph to make the data visualization. 
-
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_AllUsersHrs.png?raw=true)
-
-As you can see Dota 2 has the highest number of players and the highest number of total hours played so undeniably the most popular game. Where as other games such as "Half-Life 2 Lost Coast" have 981 users but a total of 184.4 hours played. I expect this game is in most cases a free bundle game. Some Games like these add noise to the dataset. So that's one of the reasons we use EM algorithms to create rating system for the games.
-
-
 ## III. Methodology
 
 We decided to use 3 differents algorithms to generate recommendation by user. We use 2 collaborative algorithm,
 one using the ALS and one using the EM and SVD algorithms and we use one content-based algorithm.<br/>
 
-### Collaborative recommender with ALS
+### Collaborative Recommender
+
+#### a. Training and Test Datasets
+[//]: # (Describe splitting of user dataset into training and testing)
+To create a training and testing dataset, we started by combining the information about play and purchase in a single row,
+in this new form, the columns are user ID, name of the game, amount of hours of play time, play (0 if never played
+and 1 if played) and purchase (technically always 1), this created a total of 128804 rows. Then we extracted 20% of
+all the rows (25761 rows) for the test dataset and kept the rest  (103043 rows) for the training dataset.<br/>
+
+#### b. Collaborative Recommender with ALS
 This section describes a simple implementation of a collaborative filtering recommendation algorithm using matrix factorization with implicit data.
 The work presented is based on the ["ALS Implicit Collaborative Filtering"](https://medium.com/radon-dev/als-implicit-collaborative-filtering-5ed653ba39fe "ALS Implicit Collaborative Filtering") and the ["A Gentle Introduction to Recommender Systems with Implicit Feedback"](https://jessesw.com/Rec-System/ "A Gentle Introduction to Recommender Systems with Implicit Feedback") blog posts.
 
@@ -84,10 +100,12 @@ As described on its documentation [here](https://implicit.readthedocs.io/en/late
 
 In order to generate recommendations, the class ImplicitCollaborativeRecommender is implemented in a python script. The code is available here below.
 
-<script src="https://gist.github.com/g30rdan/d992457bf34607493c19341c96761387.js"></script>
+[//]: # (<script src="https://gist.github.com/g30rdan/d992457bf34607493c19341c96761387.js"></script>)
+
+(To complete)
 
 
-### Collaborative recommender with EM and SVD
+#### c. Collaborative recommender with EM and SVD
 
 Becaused our recommendation system should take consideration the games hasn't been played. We could create a rating system for games based on distribution of playing hours. Such like hours of some free bad games could have a distribution under 2 hours. As following, We use the EM algorithm rather than percentiles to present the distribution. In the EM algorithm, We use 5 groups as 5 stars to distinguish the good from the bad.
 
@@ -105,7 +123,7 @@ This example will use a gradient descent approach to find optimal U and V matric
 
 
  
-### Content-based recommender
+### Content-based Recommender
 
 To generate the recommendation for each game, the following function is used. The input of the function is the title of
 the game as a string and the cosine matrix (explained later) and the output is a list of recommended game title.<br/>
