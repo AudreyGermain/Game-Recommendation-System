@@ -56,6 +56,11 @@ languages, achievements, genre (Action, Adventure, RPG, Strategy…), game descr
 minimum requirement to run the game, recommended requirement, original price and price with discount.
 There is a total of 51920 games in the dataset.<br/>
 
+The third dataset is a list we split out the purchase/play column into two columns. Because The raw 'purchase' row records 1 hour, Clearly this doesn't make any sense so we remove it during the process of splitting the column and calculate the correct 'play' hours.
+
+Then we count the number of users for each games, and output a histograph to make the data visualization. As you can see Dota 2 has the highest number of players and the highest number of total hours played so undeniably the most popular game. Where as other games such as "Half-Life 2 Lost Coast" have 981 users but a total of 184.4 hours played. I expect this game is in most cases a free bundle game. Some Games like these add noise to the dataset. So that's one of the reasons we use EM algorithms to create rating system for the games.
+
+
 ## III. Methodology
 
 We decided to use 3 differents algorithms to generate recommendation by user. We use 2 collaborative algorithm,
@@ -85,7 +90,15 @@ Becaused our recommendation system should take consideration the games hasn't be
 
 ![Image text](https://raw.githubusercontent.com/AudreyGermain/Game-Recommendation-System/master/plots/EM%20plot.png?token=AKJKIZO5MDSWOLNZU7P6S2S55BWKU)
 
-According to the plot, we could see the there are most of the users of Witcher 3 distribute in 4-5 groups. However there are a few users quickly lost their interests. It make sense to request a refund for the game that have benn played less than 2 hours. As you can see EM algorithm does a great job finding the groups of people with similar gaming habits and would potentially rate the game in a similar way. It does have some trouble converging which isn't surprising however the resulting distributions look very reasonable. 
+According to the plot, we could see the there are most of the users of Witcher 3 distribute in 4-5 groups. However there are a few users quickly lost their interests. It make sense to request a refund for the game that have benn played less than 2 hours. As you can see EM algorithm does a great job finding the groups of people with similar gaming habits and would potentially rate the game in a similar way. 
+
+It does have some trouble converging which iThis example will use a gradient descent approach to find optimal U and V matrices which retain the actual observations with predict the missing values by drawing on the information between similar users and games. I have chosen a learning rate of 0.001 and will run for 200 iterations tracking the RMSE. The objective function is the squared error between the actual observed values and the predicted values. The U and V matrices are initialised with a random draw from a ~N(0, 0.01) distibution. This may take a few minutes to run.sn't surprising however the resulting distributions look very reasonable. 
+
+A user-item matrix is created with the users being the rows and games being the columns. The missing values are set to zero. The observed values are the log hours for each observed user-game combination. The data was subset to games which have greater than 50 users and users which played the game for greater than 2 hours. This was chosen as 2 hours is the limit in which Steam will offer a return if you did not like the purchased game (a shout out to the Australian Competition and Consumer Commission for that one!).
+
+The basic SVD approach will perform matrix factorisation using the first 60 leading components. Since the missing values are set to 0 the factorisation will try and recreate them which is not quite what we want. For this example we will simply impute the missing observations with a mean value.
+
+This example will use a gradient descent approach to find optimal U and V matrices which retain the actual observations with predict the missing values by drawing on the information between similar users and games. I have chosen a learning rate of 0.001 and will run for 200 iterations tracking the RMSE. The objective function is the squared error between the actual observed values and the predicted values. The U and V matrices are initialised with a random draw from a ~N(0, 0.01) distibution. This may take a few minutes to run.
 
 
  
