@@ -98,14 +98,14 @@ the game as a string and the cosine matrix (explained later) and the output is a
 def get_recommendations(title, cosine_sim):
 
 	if title not in listGames:
-    	return []
+    	    return []
 
 	# Get the index of the game that matches the name
 	idx = indices[title]
 
 	# if there's 2 games or more with same name (game RUSH)
 	if type(idx) is Series:
-    	return []
+    	    return []
 
 	# Get the pairwise similarity scores of all games with that game
 	sim_scores = list(enumerate(cosine_sim[idx]))
@@ -141,13 +141,13 @@ Finally we just need to extract the amount of recommendation that we want and re
 The variable n_recommendation contains the amount of recommendation we want to get, we decided to set it to 20.<br/>
 
 To generate the cosine similarity matrix we use the following code. First it calculate the matrix of frequency of each
-words in the popular tag of each of the games, then it calculate the cosine similarity function.<br/>
+words in the chosen column (column_name) of each of the games, then it calculate the cosine similarity function.<br/>
 
 ```python
-# Compute the Cosine Similarity matrix using the popular tags column
+# Compute the Cosine Similarity matrix using the column
 count = CountVectorizer(stop_words='english')
-count_matrix_popular_tags = count.fit_transform(dataGames['popular_tags'])
-cosine_sim_matrix_popular_tags = cosine_similarity(count_matrix_popular_tags, count_matrix_popular_tags)
+count_matrix = count.fit_transform(dataGames[column_name])
+cosine_sim_matrix = cosine_similarity(count_matrix, count_matrix)
 ```
 To get the recommendation for each user, we implemented a function that combines the recommendations and get the
 recommendation with the best reviews (extracted from the game dataset). This function takes the ID of each user,
@@ -158,8 +158,8 @@ return a dataframe containing the user ID in the first column and then 20 column
 ```python
 def make_recommendation_for_user(user_id, game_list, game_user_have):
 	if type(game_list) is not list or len(game_list) == 0:
-    	# return empty one
-    	return DataFrame(data=[[user_id] + [""] * n_recommendation], columns=col_names)
+    	    # return empty one
+    	    return DataFrame(data=[[user_id] + [""] * n_recommendation], columns=col_names)
 
 	# get reviews of game recommendation, remove the games the user already has and order them by reviews
 	recommendation_reviews = dataReviews.loc[dataReviews['name'].isin(game_list)]
@@ -167,21 +167,85 @@ def make_recommendation_for_user(user_id, game_list, game_user_have):
 	recommendation_reviews = recommendation_reviews.sort_values(by="percentage_positive_review", ascending=False)
 
 	if len(recommendation_reviews.index) < n_recommendation:
-    	return DataFrame(data=[[user_id] + recommendation_reviews["name"].tolist() +
-                           	[""] * (n_recommendation - len(recommendation_reviews.index))],
-                     	columns=col_names)
+    	    return DataFrame(data=[[user_id] + recommendation_reviews["name"].tolist() +
+                           	   [""] * (n_recommendation - len(recommendation_reviews.index))],
+                     	     columns=col_names)
 	else:
-    	return DataFrame(data=[[user_id] + recommendation_reviews["name"].tolist()[0:n_recommendation]],
-                     	columns=col_names)
+    	    return DataFrame(data=[[user_id] + recommendation_reviews["name"].tolist()[0:n_recommendation]],
+                     	     columns=col_names)
 ```
-First, is the list of recommendation is empty (can happen if none of the game the user has are in the game dataset)
+First, if the list of recommendation is empty (can happen if none of the game the user has are in the game dataset)
 or not valid, a dataframe without recommendation is returned. If there is no problem with the recommendation list,
 we get a dataframe of the name of the recommended games and the review (percentage of positive review) and we remove
 the games that the user already has (no need to recommend a game the user already has). Then the recommendation are
-ordered from the best review to the worst. If there is less recommendations then needed, empty spaces fill the rest of the column.<br/>
+ordered from the best review to the worst. If there is less recommendations then needed, empty spaces fill the rest of the column.
+The reviews are used to order the recommendation since it's the easiest way to order them particularly considering that
+not every games the user has produce recommendation because of the games in both datasets do not match totally like mentionned above.
+If it wasn't because of that problem, we thought of taking into account the proportion of play time of each games to
+recommend similar games to games that are most played. Using the reviews still ensure that the recommended games are
+considered good in general by all the users.<br/>
 
 All the dataframe rows produced by this functions are combine and are printed in a CSV file.<br/>
 
+The whole script is arranged in a function to let us run it with multiple different input.
+The different input of the content based recommender are generated in a script that rearrange the data in an easy 
+to use it for the algorithm, it correspond to the varible column_name in the code above.<br/>
+
+To prepare the data for the content based recommender we started by selecting the information we thought would be the 
+most useful to find similar games. We read the useful column using the following code.
+
+```python
+dataGames = read_csv(locationGamesFile, usecols=["name", "genre", "game_details", "popular_tags", "publisher", "developer"])
+```
+
+Like mentioned previously, we decided to only keep the games that were both in the game dataset and the user dataset.
+We chose to do it this way because there is no point in recommending games the user don't have and it will affect the 
+performance of the algorithm compare to the other too. Also the dataset was too big to create matrix of cosine similarity
+since it took to much memory. To match the games from both dataset together, we created an ID for the games by removing
+all symbols the weren't alphanumeric, removing all capital letters and removing all spaces using to following code. 
+We did the same on the games in the user dataset.
+
+```python
+# remove spaces and special character from game name in both dataset
+for i, row in dataGames.iterrows():
+    clean = re.sub('[^A-Za-z0-9]+', '', row["name"])
+    clean = clean.lower()
+    dataGames.at[i, 'ID'] = clean
+```
+After this, we found all the uniques ID from the user dataset and kept only the rows in the games dataset where the ID 
+matched one of the ID in the user dataset. This way we were able to get 3036 games of the game dataset that matched 
+some of the 5151 games from the user dataset. Without the ID we only were able to find 71 games that matched only 
+using the names. Since we have less games in the new game dataset, the recommender system will not be able to find 
+recommendation for every games in the user dataset. This will surly affect its performance.<br/>
+
+With the new smaller game dataset, we made sure to remove the spaces from le useful column we chose to use.
+By removing the spaces, we ensure that, for exemple, Steam Achievement and Steam Cloud dont get a match because they 
+both contain Steam. Therefor we apply the following function to all the columns like this.
+
+```python
+def clean_data(x):
+    if isinstance(x, str):
+        return x.replace(" ", "")
+    else:
+        print(x)
+        return x
+
+
+usedGames.loc[:, 'genre'] = usedGames['genre'].apply(clean_data)
+```
+
+Finally, we created some custom columns by combining multiple column to try and find the combination of information 
+that will give us the best recommendation system possible. 
+
+```python
+# create some column containing a mix of different information
+usedGames["genre_publisher_developer"] = usedGames['genre'] + usedGames['publisher'] + usedGames['developer']
+usedGames["genre_popular_tags_developer"] = usedGames['genre'] + usedGames['popular_tags'] + usedGames['developer']
+usedGames["genre_popular_tags_game_details"] = usedGames['genre'] + usedGames['popular_tags'] + usedGames['game_details']
+usedGames["genre_publisher_developer_game_details"] = usedGames['genre'] + usedGames['publisher'] + usedGames['developer'] + usedGames['game_details']
+```
+
+The results of the different columns will be compared in the Evaluation & Analysis section of this article.
 ## IV. Evaluation & Analysis
 
 To compare the different algorithms we created a script that calculate the ratio of games the user has 
