@@ -62,12 +62,13 @@ Eb=pd.Categorical(most,ordered=True)
 
 #Histogram
 #print(most) for check
-sns.set(style="darkgrid")
-sns.barplot(x='alusers',y='game_name',hue='hours',alpha=0.9,data=most,palette='BuGn',dodge=False)
-plt.title('Top 20 games with the most users')
-plt.ylabel('Game', fontsize=12)
-plt.xlabel('Top 20 games with the most users', fontsize=12)
-plt.show()
+game_total_hrs = steam_clean.groupby(by='game')['hrs'].sum()
+most_played_games = game_total_hrs.sort_values(ascending=False)[:20]
+
+
+# game with the highest number of users
+game_freq = steam_clean.groupby(by='game').agg({'user': 'count', 'hrs': 'sum'}).reset_index()
+top20 = game_freq.sort_values(by='user',ascending=False)[:20].reset_index()
 
 #print(ggplot(Eb, aes(x = 'game_name', y = 'alusers', fill = 'hours')) +
 #      geom_bar(stat = "identity") +
