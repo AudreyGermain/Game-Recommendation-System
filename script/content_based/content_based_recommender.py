@@ -83,10 +83,10 @@ def generate_recommendation_output(column_name, location_output_file):
 
     # need to do some modification on data to make sure there is no NaN in column
     dataGames[column_name] = dataGames[column_name].fillna('')
-    # Compute the Cosine Similarity matrix using the popular tags column
+    # Compute the Cosine Similarity matrix using the column
     count = CountVectorizer(stop_words='english')
-    count_matrix_popular_tags = count.fit_transform(dataGames[column_name])
-    cosine_sim_matrix_popular_tags = cosine_similarity(count_matrix_popular_tags, count_matrix_popular_tags)
+    count_matrix = count.fit_transform(dataGames[column_name])
+    cosine_sim_matrix = cosine_similarity(count_matrix, count_matrix)
 
     previousId = ""
     listSuggestion = list()
@@ -102,7 +102,7 @@ def generate_recommendation_output(column_name, location_output_file):
             listSuggestion = list()
             listGamesUserHas = list()
         listGamesUserHas.extend([row["game_name"]])
-        listSuggestion.extend(get_recommendations(row["game_name"], cosine_sim_matrix_popular_tags))
+        listSuggestion.extend(get_recommendations(row["game_name"], cosine_sim_matrix))
 
     # add the last element for the last user
     recommendationByUserData = concat([recommendationByUserData,
