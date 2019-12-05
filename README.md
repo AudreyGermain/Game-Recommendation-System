@@ -54,7 +54,7 @@ The third dataset is a list we split out the purchase/play column into two colum
 [//]: # (Histogram 1: all users: play + purchase)
 Then we count the number of users for each games, and output a histograph to make the data visualization. 
 | index |                                       game  |  user|       hrs|
-|:-------------:|:-------------| -----:|-----:|
+| :-------------: | :------------- | -----: | -----: |
 |  1336 |                                       Dota 2|   484|  981684.6|
 |  4257 |                              Team Fortress 2|  2323|  173673.3|
 |  4788 |                                     Unturned|  1563|   16096.4|
