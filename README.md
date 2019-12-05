@@ -57,8 +57,11 @@ minimum requirement to run the game, recommended requirement, original price and
 There is a total of 51920 games in the dataset.<br/>
 
 The third dataset is a list we split out the purchase/play column into two columns. Because The raw 'purchase' row records 1 hour, Clearly this doesn't make any sense so we remove it during the process of splitting the column and calculate the correct 'play' hours.
+Then we count the number of users for each games, and output a histograph to make the data visualization. 
 
-Then we count the number of users for each games, and output a histograph to make the data visualization. As you can see Dota 2 has the highest number of players and the highest number of total hours played so undeniably the most popular game. Where as other games such as "Half-Life 2 Lost Coast" have 981 users but a total of 184.4 hours played. I expect this game is in most cases a free bundle game. Some Games like these add noise to the dataset. So that's one of the reasons we use EM algorithms to create rating system for the games.
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_AllUsersHrs.png?raw=true)
+
+As you can see Dota 2 has the highest number of players and the highest number of total hours played so undeniably the most popular game. Where as other games such as "Half-Life 2 Lost Coast" have 981 users but a total of 184.4 hours played. I expect this game is in most cases a free bundle game. Some Games like these add noise to the dataset. So that's one of the reasons we use EM algorithms to create rating system for the games.
 
 
 ## III. Methodology
