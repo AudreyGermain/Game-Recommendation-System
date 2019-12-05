@@ -5,7 +5,23 @@
 - Audrey Germain, Computer Engineering, Department of Software Engineering and Computer Engineering, Polytechnique Montreal<br/>
 - Geordan Jove, Aerospace Engineering, Department of Mechanical Engineering, Polytechnique Montreal<br/>
 
-## I. Introduction
+## Table of content
+
+[I. Introduction](#introduction)<br/>
+[II. Datasets](#dataset)<br/>
+&nbsp;&nbsp;[a. User Dataset](#user)<br/>
+&nbsp;&nbsp;[b. Game Dataset](#game)<br/>
+[III. Methodology](#methodology)<br/>
+&nbsp;&nbsp;[Collaborative Recommender](#collaborative)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;[a. Training and Test Datasets](#training-test)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;[b. Collaborative Recommender with ALS](#als)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;[c. Collaborative recommender with EM and SVD](#em)<br/>
+&nbsp;&nbsp;[Content-based Recommender](#content-based)<br/>
+[IV. Evaluation & Analysis](#evaluation-analysis)<br/>
+[V. Related Work](#related-work)<br/>
+[VI. Conclusion: Discussion](#conclusion)<br/>
+
+## I. Introduction <a name="introduction"></a>
 Like many young people, all member of this team have an interest in video games, more particularly in computer games.
 Therefore, this project has for goal to build a recommender system for computer game.<br/>
 
@@ -37,10 +53,10 @@ using the website or app as usual. <br/>
 In this project we implemented 2 collaboratives and 1 content based algorithm. 
 We used implicite data from the users to implement them.
 
-## II. Datasets
+## II. Datasets <a name="dataset"></a>
 For this project, 2 differents datasets are used. Both dataset are available for free on kaggle and are extracted from Steam.<br/>
 
-### a. User Dataset
+### a. User Dataset <a name="user"></a>
 
 [//]: # (User Dataset description)
 The first dataset is the [user](https://www.kaggle.com/tamber/steam-video-games) dataset. It contains the user id, the game, the behavior and the amount of hours played.
@@ -88,7 +104,7 @@ Some Games like these add noise to the dataset. So that's one of the reasons we 
 
 [//]: # (Box plot)
 
-### b. Game Dataset
+### b. Game Dataset <a name="game"></a>
 [//]: # (Game Dataset description)
 The second dataset contains a list of [games](https://www.kaggle.com/trolukovich/steam-games-complete-dataset/version/1) and their descriptions. It contains the url (directed to Steam store),
 the type of package (app, bundle…), the name of the game, a short description, recent reviews, all reviews, release date,
@@ -97,21 +113,21 @@ languages, achievements, genre (Action, Adventure, RPG, Strategy…), game descr
 minimum requirement to run the game, recommended requirement, original price and price with discount.
 There is a total of 51920 games in the dataset.<br/>
 
-## III. Methodology
+## III. Methodology <a name="methodology"></a>
 
 We decided to use 3 differents algorithms to generate recommendation by user. We use 2 collaborative algorithm,
 one using the ALS and one using the EM and SVD algorithms and we use one content-based algorithm.<br/>
 
-### Collaborative Recommender
+### Collaborative Recommender <a name="collaborative"></a>
 
-#### a. Training and Test Datasets
+#### a. Training and Test Datasets <a name="training-test"></a>
 [//]: # (Describe splitting of user dataset into training and testing)
 To create a training and testing dataset, we started by combining the information about play and purchase in a single row,
 in this new form, the columns are user ID, name of the game, amount of hours of play time, play (0 if never played
 and 1 if played) and purchase (technically always 1), this created a total of 128804 rows. Then we extracted 20% of
 all the rows (25761 rows) for the test dataset and kept the rest  (103043 rows) for the training dataset.<br/>
 
-#### b. Collaborative Recommender with ALS
+#### b. Collaborative Recommender with ALS <a name="als"></a>
 This section describes a simple implementation of a collaborative filtering recommendation algorithm using matrix factorization with implicit data.
 The work presented is based on the ["ALS Implicit Collaborative Filtering"](https://medium.com/radon-dev/als-implicit-collaborative-filtering-5ed653ba39fe "ALS Implicit Collaborative Filtering") and the ["A Gentle Introduction to Recommender Systems with Implicit Feedback"](https://jessesw.com/Rec-System/ "A Gentle Introduction to Recommender Systems with Implicit Feedback") blog posts.
 
@@ -131,7 +147,7 @@ In order to generate recommendations, the class ImplicitCollaborativeRecommender
 (To complete)
 
 
-#### c. Collaborative recommender with EM and SVD
+#### c. Collaborative recommender with EM and SVD <a name="em"></a>
 
 Becaused our recommendation system should take consideration the games hasn't been played. We could create a rating system for games based on distribution of playing hours. Such like hours of some free bad games could have a distribution under 2 hours. As following, We use the EM algorithm rather than percentiles to present the distribution. In the EM algorithm, We use 5 groups as 5 stars to distinguish the good from the bad.
 
@@ -149,7 +165,7 @@ This example will use a gradient descent approach to find optimal U and V matric
 
 
  
-### Content-based Recommender
+### Content-based Recommender <a name="content-based"></a>
 
 To generate the recommendation for each game, the following function is used. The input of the function is the title of
 the game as a string and the cosine matrix (explained later) and the output is a list of recommended game title.<br/>
@@ -188,7 +204,7 @@ The variable listGames is a list of all the games that are in both of the datase
 We use this because there is a lot of games in the game dataset that have never been played or purchased by any user,
 so there's no use in considering them in the recommender and some of the games in the user dataset are not in the game dataset.
 To maximize the amount of match between the game titles in the datasets we removed all symboles and spaces and put
-every letters in lower case. We were able to find 3036 games in the game dataset that match some of the 5151 games that are in the user dataset.<br/>
+every letters in lower case. We were able to find 3036 games in the game dataset that match some of the 5152 games that are in the user dataset.<br/>
 
 The variable indices is a reverse map that use the name as key to get the index of each game in the cosine similarity matrix.
 We make sure that the idx is not a Series, it can happen in the case where 2 different games have the same name (in our dataset 2 games have the name "RUSH").<br/>
@@ -245,7 +261,36 @@ If it wasn't because of that problem, we thought of taking into account the prop
 recommend similar games to games that are most played. Using the reviews still ensure that the recommended games are
 considered good in general by all the users.<br/>
 
-All the dataframe rows produced by this functions are combine and are printed in a CSV file.<br/>
+To obtain the reviews, we had to do some manipulations on the review column in the game dataset to extract the 
+percentage and other possibly useful information. We created the following script to do this and print the 
+result in a CSV file. We read it from the content-based recommender script to get the reviews.
+
+```python
+for i, row in dataGames.iterrows():
+    if type(row["all_reviews"]) == str:
+
+        # extract % of positive reviews
+        x = re.findall(r'- [0,1,2,3,4,5,6,7,8,9]*%', row["all_reviews"])
+        if len(x) != 0:
+            dataGames.at[i, 'percentage_positive_review'] = x[0].translate({ord(i): None for i in '- %'})
+
+        # extract qualification of reviews
+        reviewParse = row["all_reviews"].split(",")
+        if 'user reviews' in reviewParse[0]:
+            dataGames.at[i, 'review_qualification'] = ""
+        else:
+            dataGames.at[i, 'review_qualification'] = reviewParse[0]
+```
+
+We used the fact that all reviews follow this format:
+"Mostly Positive,(11,481),- 74% of the 11,481 user reviews for this game are positive." 
+to extract the information we wanted. 
+We start by getting the percentage of good reviews by using regex to get the "- 74%" part of the reviews and we then keep the number only.
+We also got the qualitative review by splitting the reviews at the comma and keeping the first one.
+We ignore the qualification that contains the words 'user reviews' because it means not enough user reviewed the game
+and the format is different. 
+
+All the dataframe rows produced by the function 'make_recommendation_for_user' are combine and are printed in a CSV file.<br/>
 
 The whole script is arranged in a function to let us run it with multiple different input.
 The different input of the content based recommender are generated in a script that rearrange the data in an easy 
@@ -274,7 +319,7 @@ for i, row in dataGames.iterrows():
 ```
 After this, we found all the uniques ID from the user dataset and kept only the rows in the games dataset where the ID 
 matched one of the ID in the user dataset. This way we were able to get 3036 games of the game dataset that matched 
-some of the 5151 games from the user dataset. Without the ID we only were able to find 71 games that matched only 
+some of the 5152 games from the user dataset. Without the ID we only were able to find 71 games that matched only 
 using the names. Since we have less games in the new game dataset, the recommender system will not be able to find 
 recommendation for every games in the user dataset. This will surly affect its performance.<br/>
 
@@ -306,7 +351,7 @@ usedGames["genre_publisher_developer_game_details"] = usedGames['genre'] + usedG
 ```
 
 The results of the different columns will be compared in the Evaluation & Analysis section of this article.
-## IV. Evaluation & Analysis
+## IV. Evaluation & Analysis <a name="evaluation-analysis"></a>
 
 To compare the different algorithms we created a script that calculate the ratio of games the user has 
 (in the test dataset) that are in the top 20 recommendations and the amount of games the user has in the
@@ -339,7 +384,7 @@ Collaborative with ALS| 2.6707%
 Collaborative with EM and SVD | 0.2557%
 Content-based (Genre, publisher & developer) | 1.8377%
 
-## V. Related Work
+## V. Related Work <a name="related-work"></a>
 
 To understand what a recommender system is and the different types, we used [this article](https://marutitech.com/recommendation-engine-benefits/).<br/>
 
@@ -352,7 +397,7 @@ to implement the function that give the recommendation for each games.<br/>
 For the EM algorithm we used the article
 [Machine Learning with Python: Exception Maximization and Gaussian Mixture Models in Python](https://www.python-course.eu/expectation_maximization_and_gaussian_mixture_models.php).<br/>
 
-## VI. Conclusion: Discussion
+## VI. Conclusion: Discussion <a name="conclusion"></a>
 
 It would be interesting to create an hybrid recommender system using the collaborative recommender with the ALS 
 algorithm and the content based algorithm using the genre, publisher and developer as input to see if we can make 
