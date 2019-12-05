@@ -6,7 +6,22 @@ from plotnine.data import *
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+locationUsersFile=pathlib.Path(r'D:/Game-Recommendation-System/data/raw_data/steam_users.csv')
+steam = pd.read_csv(locationUsersFile, header=None, names=['user', 'game', 'purchase_play', 'hrs', 'tmp'])
+steam.drop('tmp', inplace=True, axis=1)
+steam_clean = steam
 
+
+
+steam_clean['purchase'] = steam_clean['purchase_play'] == 'purchase'
+steam_clean['purchase'] = steam_clean['purchase'].astype(int)
+steam_clean['play'] = steam_clean['purchase_play'] == 'play'
+steam_clean['play'] = steam_clean['play'].astype(int)
+steam_clean['hrs'] = steam_clean['hrs'] - steam_clean['purchase']
+steam_clean = steam_clean.groupby(by=['user', 'game']).agg({'hrs': 'sum', 'purchase': 'sum', 'play': 'sum'}).reset_index()
+
+steam_clean.to_csv(r'D:/Game-Recommendation-System/data/raw_data/purchase_play.csv',index=None)
+'''
 locationUsersFile = pathlib.Path(r'data/steam-200k.csv')
 steam = pd.read_csv(locationUsersFile, header=None, usecols=[0, 1, 2, 3],
                     names=["user_id", "game_name", "behavior", "hours"])
@@ -59,7 +74,7 @@ plt.show()
 #     theme(axis_text_x=element_text(angle=90,hjust=0.5,vjust=1)) +
 #     labs(title = "Top 20 games with the most users", x = "Game", y = "Number of users"))
 
-
+'''
 
 
 

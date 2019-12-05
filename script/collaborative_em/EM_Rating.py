@@ -12,12 +12,10 @@ from sklearn.mixture import GaussianMixture
 from sklearn.model_selection import train_test_split
 from math import sqrt
 
-locationUsersFile=pathlib.Path(r'C:\Users\ammis\IdeaProjects\Game-Recommendation-System\data\raw_data\steam_users.csv')
+locationUsersFile=pathlib.Path(r'D:/Game-Recommendation-System/data/raw_data/steam_users.csv')
 steam = pd.read_csv(locationUsersFile, header=None, names=['user', 'game', 'purchase_play', 'hrs', 'tmp'])
 steam.drop('tmp', inplace=True, axis=1)
 steam_clean = steam
-
-
 
 steam_clean['purchase'] = steam_clean['purchase_play'] == 'purchase'
 steam_clean['purchase'] = steam_clean['purchase'].astype(int)
@@ -51,10 +49,10 @@ def game_hrs_density(GAME, nclass, print_vals=True):
         dens['y{}'.format(i+1)] = gaussian.weights_[i]* scipy.stats.norm(gaussian.means_[i][0], gaussian.covariances_[i][0][0]).pdf(x)
     dens = dens.melt('x', value_name='gaussian')
     game_plt = ggplot(aes(x='loghrs', y='stat(density)'), game_data) + geom_histogram(bins=25, colour = "black", alpha = 0.7, size = 0.1) + \
-                 geom_area(dens, aes(x='x', y='gaussian', fill = 'variable'), alpha = 0.5, position = position_dodge(width=0.2)) + geom_density()+ \
-                ggtitle(GAME)
+               geom_area(dens, aes(x='x', y='gaussian', fill = 'variable'), alpha = 0.5, position = position_dodge(width=0.2)) + geom_density()+ \
+               ggtitle(GAME)
     return game_plt
-    
+
 a = game_hrs_density('TheWitcher3WildHunt', 5, True)
 
 
@@ -83,7 +81,7 @@ ui_train = ui_mat
 for i in range(test.shape[0]):
     line = test.iloc[i]
     ui_train[line['user_id'], line['game_id']] = 0
-    
+
 # root mean squared error function
 def rmse(pred, test, data_frame=False):
     test_pred = np.array([np.nan] * len(test))
@@ -108,8 +106,8 @@ U, D, V = np.linalg.svd(Y)
 
 p_df = pd.DataFrame({'x': range(1, len(D)+1), 'y': D/np.sum(D)})
 ggplot(p_df, aes(x='x', y='y')) + \
-    geom_line() + \
-    labs(x = "Leading component", y = "")
+geom_line() + \
+labs(x = "Leading component", y = "")
 
 lc = 60
 pred = np.dot(np.dot(U[:, :lc], np.diag(D[:lc])), V[:lc, :])
@@ -170,7 +168,7 @@ def game_hrs_density_p(pred, GAME=None, nclass=1, print_vals=True):
         GAME = game_dict[GAME]
     game_data = pd.Series(pred[:, GAME])
     game_data = game_data[game_data > 0]
-    
+
     # em algorithm
     mu_init = np.linspace(min(game_data), max(game_data), nclass).reshape(-1, 1)
     sigma_init = np.array([1] * nclass).reshape(-1, 1, 1)
@@ -185,22 +183,36 @@ def game_hrs_density_p(pred, GAME=None, nclass=1, print_vals=True):
     dens = dens.melt('x', value_name='gaussian')
     game_data = pd.DataFrame(game_data, columns=['game_daat'])
     game_plt = ggplot(aes(x='game_data', y='stat(density)'), game_data) + geom_histogram(bins=45, colour = "black", alpha = 0.7, size = 0.1) + \
-                 geom_area(dens, aes(x='x', y='gaussian', fill = 'variable'), alpha = 0.5, position = position_dodge(width=0.2)) + geom_density()+ \
-                ggtitle(t_GAME)
+               geom_area(dens, aes(x='x', y='gaussian', fill = 'variable'), alpha = 0.5, position = position_dodge(width=0.2)) + geom_density()+ \
+               ggtitle(t_GAME)
     return game_plt
-
 
 a = game_hrs_density_p(pred, "TheWitcher3WildHunt", 5)
 
 
 # Export recommend games
 user_dict = dict(users.values)
+game_dict = {games.iloc[i, 0]: games.iloc[i, 1] for i in range(games.shape[0])}
+I_pred = np.zeros_like(I)
+for i in range(steam_clean.shape[0]):
+    line = steam_clean.iloc[i]
+    if line['user'] in user_dict and line['game1'] in game_dict:
+        I_pred[user_dict[line['user']], game_dict[line['game1']]] = 1
+
 reverse_game_dict = {games.iloc[i, 1]: games.iloc[i, 0] for i in range(games.shape[0])}
+pred_percentile = pd.DataFrame(pred)
+for col in pred_percentile.columns:
+    pred_percentile[col] = pred_percentile[col].rank(pct=True)
+pred_percentile = pred_percentile.values
 def top(n, user, print_value=True):
     not_purchased = (I - 1) % 2
     t_user = user
     user = user_dict[user]
-    top_games = (pred*not_purchased).iloc[user]
+    top_games = (pred_percentile*not_purchased).iloc[user]
+    #     line = I_pred[user]
+    #     for i, v in enumerate(line):
+    #         if v == 1:
+    #             top_games[i] = 0
     top_games = list(top_games.sort_values(ascending=False)[:20].index)
     if print_value:
         print('top {} recommended games for user {}: '.format(n, t_user))
@@ -211,17 +223,20 @@ def top(n, user, print_value=True):
         for i in range(n):
             result.append(reverse_game_dict[top_games[i]])
         return result
-    
+top(20, 5250)
+
 top_N = 20
 result = []
-
 for idx, user in tqdm(enumerate(users['user'].values)):
     result.append(top(top_N, user, False))
-    if idx ==8212:
-      break
+    if idx > 10:
+        break
 df = pd.DataFrame(result)
 columns = ['user'] + ['top_{}'.format(i+1) for i in range(top_N)]
 df.columns = columns
-df.to_csv('./output.csv', index=None)
+df.to_csv('D:/Game-Recommendation-System/data/output_data/Collaborative_EM_output.csv', index=None)
+
+
+
 
 
