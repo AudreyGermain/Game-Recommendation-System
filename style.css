@@ -2,12 +2,8 @@
 ---
 
 @import "{{ site.theme }}";
-.gist {
-   max-width:350px;
-   overflow:auto;
-}
-
 .gist .blob-wrapper.data {
    max-height:200px;
+   max-width:350px
    overflow:auto;
 }
