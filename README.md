@@ -1,3 +1,5 @@
+<style type="text/css"> .gist {width:500px; overflow:auto}  .gist .file-data {max-height: 500px;max-width: 500px;} </style>
+
 # Recommendation System for Steam Game Store: An overview of recommender systems
 
 ## Team:<br/>
