@@ -73,6 +73,6 @@ def box_plot(csv_file, plot_file, nb_games=20):
 
 
 if __name__ == "__main__":
-    csv_data = r'data/purchase_play.csv'
-    plot_png = r'plots/boxplot_top_20_games.png'
+    csv_data = r'../../data/raw_data/steam_users_purchase_play.csv'
+    plot_png = r'../../plots/boxplot_top_20_games.png'
     stats = box_plot(csv_data, plot_png, 20)
