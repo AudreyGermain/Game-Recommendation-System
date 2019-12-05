@@ -61,6 +61,12 @@ As you can see Dota 2 has the highest number of players and the highest number o
 [//]: # (Histogram 2: only users: play)
 
 [//]: # (Box plot)
+In order to have a better understanding of the user data distribution and user's playing habits, a box plot is produced for the top 20 most played games.
+
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/boxplot_top_20_games.png?raw=true)
+
+As we can see, the data distribution for each game considered is not symmetrical. Even more, 75% of data points for each game is in the range of the hundreds hours, with several games having very large outliers. We can see for example a user played more than 10,000 hours "Dota 2". Another interesting example, a user played almost 12,000 hours "Sid Meier's Civilization V".
+ 
 
 ### b. Game Dataset
 [//]: # (Game Dataset description)
@@ -85,18 +91,20 @@ in this new form, the columns are user ID, name of the game, amount of hours of 
 and 1 if played) and purchase (technically always 1), this created a total of 128804 rows. Then we extracted 20% of
 all the rows (25761 rows) for the test dataset and kept the rest  (103043 rows) for the training dataset.<br/>
 
+
+
 #### b. Collaborative Recommender with ALS
 This section describes a simple implementation of a collaborative filtering recommendation algorithm using matrix factorization with implicit data.
 The work presented is based on the ["ALS Implicit Collaborative Filtering"](https://medium.com/radon-dev/als-implicit-collaborative-filtering-5ed653ba39fe "ALS Implicit Collaborative Filtering") and the ["A Gentle Introduction to Recommender Systems with Implicit Feedback"](https://jessesw.com/Rec-System/ "A Gentle Introduction to Recommender Systems with Implicit Feedback") blog posts.
 
 Collaborative filtering does not require any information about the items or the users in order to provide recommendation. It only uses the interactions between users and items expressed by some kind of rating.
 
-The data used for this recommender system is that of the steam users described in [subsection X](). The data does not explicitly contains the rating or preference of users towards the games, but rather it is **implicitly** expressed by the amount of hours users played games.
+The data used for this recommender system is that of the steam users described in [subsection II.a](#a.-user-dataset). The data does not explicitly contains the rating or preference of users towards the games, but rather it is **implicitly** expressed by the amount of hours users played games.
 
 The Alternating Least Squares (ALS) is the model used to fit the data and generate recommendations. The ALS model is already implemented in the [implicit](https://github.com/benfred/implicit) python library thanks to [Ben Frederickson](http://www.benfrederickson.com/fast-implicit-matrix-factorization/).  
 As described on its documentation [here](https://implicit.readthedocs.io/en/latest/als.html), the ALS algorithm available through the implicit library is a Recommendation Model based on the algorithms described in the paper [Collaborative Filtering for Implicit Feedback Datasets](http://yifanhu.net/PUB/cf.pdf) with performance optimizations described in [Applications of the Conjugate Gradient Method for Implicit Feedback Collaborative Filtering](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.379.6473&rep=rep1&type=pdf). The advantage of using the implicit python library versus a manual implementation of the algorithm is the speed required to generate recommendation since the ALS model in the implicit library uses Cython allowing the parallelization of the code among threads.
 
-(Explain what's ALS and what it does)
+**(Explain what's ALS and what it does)**
 
 In order to generate recommendations, the class ImplicitCollaborativeRecommender is implemented in a python script. The code is available here below.
 
