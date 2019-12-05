@@ -10,20 +10,10 @@ import time
 import matplotlib.pyplot as plt
 from sklearn.mixture import GaussianMixture
 from sklearn.model_selection import train_test_split
-from math import sqrt
 
-locationUsersFile=pathlib.Path(r'D:/Game-Recommendation-System/data/raw_data/steam_users.csv')
-steam = pd.read_csv(locationUsersFile, header=None, names=['user', 'game', 'purchase_play', 'hrs', 'tmp'])
-steam.drop('tmp', inplace=True, axis=1)
-steam_clean = steam
 
-steam_clean['purchase'] = steam_clean['purchase_play'] == 'purchase'
-steam_clean['purchase'] = steam_clean['purchase'].astype(int)
-steam_clean['play'] = steam_clean['purchase_play'] == 'play'
-steam_clean['play'] = steam_clean['play'].astype(int)
-steam_clean['hrs'] = steam_clean['hrs'] - steam_clean['purchase']
-
-steam_clean = steam_clean.groupby(by=['user', 'game']).agg({'hrs': 'sum', 'purchase': 'sum', 'play': 'sum'}).reset_index()
+locationUsersFile=pathlib.Path(r'D:/Game-Recommendation-System/data/steam_users_purchase_play.csv')
+steam_clean = pd.read_csv(locationUsersFile, header=1, names=['user', 'game', 'hrs', 'purchase','play'])
 
 game_freq = steam_clean.groupby(by='game').agg({'user': 'count', 'hrs': 'sum'}).reset_index()
 top20 = game_freq.sort_values(by='user',ascending=False)[:20].reset_index()
@@ -229,7 +219,7 @@ top_N = 20
 result = []
 for idx, user in tqdm(enumerate(users['user'].values)):
     result.append(top(top_N, user, False))
-    if idx > 10:
+    if idx > 8212:
         break
 df = pd.DataFrame(result)
 columns = ['user'] + ['top_{}'.format(i+1) for i in range(top_N)]
