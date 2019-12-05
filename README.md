@@ -53,8 +53,9 @@ The third dataset is a list we split out the purchase/play column into two colum
 
 [//]: # (Histogram 1: all users: play + purchase)
 Then we count the number of users for each games, and output a histograph to make the data visualization. 
+
 | index |                                       game  |  user|       hrs|
-| :-------------: | :------------- | -----: | -----: |
+| :---: | :------------------------------------------ | ---: | -------: |
 |  1336 |                                       Dota 2|   484|  981684.6|
 |  4257 |                              Team Fortress 2|  2323|  173673.3|
 |  4788 |                                     Unturned|  1563|   16096.4|
@@ -75,6 +76,7 @@ Then we count the number of users for each games, and output a histograph to mak
 |  3825 |                   Sid Meier's Civilization V|   596|   99821.3|
 |  4885 |                                  War Thunder|   590|   14381.6|
 |  3222 |                                       Portal|   588|    2282.8|
+
 ![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_AllUsersHrs.png?raw=true)
 
 As you can see Dota 2 has the highest number of players and the highest number of total hours played so undeniably the most popular game. Where as other games such as "Half-Life 2 Lost Coast" have 981 users but a total of 184.4 hours played. I expect this game is in most cases a free bundle game. Some Games like these add noise to the dataset. So that's one of the reasons we use EM algorithms to create rating system for the games.
