@@ -2,7 +2,12 @@
 ---
 
 @import "";
-.gist-data{
-    height:250px; // Any height
-    overflow-y: visible;
+.gist {
+   max-width:350px;
+   overflow:auto;
+}
+
+.gist .blob-wrapper.data {
+   max-height:200px;
+   overflow:auto;
 }
