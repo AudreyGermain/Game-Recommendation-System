@@ -6,58 +6,42 @@ from plotnine.data import *
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-
-locationUsersFile = pathlib.Path(r'data/steam-200k.csv')
-steam = pd.read_csv(locationUsersFile, header=None, usecols=[0, 1, 2, 3],
-                    names=["user_id", "game_name", "behavior", "hours"])
-#print(steam)  for check
-
-#Split purchase and calculate time
-steam['purchase']=1
-
-#Split play
-steam['play']=np.where(steam['behavior']=='play',1,0)
-steam['hours']=steam['hours']+steam['play']-1
-
-#Clean dataset
-clean_steam=steam.drop_duplicates(subset=['user_id','game_name'],keep='last')
-clean_steam=clean_steam.drop(columns=['behavior'])
-
-#Export to csv
-clean_steam.to_csv(r'data/purchase_play.csv',index=None)
-
-#Most played game - hrs
-index=clean_steam[clean_steam['play']==0].index
-clean_steam.drop(index,inplace=True)  #drop the columns that the players only purchased
-
-played=clean_steam.groupby(['game_name'])
-phrs=played.agg({'hours':np.sum})
-phrs=phrs.round(1)
+locationUsersFile=pathlib.Path(r'D:/Game-Recommendation-System/data/raw_data/steam_users_purchase_play.csv')
+steam_clean = pd.read_csv(locationUsersFile, header=1, names=['user', 'game', 'hrs', 'purchase', 'play'])
+print(steam_clean)
+game_total_hrs = steam_clean.groupby(by='game')['hrs'].sum()
+most_played_games = game_total_hrs.sort_values(ascending=False)[:20]
 
 
-#Most played game - users
+# game with the highest number of users
+game_freq = steam_clean.groupby(by='game').agg({'user': 'count', 'hrs': 'sum'}).reset_index()
+top20 = game_freq.sort_values(by='user',ascending=False)[:20].reset_index()
+print(top20)
 
-played=played['game_name'].count().reset_index(name="alusers")
-
-
-#Merge user - hrs
-mp=pd.merge(phrs,played,on='game_name')
-most=(mp.sort_values(by='alusers',ascending=False)).head(20)
-Eb=pd.Categorical(most,ordered=True)
-
-#Histogram
-#print(most) for check
-sns.set(style="darkgrid")
-sns.barplot(x='alusers',y='game_name',hue='hours',alpha=0.9,data=most,palette='BuGn',dodge=False)
-plt.title('Top 20 games with the most users')
-plt.ylabel('Game', fontsize=12)
-plt.xlabel('Top 20 games with the most users', fontsize=12)
+# show histogram
+plt.figure(figsize=(20, 10))
+sns.set(font_scale = 2)
+ax = sns.barplot(x='user', y='game', alpha=0.9,data=top20, palette='Blues_r',dodge=False)
+ax.set(xlabel='Number of Users', ylabel='Game', title='Top 20 games with the most users(All)')
+ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
 plt.show()
 
-#print(ggplot(Eb, aes(x = 'game_name', y = 'alusers', fill = 'hours')) +
-#      geom_bar(stat = "identity") +
-#     theme(axis_text_x=element_text(angle=90,hjust=0.5,vjust=1)) +
-#     labs(title = "Top 20 games with the most users", x = "Game", y = "Number of users"))
+#consider the situation that only included play
+index=steam_clean[steam_clean['play']==0].index
+steam_clean.drop(index,inplace=True)
+game_total_hrs = steam_clean.groupby(by='game')['hrs'].sum()
+most_played_games = game_total_hrs.sort_values(ascending=False)[:20]
+# game with the highest number of users
+game_freq = steam_clean.groupby(by='game').agg({'user': 'count', 'hrs': 'sum'}).reset_index()
+top20 = game_freq.sort_values(by='user',ascending=False)[:20].reset_index()
+
+plt.figure(figsize=(20, 10))
+sns.set(font_scale = 2)
+ax = sns.barplot(x='user', y='game', alpha=0.9,data=top20, palette='Blues_r',dodge=False)
+ax.set(xlabel='Number of Users', ylabel='Game', title='Top 20 games with the most users(Play)')
+ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
+plt.show()
+
 
 
 
