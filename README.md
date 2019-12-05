@@ -134,18 +134,117 @@ In order to generate recommendations, the class ImplicitCollaborativeRecommender
 
 Becaused our recommendation system should take consideration the games hasn't been played. We could create a rating system for games based on distribution of playing hours. Such like hours of some free bad games could have a distribution under 2 hours. As following, We use the EM algorithm rather than percentiles to present the distribution. In the EM algorithm, We use 5 groups as 5 stars to distinguish the good from the bad.
 
+```python
+def game_hrs_density(GAME, nclass, print_vals=True):
+    game_data = steam_clean[(steam_clean['game1'] == GAME) & (steam_clean['hrs'] > 2)]
+    game_data['loghrs'] = np.log(steam_clean['hrs'])
+    mu_init = np.linspace(min(game_data['loghrs']), max(game_data['loghrs']), nclass).reshape(-1, 1)
+    sigma_init = np.array([1] * nclass).reshape(-1, 1, 1)
+    gaussian = GaussianMixture(n_components=nclass, means_init=mu_init, precisions_init=sigma_init).fit(game_data['loghrs'].values.reshape([-1, 1]))
+    if print_vals:
+        print(' lambda: {}\n mean: {}\n sigma: {}\n'.format(gaussian.weights_, gaussian.means_, gaussian.covariances_))
+    # building data frame for plotting
+    x = np.linspace(min(game_data['loghrs']), max(game_data['loghrs']), 1000)
+    dens = pd.DataFrame({'x': x})
+    for i in range(nclass):
+        dens['y{}'.format(i+1)] = gaussian.weights_[i]* scipy.stats.norm(gaussian.means_[i][0], gaussian.covariances_[i][0][0]).pdf(x)
+    dens = dens.melt('x', value_name='gaussian')
+    game_plt = ggplot(aes(x='loghrs', y='stat(density)'), game_data) + geom_histogram(bins=25, colour = "black", alpha = 0.7, size = 0.1) + \
+               geom_area(dens, aes(x='x', y='gaussian', fill = 'variable'), alpha = 0.5, position = position_dodge(width=0.2)) + geom_density()+ \
+               ggtitle(GAME)
+    return game_plt
+
+a = game_hrs_density('Fallout4', 5, True)
+```
+
 ![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/EM_SingleAnalysis.png)
 
 According to the plot, we could see the there are most of the users of Fallout 4 distribute in 4-5 groups. However there are a few users quickly lost their interests. It make sense to request a refund for the game that have benn played less than 2 hours. As you can see EM algorithm does a great job finding the groups of people with similar gaming habits and would potentially rate the game in a similar way. 
 
 It does have some trouble converging which iThis example will use a gradient descent approach to find optimal U and V matrices which retain the actual observations with predict the missing values by drawing on the information between similar users and games. I have chosen a learning rate of 0.001 and will run for 200 iterations tracking the RMSE. The objective function is the squared error between the actual observed values and the predicted values. The U and V matrices are initialised with a random draw from a ~N(0, 0.01) distibution. This may take a few minutes to run.sn't surprising however the resulting distributions look very reasonable. 
 
+```python
+np.random.seed(910)
+game_freq['game1'] = game_freq['game'].apply(lambda x: re.sub('[^a-zA-Z0-9]', '', x))
+game_users = game_freq[game_freq['user'] > 50]
+steam_clean_pos = steam_clean[steam_clean['hrs'] > 2]
+steam_clean_pos_idx = steam_clean_pos['game1'].apply(lambda x: x in game_users['game1'].values)
+steam_clean_pos = steam_clean_pos[steam_clean_pos_idx]
+steam_clean_pos['loghrs'] = np.log(steam_clean_pos['hrs'])
+
+# make matrix
+games = pd.DataFrame({'game1': sorted(steam_clean_pos['game1'].unique()), 'game_id': range(len(steam_clean_pos['game1'].unique()))})
+users = pd.DataFrame({'user': sorted(steam_clean_pos['user'].unique()), 'user_id': range(len(steam_clean_pos['user'].unique()))})
+steam_clean_pos = pd.merge(steam_clean_pos, games, on=['game1'])
+steam_clean_pos = pd.merge(steam_clean_pos, users, on=['user'])
+ui_mat = np.zeros([len(users), len(games)])
+for i in range(steam_clean_pos.shape[0]):
+    line = steam_clean_pos.iloc[i]
+    ui_mat[line['user_id'], line['game_id']] = line['loghrs']
+```
+   
 A user-item matrix is created with the users being the rows and games being the columns. The missing values are set to zero. The observed values are the log hours for each observed user-game combination. The data was subset to games which have greater than 50 users and users which played the game for greater than 2 hours. This was chosen as 2 hours is the limit in which Steam will offer a return if you did not like the purchased game (a shout out to the Australian Competition and Consumer Commission for that one!).
 
+```python
+Y = pd.DataFrame(ui_train).copy()
+# mean impute
+means = np.mean(Y)
+for i, col in enumerate(Y.columns):
+    Y[col] = Y[col].apply(lambda x: means[i] if x == 0 else x)
+U, D, V = np.linalg.svd(Y)
+
+p_df = pd.DataFrame({'x': range(1, len(D)+1), 'y': D/np.sum(D)})
+ggplot(p_df, aes(x='x', y='y')) + \
+geom_line() + \
+labs(x = "Leading component", y = "")
+lc = 60
+pred = np.dot(np.dot(U[:, :lc], np.diag(D[:lc])), V[:lc, :])
+#print(rmse(pred, test))
+rmse(pred, test, True).head()
+```
 The basic SVD approach will perform matrix factorisation using the first 60 leading components. Since the missing values are set to 0 the factorisation will try and recreate them which is not quite what we want. For this example we will simply impute the missing observations with a mean value.
 
+```python
+# SVD via gradient descent
+# Setting matricies
+leading_components=60
+leading_components=60
+Y = pd.DataFrame(ui_train)
+I = Y.copy()
+for col in I.columns:
+    I[col] = I[col].apply(lambda x: 1 if x > 0 else 0)
+U = np.random.normal(0, 0.01, [I.shape[0], leading_components])
+V = np.random.normal(0, 0.01, [I.shape[1], leading_components])
+
+def f(U, V):
+    return np.sum(I.values*(np.dot(U, V.T)-Y.values)**2)
+def dfu(U):
+    return np.dot((2*I.values*(np.dot(U, V.T)-Y.values)), V)
+def dfv(V):
+    return np.dot((2*I.values*(np.dot(U, V.T)-Y.values)).T, U)
+# gradient descent
+N = 200
+alpha = 0.001
+pred = np.round(np.dot(U, V.T), decimals=2)
+fobj = [f(U, V)]
+rmsej = [rmse(pred, test)]
+start = time.time()
+for i in tqdm(range(N)):
+    U = U - alpha*dfu(U)
+    V = V - alpha*dfv(V)
+    fobj.append(f(U, V))
+    pred = np.round(np.dot(U, V.T), 2)
+    rmsej.append(rmse(pred, test))
+print('Time difference of {} mins'.format((time.time() - start) / 60))
+fojb = np.array(fobj)
+rmsej = np.array(rmsej)
+path1 = pd.DataFrame({'itr': range(1, N+2), 'fobj': fobj, 'fobjp': fobj/max(fobj), 'rmse': rmsej, 'rmsep': rmsej/max(rmsej)})
+path1gg = pd.melt(path1[["itr", "fobjp", "rmsep"]], id_vars=['itr'])
+```
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/SVD_Compare.png)
 This example will use a gradient descent approach to find optimal U and V matrices which retain the actual observations with predict the missing values by drawing on the information between similar users and games. I have chosen a learning rate of 0.001 and will run for 200 iterations tracking the RMSE. The objective function is the squared error between the actual observed values and the predicted values. The U and V matrices are initialised with a random draw from a ~N(0, 0.01) distibution. This may take a few minutes to run.
 
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/EM_SVD_Analysis.png?raw=true)
 
  
 ### Content-based Recommender
