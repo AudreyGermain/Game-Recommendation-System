@@ -2,7 +2,3 @@
 ---
 
 @import "{{ site.theme }}";
-.gist-data{
-    height:400px; // Any height
-    overflow-y: visible;
-}
