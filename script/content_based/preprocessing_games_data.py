@@ -7,7 +7,7 @@ locationGamesFile = pathlib.Path(r'../../data/raw_data/steam_games.csv')
 dataGames = read_csv(locationGamesFile,
                      usecols=["name", "genre", "game_details", "popular_tags", "publisher", "developer"])
 
-locationUsersFile = pathlib.Path(r'../../data/model_data/steam_user_train.csv')
+locationUsersFile = pathlib.Path(r'../../data/raw_data/steam_users_purchase_play.csv')
 dataUsers = read_csv(locationUsersFile, header=None, usecols=[0, 1, 2, 3],
                      names=["user_id", "game_name", "behavior", "hours"])
 

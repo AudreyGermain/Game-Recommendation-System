@@ -474,11 +474,11 @@ This version will be used to compare the other 2 algorithms.
 Algorithm| Ratio
 ------------ | -------------
 Popular tags| 0.6455%
-Genre | 1.1295%
+Genre | 1.0847%
 Genre, popular tags & developer | 0.6992%
-Genre, popular tags & game details | 0.9234%
-Genre, publisher & developer | 1.8377%
-Genre, publisher, developer & game details | 1.6943%
+Genre, popular tags & game details | 0.9144%
+Genre, publisher & developer | 1.8198%
+Genre, publisher, developer & game details | 1.6764%
 
 We calculated the ratio in the same way for both of the collaborative algorithm, the result are in the following table.
 As we can see, the collaborative recommender with ALS is the best one, followed by the content based recommender.
@@ -487,8 +487,8 @@ The performance of the collaborative recommendation system with EM and SVD is fa
 Algorithm| Ratio
 ------------ | -------------
 Collaborative with ALS| 2.6707%
-Collaborative with EM and SVD | 0.2557%
-Content-based (Genre, publisher & developer) | 1.8377%
+Collaborative with EM and SVD | 0.3652%
+Content-based (Genre, publisher & developer) | 1.8198%
 
 ## V. Related Work <a name="related-work"></a>
 
@@ -504,6 +504,10 @@ For the EM algorithm we used the article
 [Machine Learning with Python: Exception Maximization and Gaussian Mixture Models in Python](https://www.python-course.eu/expectation_maximization_and_gaussian_mixture_models.php).<br/>
 
 ## VI. Conclusion: Discussion <a name="conclusion"></a>
+
+In conclusion, we implemented 3 different algorithm for recommendation system, one content-based and two collaborative,
+one with the ALS algorithm and the other with the EM and SVD algorithm. The collaborative recommender with the ALS
+algorithm seems to give the best recommendation based on our evaluation.<br/>
 
 It would be interesting to create an hybrid recommender system using the collaborative recommender with the ALS 
 algorithm and the content based algorithm using the genre, publisher and developer as input to see if we can make 
