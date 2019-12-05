@@ -179,7 +179,7 @@ def game_hrs_density_p(pred, GAME=None, nclass=1, print_vals=True):
 
 a = game_hrs_density_p(pred, "Fallout4", 5)
 print(a)
-'''
+
 # Export recommend games
 user_dict = dict(users.values)
 game_dict = {games.iloc[i, 0]: games.iloc[i, 1] for i in range(games.shape[0])}
@@ -225,7 +225,7 @@ df = pd.DataFrame(result)
 columns = ['user'] + ['top_{}'.format(i+1) for i in range(top_N)]
 df.columns = columns
 df.to_csv('D:/Game-Recommendation-System/data/output_data/Collaborative_EM_output.csv', index=None)
-'''
+
 
 
 
