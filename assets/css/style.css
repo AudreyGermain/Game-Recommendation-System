@@ -1,0 +1,8 @@
+---
+---
+
+@import "";
+.gist-data{
+    height:250px; // Any height
+    overflow-y: visible;
+}

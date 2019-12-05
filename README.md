@@ -32,6 +32,7 @@ We will be using some user data and game data, the datasets used will be explain
 
 The primary focus of this project is to build a recommendation system that will recommend games for each user based on
 their preferences and gaming habits. In order to make our recommendation system the best possible, multiple algorithms
+
 will be implemented and compared to make the recommendation the most relevant possible for each users.<br/>
 
 There are three main types of recommendation system: collaborative filtering, content-based filtering and hybrid recommendation system. 
@@ -102,6 +103,11 @@ After we removed the users who just purchased the games but hasn't played. Some 
 Some Games like these add noise to the dataset. So that's one of the reasons we use EM algorithms to create rating system for the games.
 
 [//]: # (Box plot)
+In order to have a better understanding of the user data distribution and user's playing habits, a box plot is produced for the top 20 most played games.
+
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/boxplot_top_20_games.png?raw=true)
+
+As we can see, the data distribution for each game considered is not symmetrical. Even more, 75% of data points for each game is in the range of the hundreds hours, with several games having very large outliers. We can see for example a user played more than 10,000 hours "Dota 2". Another interesting example, a user played almost 12,000 hours "Sid Meier's Civilization V".
 
 ### b. Game Dataset <a name="game"></a>
 [//]: # (Game Dataset description)
@@ -132,12 +138,12 @@ The work presented is based on the ["ALS Implicit Collaborative Filtering"](http
 
 Collaborative filtering does not require any information about the items or the users in order to provide recommendation. It only uses the interactions between users and items expressed by some kind of rating.
 
-The data used for this recommender system is that of the steam users described in [subsection X](). The data does not explicitly contains the rating or preference of users towards the games, but rather it is **implicitly** expressed by the amount of hours users played games.
+The data used for this recommender system is that of the steam users described in [subsection II.a](#user). The data does not explicitly contains the rating or preference of users towards the games, but rather it is **implicitly** expressed by the amount of hours users played games.
 
 The Alternating Least Squares (ALS) is the model used to fit the data and generate recommendations. The ALS model is already implemented in the [implicit](https://github.com/benfred/implicit) python library thanks to [Ben Frederickson](http://www.benfrederickson.com/fast-implicit-matrix-factorization/).  
 As described on its documentation [here](https://implicit.readthedocs.io/en/latest/als.html), the ALS algorithm available through the implicit library is a Recommendation Model based on the algorithms described in the paper [Collaborative Filtering for Implicit Feedback Datasets](http://yifanhu.net/PUB/cf.pdf) with performance optimizations described in [Applications of the Conjugate Gradient Method for Implicit Feedback Collaborative Filtering](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.379.6473&rep=rep1&type=pdf). The advantage of using the implicit python library versus a manual implementation of the algorithm is the speed required to generate recommendation since the ALS model in the implicit library uses Cython allowing the parallelization of the code among threads.
 
-(Explain what's ALS and what it does)
+**(Explain what's ALS and what it does)**
 
 In order to generate recommendations, the class ImplicitCollaborativeRecommender is implemented in a python script. The code is available here below.
 
