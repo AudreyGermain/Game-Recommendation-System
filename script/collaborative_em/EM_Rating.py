@@ -12,7 +12,7 @@ from sklearn.mixture import GaussianMixture
 from sklearn.model_selection import train_test_split
 
 
-locationUsersFile=pathlib.Path(r'D:/Game-Recommendation-System/data/steam_users_purchase_play.csv')
+locationUsersFile=pathlib.Path(r'D:/Game-Recommendation-System/data/raw_data/steam_users_purchase_play.csv')
 steam_clean = pd.read_csv(locationUsersFile, header=1, names=['user', 'game', 'hrs', 'purchase','play'])
 
 game_freq = steam_clean.groupby(by='game').agg({'user': 'count', 'hrs': 'sum'}).reset_index()
@@ -43,8 +43,7 @@ def game_hrs_density(GAME, nclass, print_vals=True):
                ggtitle(GAME)
     return game_plt
 
-a = game_hrs_density('TheWitcher3WildHunt', 5, True)
-
+a = game_hrs_density('Fallout4', 5, True)
 
 
 # Create user item matrix
@@ -65,6 +64,7 @@ ui_mat = np.zeros([len(users), len(games)])
 for i in range(steam_clean_pos.shape[0]):
     line = steam_clean_pos.iloc[i]
     ui_mat[line['user_id'], line['game_id']] = line['loghrs']
+
 # create training set i.e. suppress a tenth of the actual ratings
 train, test = train_test_split(steam_clean_pos, test_size=0.1)
 ui_train = ui_mat
@@ -145,7 +145,7 @@ path1gg = pd.melt(path1[["itr", "fobjp", "rmsep"]], id_vars=['itr'])
 #print(path1.tail(1))
 
 
-ggplot(path1gg, aes('itr', 'value', color = 'variable')) + geom_line()
+print(ggplot(path1gg, aes('itr', 'value', color = 'variable')) + geom_line())
 
 
 # Create a rating based on time played
@@ -177,8 +177,8 @@ def game_hrs_density_p(pred, GAME=None, nclass=1, print_vals=True):
                ggtitle(t_GAME)
     return game_plt
 
-a = game_hrs_density_p(pred, "TheWitcher3WildHunt", 5)
-
+a = game_hrs_density_p(pred, "Fallout4", 5)
+print(a)
 
 # Export recommend games
 user_dict = dict(users.values)
@@ -225,7 +225,6 @@ df = pd.DataFrame(result)
 columns = ['user'] + ['top_{}'.format(i+1) for i in range(top_N)]
 df.columns = columns
 df.to_csv('D:/Game-Recommendation-System/data/output_data/Collaborative_EM_output.csv', index=None)
-
 
 
 
