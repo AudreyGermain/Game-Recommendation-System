@@ -147,7 +147,7 @@ As described on its documentation [here](https://implicit.readthedocs.io/en/late
 
 In order to generate recommendations, the class ImplicitCollaborativeRecommender is implemented in a python script. The code is available here below.
 
-[//]: # (<script src="https://gist.github.com/g30rdan/d992457bf34607493c19341c96761387.js"></script>)
+<script src="https://gist.github.com/g30rdan/d992457bf34607493c19341c96761387.js"></script>
 
 (To complete)
 
