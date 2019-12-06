@@ -97,11 +97,13 @@ As you can see Dota 2 has the highest number of players and the highest number o
 
 [//]: # (Histogram 1: all users: play + purchase)
 Then we count the number of users for each games, and output a histograph to make the data visualization. 
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_AllUsersHrs.png)
+
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_AllUsersHrs.png?raw=true)
 
 [//]: # (Histogram 2: only users: play)
 After we removed the users who just purchased the games but hasn't played. Some games fell from the top 20.
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_UsersHrs.png)
+
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_UsersHrs.png?raw=true)
 Some Games like these add noise to the dataset. So that's one of the reasons we use EM algorithms to create rating system for the games.
 
 [//]: # (Box plot)
