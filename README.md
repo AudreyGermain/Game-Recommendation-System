@@ -480,6 +480,9 @@ test dataset. The mean of the ratio for all users is the calculated. The ratio i
 user in the training dataset it was not possible to get the recommendations and some user don't have games
 in the test dataset, in those cases the ratio will be 0. <br>
 
+The idea of calculating the ratio in this way was inspired but the precision at K metric used in the KDD reseach paper: 
+[Real-time Attention Based Look-alike Model for Recommender System](https://www.kdd.org/kdd2019/accepted-papers/view/real-time-attention-based-look-alike-model-for-recommender-system).
+
 ![image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/ratio_equation.png)
 
 First of all, we compared the content based algorithm with different input. 
@@ -519,6 +522,9 @@ to implement the function that give the recommendation for each games.<br/>
 
 For the EM algorithm we used the article
 [Machine Learning with Python: Exception Maximization and Gaussian Mixture Models in Python](https://www.python-course.eu/expectation_maximization_and_gaussian_mixture_models.php).<br/>
+
+The KDD research paper [Real-time Attention Based Look-alike Model for Recommender System](https://www.kdd.org/kdd2019/accepted-papers/view/real-time-attention-based-look-alike-model-for-recommender-system)
+gave us the idea to calculate the ratio the way we did to compare the algorithms.
 
 ## VI. Conclusion: Discussion <a name="conclusion"></a>
 
