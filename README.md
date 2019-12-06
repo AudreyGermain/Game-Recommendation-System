@@ -109,7 +109,7 @@ Some Games like these add noise to the dataset. So that's one of the reasons we 
 [//]: # (Box plot)
 In order to have a better understanding of the user data distribution and user's playing habits, a box plot is produced for the top 20 most played games.
 
-![Image text](master/plots/boxplot_top_20_games.png?raw=true)
+![Image text](plots/boxplot_top_20_games.png?raw=true)
 
 As we can see, the data distribution for each game considered is not symmetrical. Even more, 75% of data points for each game is in the range of the hundreds hours, with several games having very large outliers. We can see for example a user played more than 10,000 hours "Dota 2". Another interesting example, a user played almost 12,000 hours "Sid Meier's Civilization V".
 
