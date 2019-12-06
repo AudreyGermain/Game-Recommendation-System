@@ -483,7 +483,7 @@ in the test dataset, in those cases the ratio will be 0. <br>
 The idea of calculating the ratio in this way was inspired but the precision at K metric used in the KDD reseach paper: 
 [Real-time Attention Based Look-alike Model for Recommender System](https://www.kdd.org/kdd2019/accepted-papers/view/real-time-attention-based-look-alike-model-for-recommender-system).
 
-![image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/ratio_equation.png)
+![image text](plots/ratio_equation.png)
 
 First of all, we compared the content based algorithm with different input. 
 Those input are either column from the original dataset or a combination of different columns. 
