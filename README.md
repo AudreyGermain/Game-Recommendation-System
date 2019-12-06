@@ -98,18 +98,18 @@ As you can see Dota 2 has the highest number of players and the highest number o
 [//]: # (Histogram 1: all users: play + purchase)
 Then we count the number of users for each games, and output a histograph to make the data visualization. 
 
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_AllUsersHrs.png?raw=true)
+![Image text](plots/Histogram_AllUsersHrs.png?raw=true)
 
 [//]: # (Histogram 2: only users: play)
 After we removed the users who just purchased the games but hasn't played. Some games fell from the top 20.
 
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_UsersHrs.png?raw=true)
+![Image text](plots/Histogram_UsersHrs.png?raw=true)
 Some Games like these add noise to the dataset. So that's one of the reasons we use EM algorithms to create rating system for the games.
 
 [//]: # (Box plot)
 In order to have a better understanding of the user data distribution and user's playing habits, a box plot is produced for the top 20 most played games.
 
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/boxplot_top_20_games.png?raw=true)
+![Image text](master/plots/boxplot_top_20_games.png?raw=true)
 
 As we can see, the data distribution for each game considered is not symmetrical. Even more, 75% of data points for each game is in the range of the hundreds hours, with several games having very large outliers. We can see for example a user played more than 10,000 hours "Dota 2". Another interesting example, a user played almost 12,000 hours "Sid Meier's Civilization V".
 
@@ -196,7 +196,7 @@ def game_hrs_density(GAME, nclass, print_vals=True):
 a = game_hrs_density('Fallout4', 5, True)
 ```
 
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/EM_SingleAnalysis.png?raw=true)
+![Image text](plots/EM_SingleAnalysis.png?raw=true)
 
 According to the plot, we could see the there are most of the users of Fallout 4 distribute in 4-5 groups. However there are a few users quickly lost their interests. It make sense to request a refund for the game that have benn played less than 2 hours. As you can see EM algorithm does a great job finding the groups of people with similar gaming habits and would potentially rate the game in a similar way. 
 
@@ -280,10 +280,10 @@ rmsej = np.array(rmsej)
 path1 = pd.DataFrame({'itr': range(1, N+2), 'fobj': fobj, 'fobjp': fobj/max(fobj), 'rmse': rmsej, 'rmsep': rmsej/max(rmsej)})
 path1gg = pd.melt(path1[["itr", "fobjp", "rmsep"]], id_vars=['itr'])
 ```
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/SVD_Compare.png?raw=true)
+![Image text](plots/SVD_Compare.png?raw=true)
 This example will use a gradient descent approach to find optimal U and V matrices which retain the actual observations with predict the missing values by drawing on the information between similar users and games. I have chosen a learning rate of 0.001 and will run for 200 iterations tracking the RMSE. The objective function is the squared error between the actual observed values and the predicted values. The U and V matrices are initialised with a random draw from a ~N(0, 0.01) distibution. This may take a few minutes to run.
 
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/EM_SVD_Analysis.png?raw=true)
+![Image text](plots/EM_SVD_Analysis.png?raw=true)
 
  
 ### Content-based Recommender <a name="content-based"></a>
