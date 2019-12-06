@@ -158,11 +158,13 @@ The collaborative recommender model is created using the training user data with
 <script src="https://gist.github.com/g30rdan/ae0a11c3715295c3fd88cb5ee6e7ee57.js"></script>
 
 With me model successfully loaded, we can start generating recommendations for all the users for which user/items interactions were hidden during the process of 
-training and testing data splitting. For each user, 20 recommendations are generated using the following lines of code.
+training and testing data splitting. For each user, 20 recommendations are generated using the following lines of code. Recommendations are stored in a Pandas dataframe, which is later on exported as a csv file.
 
 <script src="https://gist.github.com/g30rdan/8f225e83ae3249fa051d8c4beba5e202.js"></script>
 
 It is to note that for some users, the model fails to produce recommendations. This is  due to the fact that many users have only one user/interactions which ended up in the testing dataset. Hence, since the model has no knowledge about these users preferences, it cannot produce any recommendations. For these cases, the output values are set equal to '-999'.
+
+
 
 
 
