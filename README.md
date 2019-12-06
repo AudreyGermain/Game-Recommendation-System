@@ -465,30 +465,32 @@ test dataset. The mean of the ratio for all users is the calculated. The ratio i
 user in the training dataset it was not possible to get the recommendations and some user don't have games
 in the test dataset, in those cases the ratio will be 0. <br>
 
+![image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/ratio_equation.png)
+
 First of all, we compared the content based algorithm with different input. 
 Those input are either column from the original dataset or a combination of different columns. 
 In the following table we ca see the ratio for the different inputs. 
 As we can see, the best algorithm is the one that uses the genre, publisher and developer of the game as input.
 This version will be used to compare the other 2 algorithms.
 
-Algorithm| Ratio
------------- | -------------
-Popular tags| 0.6455%
-Genre | 1.0847%
-Genre, popular tags & developer | 0.6992%
-Genre, popular tags & game details | 0.9144%
-Genre, publisher & developer | 1.8198%
-Genre, publisher, developer & game details | 1.6764%
+Content-Based Algorithm Input| Ratio [10<sup>2</sup>] | Number of Game in the Recommendation the User has in Test Dataset | Number of Game the User has in Test Dataset
+------------ | ------------- | ------------- | -------------
+Popular tags| 0.6455 | 0.074316 | 2.190587
+Genre | 1.0847 | 0.069745 | 2.190587
+Genre, popular tags & developer | 0.6992 | 0.075571 | 2.190587
+Genre, popular tags & game details | 0.9144 | 0.093949 | 2.190587
+Genre, publisher & developer | 1.8198 | 0.105782 | 2.190587
+Genre, publisher, developer & game details | 1.6764 | 0.104169 | 2.190587
 
 We calculated the ratio in the same way for both of the collaborative algorithm, the result are in the following table.
 As we can see, the collaborative recommender with ALS is the best one, followed by the content based recommender.
 The performance of the collaborative recommendation system with EM and SVD is far behind the other 2.
 
-Algorithm| Ratio
------------- | -------------
-Collaborative with ALS| 2.6707%
-Collaborative with EM and SVD | 0.3652%
-Content-based (Genre, publisher & developer) | 1.8198%
+Algorithm| Ratio [10<sup>2</sup>] | Number of Game in the Recommendation the User has in Test Dataset | Number of Game the User has in Test Dataset
+------------ | ------------- | ------------- | -------------
+Collaborative with ALS| 2.6707 | 1.226195 | 27.357905
+Collaborative with EM and SVD | 0.3652 | 0.024349 | 2.907840
+Content-based (Genre, publisher & developer) | 1.8198 | 0.105782 | 2.190587
 
 ## V. Related Work <a name="related-work"></a>
 
