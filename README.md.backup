@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="style.css">
+
 # Recommendation System for Steam Game Store: An overview of recommender systems
 
 ## Team:<br/>
@@ -95,11 +97,13 @@ As you can see Dota 2 has the highest number of players and the highest number o
 
 [//]: # (Histogram 1: all users: play + purchase)
 Then we count the number of users for each games, and output a histograph to make the data visualization. 
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_AllUsersHrs.png)
+
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_AllUsersHrs.png?raw=true)
 
 [//]: # (Histogram 2: only users: play)
 After we removed the users who just purchased the games but hasn't played. Some games fell from the top 20.
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_UsersHrs.png)
+
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_UsersHrs.png?raw=true)
 Some Games like these add noise to the dataset. So that's one of the reasons we use EM algorithms to create rating system for the games.
 
 [//]: # (Box plot)
@@ -138,18 +142,29 @@ The work presented is based on the ["ALS Implicit Collaborative Filtering"](http
 
 Collaborative filtering does not require any information about the items or the users in order to provide recommendation. It only uses the interactions between users and items expressed by some kind of rating.
 
-The data used for this recommender system is that of the steam users described in [subsection X](). The data does not explicitly contains the rating or preference of users towards the games, but rather it is **implicitly** expressed by the amount of hours users played games.
+The data used for this recommender system is that of the steam users described in [subsection II.a](#user). The data does not explicitly contains the rating or preference of users towards the games, but rather it is **implicitly** expressed by the amount of hours users played games.
 
 The Alternating Least Squares (ALS) is the model used to fit the data and generate recommendations. The ALS model is already implemented in the [implicit](https://github.com/benfred/implicit) python library thanks to [Ben Frederickson](http://www.benfrederickson.com/fast-implicit-matrix-factorization/).  
 As described on its documentation [here](https://implicit.readthedocs.io/en/latest/als.html), the ALS algorithm available through the implicit library is a Recommendation Model based on the algorithms described in the paper [Collaborative Filtering for Implicit Feedback Datasets](http://yifanhu.net/PUB/cf.pdf) with performance optimizations described in [Applications of the Conjugate Gradient Method for Implicit Feedback Collaborative Filtering](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.379.6473&rep=rep1&type=pdf). The advantage of using the implicit python library versus a manual implementation of the algorithm is the speed required to generate recommendation since the ALS model in the implicit library uses Cython allowing the parallelization of the code among threads.
 
-(Explain what's ALS and what it does)**
+**(Explain what's ALS and what it does)**
 
 In order to generate recommendations, the class ImplicitCollaborativeRecommender is implemented in a python script. The code is available here below.
 
-[//]: # (<script src="https://gist.github.com/g30rdan/d992457bf34607493c19341c96761387.js"></script>)
+<script src="https://gist.github.com/g30rdan/d992457bf34607493c19341c96761387.js"></script>
 
-(To complete)
+The collaborative recommender model is created using the training user data with the following lines of code.
+
+<script src="https://gist.github.com/g30rdan/ae0a11c3715295c3fd88cb5ee6e7ee57.js"></script>
+
+With me model successfully loaded, we can start generating recommendations for all the users for which user/items interactions were hidden during the process of 
+training and testing data splitting. For each user, 20 recommendations are generated using the following lines of code.
+
+<script src="https://gist.github.com/g30rdan/8f225e83ae3249fa051d8c4beba5e202.js"></script>
+
+It is to note that for some users, the model fails to produce recommendations. This is  due to the fact that many users have only one user/interactions which ended up in the testing dataset. Hence, since the model has no knowledge about these users preferences, it cannot produce any recommendations. For these cases, the output values are set equal to '-999'.
+
+
 
 
 #### c. Collaborative recommender with EM and SVD <a name="em"></a>
@@ -472,11 +487,11 @@ This version will be used to compare the other 2 algorithms.
 Algorithm| Ratio
 ------------ | -------------
 Popular tags| 0.6455%
-Genre | 1.1295%
+Genre | 1.0847%
 Genre, popular tags & developer | 0.6992%
-Genre, popular tags & game details | 0.9234%
-Genre, publisher & developer | 1.8377%
-Genre, publisher, developer & game details | 1.6943%
+Genre, popular tags & game details | 0.9144%
+Genre, publisher & developer | 1.8198%
+Genre, publisher, developer & game details | 1.6764%
 
 We calculated the ratio in the same way for both of the collaborative algorithm, the result are in the following table.
 As we can see, the collaborative recommender with ALS is the best one, followed by the content based recommender.
@@ -485,8 +500,8 @@ The performance of the collaborative recommendation system with EM and SVD is fa
 Algorithm| Ratio
 ------------ | -------------
 Collaborative with ALS| 2.6707%
-Collaborative with EM and SVD | 0.2557%
-Content-based (Genre, publisher & developer) | 1.8377%
+Collaborative with EM and SVD | 0.3652%
+Content-based (Genre, publisher & developer) | 1.8198%
 
 ## V. Related Work <a name="related-work"></a>
 
@@ -502,6 +517,10 @@ For the EM algorithm we used the article
 [Machine Learning with Python: Exception Maximization and Gaussian Mixture Models in Python](https://www.python-course.eu/expectation_maximization_and_gaussian_mixture_models.php).<br/>
 
 ## VI. Conclusion: Discussion <a name="conclusion"></a>
+
+In conclusion, we implemented 3 different algorithm for recommendation system, one content-based and two collaborative,
+one with the ALS algorithm and the other with the EM and SVD algorithm. The collaborative recommender with the ALS
+algorithm seems to give the best recommendation based on our evaluation.<br/>
 
 It would be interesting to create an hybrid recommender system using the collaborative recommender with the ALS 
 algorithm and the content based algorithm using the genre, publisher and developer as input to see if we can make 

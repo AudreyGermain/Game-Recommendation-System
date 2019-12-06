@@ -3,6 +3,6 @@
 
 @import "{{ site.theme }}";
 .gist-data{
-    height:250px; // Any height
+    height:500px; // Any height
     overflow-y: visible;
 }
