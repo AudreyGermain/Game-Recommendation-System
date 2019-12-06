@@ -97,11 +97,13 @@ As you can see Dota 2 has the highest number of players and the highest number o
 
 [//]: # (Histogram 1: all users: play + purchase)
 Then we count the number of users for each games, and output a histograph to make the data visualization. 
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_AllUsersHrs.png)
+
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_AllUsersHrs.png?raw=true)
 
 [//]: # (Histogram 2: only users: play)
 After we removed the users who just purchased the games but hasn't played. Some games fell from the top 20.
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_UsersHrs.png)
+
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/Histogram_UsersHrs.png?raw=true)
 Some Games like these add noise to the dataset. So that's one of the reasons we use EM algorithms to create rating system for the games.
 
 [//]: # (Box plot)
@@ -151,7 +153,20 @@ In order to generate recommendations, the class ImplicitCollaborativeRecommender
 
 <script src="https://gist.github.com/g30rdan/d992457bf34607493c19341c96761387.js"></script>
 
-(To complete)
+The collaborative recommender model is created using the training user data with the following lines of code.
+
+<script src="https://gist.github.com/g30rdan/ae0a11c3715295c3fd88cb5ee6e7ee57.js"></script>
+
+With me model successfully loaded, we can start generating recommendations for all the users for which user/items interactions were hidden during the process of 
+training and testing data splitting. For each user, 20 recommendations are generated using the following lines of code. Recommendations are stored in a Pandas dataframe, which is later on exported as a csv file.
+
+<script src="https://gist.github.com/g30rdan/8f225e83ae3249fa051d8c4beba5e202.js"></script>
+
+It is to note that for some users, the model fails to produce recommendations. This is  due to the fact that many users have only one user/interactions which ended up in the testing dataset. Hence, since the model has no knowledge about these users preferences, it cannot produce any recommendations. For these cases, the output values are set equal to '-999'.
+
+
+
+
 
 
 #### c. Collaborative recommender with EM and SVD <a name="em"></a>
@@ -181,7 +196,7 @@ def game_hrs_density(GAME, nclass, print_vals=True):
 a = game_hrs_density('Fallout4', 5, True)
 ```
 
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/EM_SingleAnalysis.png)
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/EM_SingleAnalysis.png?raw=true)
 
 According to the plot, we could see the there are most of the users of Fallout 4 distribute in 4-5 groups. However there are a few users quickly lost their interests. It make sense to request a refund for the game that have benn played less than 2 hours. As you can see EM algorithm does a great job finding the groups of people with similar gaming habits and would potentially rate the game in a similar way. 
 
@@ -265,7 +280,7 @@ rmsej = np.array(rmsej)
 path1 = pd.DataFrame({'itr': range(1, N+2), 'fobj': fobj, 'fobjp': fobj/max(fobj), 'rmse': rmsej, 'rmsep': rmsej/max(rmsej)})
 path1gg = pd.melt(path1[["itr", "fobjp", "rmsep"]], id_vars=['itr'])
 ```
-![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/SVD_Compare.png)
+![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/SVD_Compare.png?raw=true)
 This example will use a gradient descent approach to find optimal U and V matrices which retain the actual observations with predict the missing values by drawing on the information between similar users and games. I have chosen a learning rate of 0.001 and will run for 200 iterations tracking the RMSE. The objective function is the squared error between the actual observed values and the predicted values. The U and V matrices are initialised with a random draw from a ~N(0, 0.01) distibution. This may take a few minutes to run.
 
 ![Image text](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/plots/EM_SVD_Analysis.png?raw=true)

@@ -2,7 +2,7 @@
 ---
 
 @import "{{ site.theme }}";
-.gist .blob-wrapper.data {
-   max-height:500px;
-   overflow:auto;
+.gist-data{
+    max-height:500px; // Any height
+    overflow-y: scroll;
 }
