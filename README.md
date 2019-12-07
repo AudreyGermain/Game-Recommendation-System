@@ -421,7 +421,9 @@ indices = Series(dataGames.index, index=dataGames['name']).drop_duplicates()
 ```
 
 To generate the recommendation for each game, the following function is used. The input of the function is the title of
-the game as a string and the cosine matrix and the output is a list of recommended game title ordered by similarity.<br/>
+the game as a string and the cosine matrix and the output is a list of recommended game title ordered by similarity.
+The code for this function as well as the code to generate de cosine similarity matrix are taken from 
+[this tutorial](https://www.datacamp.com/community/tutorials/recommender-systems-python?fbclid=IwAR1fz9YLOgZ95KHwoLpgb-hTdV2MekujDGBngRTG3kYmBJYxwSK3UWvNJDg).<br/>
 
 ```python
 def get_recommendations(title, cosine_sim):
@@ -559,6 +561,14 @@ gave us the idea to calculate the ratio the way we did to compare the algorithms
 In conclusion, we implemented 3 different algorithm for recommendation system, one content-based and two collaborative,
 one with the ALS algorithm and the other with the EM and SVD algorithm. The collaborative recommender with the ALS
 algorithm seems to give the best recommendation based on our evaluation.<br/>
+
+When the project was started using the 2 datasets, it was expected, since the both came from Steam, that every game in 
+the user dataset would match a game in the training dataset, but as the project progressed we realized it wasn't the case. 
+This caused a major issue for the content-based algorithm since it really relies on the fact that the game dataset 
+have information about the games that are in the user dataset. Because of this issue, it was not possible to generate 
+recommendation for every games the users have. Because of this, a lot of user don't have recommendation and it probably 
+affect the performance of the algorithm. If we had to do a similar project on recommender system again, it would be 
+important to make sure we have information about every product when choosing the datasets.<br/>
 
 It would be interesting to create an hybrid recommender system using the collaborative recommender with the ALS 
 algorithm and the content based algorithm using the genre, publisher and developer as input to see if we can make 
