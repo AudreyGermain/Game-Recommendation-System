@@ -127,6 +127,19 @@ percentage of positive reviews.
 
 ![Image text](plots/Histogram_GameReviews.png)
 
+This is all the genre of the games in the game dataset and the number of game associated to the genre.
+
+![Image text](plots/Histogram_GameGenre.png)
+
+This is the 20 most popular tags in the game dataset and the number of game associated to them.
+
+![Image text](plots/Histogram_GamePopularTags.png)
+
+This is the 20 most recurrent game details in the game dataset and the number of game associated to them.
+
+![Image text](plots/Histogram_GameDetails.png)
+
+
 ## III. Methodology <a name="methodology"></a>
 
 We decided to use 3 differents algorithms to generate recommendation by user. We use 2 collaborative algorithm,
