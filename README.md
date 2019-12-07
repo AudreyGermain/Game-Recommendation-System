@@ -549,13 +549,13 @@ Genre, publisher & developer | 1.8198 | 0.105782 | 2.190587
 Genre, publisher, developer & game details | 1.6764 | 0.104169 | 2.190587
 
 We calculated the ratio in the same way for both of the collaborative algorithm, the result are in the following table.
-As we can see, the collaborative recommender with ALS is the best one, followed by the content based recommender.
-The performance of the collaborative recommendation system with EM and SVD is far behind the other 2.
+As we can see, the collaborative recommender with ALS is the best one.
+The performance of the collaborative recommendation system with EM and SVD and the content-based recommender system are far behind it.
 
 Algorithm| Ratio [10<sup>2</sup>] | Number of Game in the Recommendation the User has in Test Dataset | Number of Game the User has in Test Dataset
 ------------ | ------------- | ------------- | -------------
-Collaborative with ALS| 2.6707 | 1.226195 | 27.357905
-Collaborative with EM and SVD | 0.3652 | 0.024349 | 2.907840
+Collaborative with ALS| 9.3402 | 0.444216 | 4.414910
+Collaborative with EM and SVD | 0.4143 | 0.024372 | 2.909578
 Content-based (Genre, publisher & developer) | 1.8198 | 0.105782 | 2.190587
 
 ## V. Related Work <a name="related-work"></a>
