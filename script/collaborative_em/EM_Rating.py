@@ -15,12 +15,19 @@ from sklearn.model_selection import train_test_split
 locationUsersFile=pathlib.Path(r'D:/Game-Recommendation-System/data/raw_data/steam_users_purchase_play.csv')
 steam_clean = pd.read_csv(locationUsersFile, header=1, names=['user', 'game', 'hrs', 'purchase','play'])
 
+locationUsersFile_train=pathlib.Path(r'D:/Game-Recommendation-System/data/model_data/steam_user_train.csv')
+steam_traind = pd.read_csv(locationUsersFile_train, header=1, names=['user', 'game', 'hrs', 'purchase','play'])
+
+locationUsersFile_test=pathlib.Path(r'D:/Game-Recommendation-System/data/model_data/steam_user_test.csv')
+steam_test = pd.read_csv(locationUsersFile_test, header=1, names=['user', 'game', 'hrs', 'purchase','play'])
+
 game_freq = steam_clean.groupby(by='game').agg({'user': 'count', 'hrs': 'sum'}).reset_index()
 top20 = game_freq.sort_values(by='user',ascending=False)[:20].reset_index()
 #print(top20)
 
 # Cleaning up the game columns. It doesn't like some of the special characters
 steam_clean['game1'] = steam_clean['game'].apply(lambda x: re.sub('[^a-zA-Z0-9]', '', x))
+steam_traind['game1'] = steam_traind['game'].apply(lambda x: re.sub('[^a-zA-Z0-9]', '', x))
 #steam_clean.head()
 
 #First EM Algorithm
@@ -50,23 +57,49 @@ a = game_hrs_density('Fallout4', 5, True)
 np.random.seed(910)
 game_freq['game1'] = game_freq['game'].apply(lambda x: re.sub('[^a-zA-Z0-9]', '', x))
 game_users = game_freq[game_freq['user'] > 50]
+
+#For whole dataset
 steam_clean_pos = steam_clean[steam_clean['hrs'] > 2]
 steam_clean_pos_idx = steam_clean_pos['game1'].apply(lambda x: x in game_users['game1'].values)
 steam_clean_pos = steam_clean_pos[steam_clean_pos_idx]
 steam_clean_pos['loghrs'] = np.log(steam_clean_pos['hrs'])
+
 
 # make matrix
 games = pd.DataFrame({'game1': sorted(steam_clean_pos['game1'].unique()), 'game_id': range(len(steam_clean_pos['game1'].unique()))})
 users = pd.DataFrame({'user': sorted(steam_clean_pos['user'].unique()), 'user_id': range(len(steam_clean_pos['user'].unique()))})
 steam_clean_pos = pd.merge(steam_clean_pos, games, on=['game1'])
 steam_clean_pos = pd.merge(steam_clean_pos, users, on=['user'])
+print(steam_clean_pos)
+
+#test dataset user
+users_test = pd.DataFrame({'user': sorted(steam_test['user'].unique()), 'user_id': range(len(steam_test['user'].unique()))})
+
+
+#for train dataset
+steam_train = steam_traind[steam_traind['hrs'] > 2]
+steam_train_idx = steam_train['game1'].apply(lambda x: x in game_users['game1'].values)
+steam_train = steam_train[steam_train_idx]
+steam_train['loghrs'] = np.log(steam_train['hrs'])
+
+# make matrix
+games_train = pd.DataFrame({'game1': sorted(steam_train['game1'].unique()), 'game_id': range(len(steam_train['game1'].unique()))})
+users_train = pd.DataFrame({'user': sorted(steam_train['user'].unique()), 'user_id': range(len(steam_train['user'].unique()))})
+steam_train = pd.merge(steam_train, games_train, on=['game1'])
+steam_train = pd.merge(steam_train, users_train, on=['user'])
+print(steam_train)
+
+
 ui_mat = np.zeros([len(users), len(games)])
 for i in range(steam_clean_pos.shape[0]):
-    line = steam_clean_pos.iloc[i]
-    ui_mat[line['user_id'], line['game_id']] = line['loghrs']
+  line = steam_clean_pos.iloc[i]
+  ui_mat[line['user_id'], line['game_id']] = line['loghrs']
+
 
 # create training set i.e. suppress a tenth of the actual ratings
-train, test = train_test_split(steam_clean_pos, test_size=0.1)
+#train, test = train_test_split(steam_clean_pos, test_size=0.1)
+test=steam_train
+
 ui_train = ui_mat
 for i in range(test.shape[0]):
     line = test.iloc[i]
@@ -103,12 +136,13 @@ lc = 60
 pred = np.dot(np.dot(U[:, :lc], np.diag(D[:lc])), V[:lc, :])
 
 #print(rmse(pred, test))
+print(test)
 rmse(pred, test, True).head()
 
 # SVD via gradient descent
 # Setting matricies
 leading_components=60
-leading_components=60
+
 Y = pd.DataFrame(ui_train)
 I = Y.copy()
 for col in I.columns:
@@ -145,7 +179,7 @@ path1gg = pd.melt(path1[["itr", "fobjp", "rmsep"]], id_vars=['itr'])
 #print(path1.tail(1))
 
 
-print(ggplot(path1gg, aes('itr', 'value', color = 'variable')) + geom_line())
+#print(ggplot(path1gg, aes('itr', 'value', color = 'variable')) + geom_line())
 
 
 # Create a rating based on time played
@@ -178,7 +212,7 @@ def game_hrs_density_p(pred, GAME=None, nclass=1, print_vals=True):
     return game_plt
 
 a = game_hrs_density_p(pred, "Fallout4", 5)
-print(a)
+#print(a)
 
 # Export recommend games
 user_dict = dict(users.values)
@@ -218,11 +252,11 @@ top(20, 5250)
 top_N = 20
 result = []
 for idx, user in tqdm(enumerate(users['user'].values)):
-    result.append(top(top_N, user, False))
-    if idx > 8212:
-        break
+      result.append(top(top_N, user, False))
+      if idx > 8204:
+         break
 df = pd.DataFrame(result)
-columns = ['user'] + ['top_{}'.format(i+1) for i in range(top_N)]
+columns = ['user'] + ['{}'.format(i+1) for i in range(top_N)]
 df.columns = columns
 df.to_csv('D:/Game-Recommendation-System/data/output_data/Collaborative_EM_output.csv', index=None)
 
