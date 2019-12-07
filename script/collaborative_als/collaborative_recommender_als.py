@@ -264,7 +264,7 @@ if __name__ == "__main__":
     # Get users from test data for which recommendations will be generated.
     test_location = r'../../data/model_data/steam_user_test.csv'
     df_test = pd.read_csv(test_location)
-    list_users = df_test['user_id'].unique()
+    list_users = df_test['user_id'].to_list()
 
     # Create collaborative recommender model (ALS).
     train_location = r'../../data/model_data/steam_user_train.csv'
