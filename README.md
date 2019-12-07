@@ -122,6 +122,11 @@ languages, achievements, genre (Action, Adventure, RPG, Strategy…), game descr
 minimum requirement to run the game, recommended requirement, original price and price with discount.
 There is a total of 51920 games in the dataset.<br/>
 
+To understand better how the game reviews are distibuted here is a plot showing the amount of games with their 
+percentage of positive reviews. 
+
+![Image text](plots/Histogram_GameReviews.png)
+
 ## III. Methodology <a name="methodology"></a>
 
 We decided to use 3 differents algorithms to generate recommendation by user. We use 2 collaborative algorithm,
