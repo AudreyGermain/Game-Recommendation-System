@@ -152,17 +152,18 @@ Lastly, the following plot shows the top 20 most recurrent game details availabl
 
 ## III. Methodology <a name="methodology"></a>
 
-We decided to use 3 differents algorithms to generate recommendation by user. We use 2 collaborative algorithm,
-one using the ALS and one using the EM and SVD algorithms and we use one content-based algorithm.<br/>
+We decided to use 3 different algorithms to generate recommendations for each given user. Two approaches using the collaborative filtering method (one using the ALS algorithm and another using the EM and SVD algorithms) and one approach using the content-based method.
+
+All these approaches are to generate recommendations for the same users, allowing us to compare their outputs and evaluate which approach is better for our project.
 
 ### Collaborative Recommender <a name="collaborative"></a>
 
 #### a. Training and Test Datasets <a name="training-test"></a>
-[//]: # "Describe splitting of user dataset into training and testing"
-To create a training and testing dataset, we started by combining the information about play and purchase in a single row,
-in this new form, the columns are user ID, name of the game, amount of hours of play time, play (0 if never played
-and 1 if played) and purchase (technically always 1), this created a total of 128804 rows. Then we extracted 20% of
-all the rows (25761 rows) for the test dataset and kept the rest  (103043 rows) for the training dataset.<br/>
+Before implementing the algorithms to be used for the collaborative filtering recommender system, the training and testing dataset are created based on the source user dataset described in section [subsection II.a](#user). 
+
+For this, we use the reformatted version having a total of 128804 rows, each one having unique information regarding the user/game interactions. We decided to extracted 20% of all user/game interactions (25761 rows) for the test dataset and kept the rest (103043 rows) for the training dataset.
+
+The training dataset is meant to be used to implement the collaborative filtering recommender model. Once accomplished, the model is used to produce recommendations for all the users listed in the test dataset.
 
 #### b. Collaborative Recommender with ALS <a name="als"></a>
 This section describes a simple implementation of a collaborative filtering recommendation algorithm using matrix factorization with implicit data.
@@ -180,11 +181,11 @@ As described on its documentation [here](https://implicit.readthedocs.io/en/late
 In order to generate recommendations, the class ImplicitCollaborativeRecommender is implemented in a python script. The code is available here below.
 
 <script src="https://gist.github.com/g30rdan/d992457bf34607493c19341c96761387.js"></script>
-The collaborative recommender model is created using the training user data with the following lines of code.
+The collaborative recommender model is created using the training user dataset with the following lines of code.
 
 <script src="https://gist.github.com/g30rdan/ae0a11c3715295c3fd88cb5ee6e7ee57.js"></script>
 With me model successfully loaded, we can start generating recommendations for all the users for which user/items interactions were hidden during the process of 
-training and testing data splitting. For each user, 20 recommendations are generated using the following lines of code. Recommendations are stored in a Pandas dataframe, which is later on exported as a csv file.
+training and testing data splitting. For each user, 20 recommendations are generated using the following lines of code. Recommendations are stored in a Pandas DataFrame, which is later on exported as a csv file.
 
 <script src="https://gist.github.com/g30rdan/8f225e83ae3249fa051d8c4beba5e202.js"></script>
 It is to note that for some users, the model fails to produce recommendations. This is  due to the fact that many users have only one user/interactions which ended up in the testing dataset. Hence, since the model has no knowledge about these users preferences, it cannot produce any recommendations. For these cases, the output values are set equal to '-999'.
@@ -196,21 +197,26 @@ It is to note that for some users, the model fails to produce recommendations. T
 
 #### c. Collaborative recommender with EM and SVD <a name="em"></a>
 
-#### 1. [EM algorithm](#c_1)</br>
-#### 2. [Create User-Game Matrix](#c_2)</br>
-#### 3. [Basic SVD](#c_3)</br>
-#### 4. [SVD via gradient descent](#c_4)</br>
-#### 5. [EM Compare](#c_5)</br>
-#### 6. [Output](#c_6)</br>
-
 ##### EM algorithm <a name="c_1"></a>
-According to the Historgram [1](#h_1) and [2](#h_2), you can see Dota 2 has the highest number of players and the highest number of total hours played so undeniably the most popular game. Where as other games such as "Half-Life 2 Lost Coast" have 981 users but a total of 184.4 hours played. I expect this game is in most cases a free bundle game. 
+*New:*
+
+The Expectation-Maximization (EM) algorithm is an approach for maximum likelihood estimation in the presence of latent variables. It is an appropriate approach to use to estimate the parameters of a given data distribution.
+
+In order to come up with a rating system (since the user dataset has implicit data), we decided to use the distributions of hours played for each game with the EM algorithm rather than using percentiles.
+
+For our recommender system, games that were not played ('play' set to 0) are not considered. We create the rating system based on the distribution of hours played, this for each game available in the user dataset. We use 5 groups (equivalent to a 5 stars rating system) in order to define a rating users would give to a game they played based on the amount of hours each one played each game relative to that of everyone else.
+
+*Old:*
+
+According to the Historgram [1](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/README.md#h_1) and [2](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/README.md#h_2), you can see Dota 2 has the highest number of players and the highest number of total hours played so undeniably the most popular game. Where as other games such as "Half-Life 2 Lost Coast" have 981 users but a total of 184.4 hours played. I expect this game is in most cases a free bundle game.
 
 Some Games like these add noise to the dataset. So that's one of the reasons we use EM algorithms to create rating system for the games.
 
 The Expectation-Maximization Algorithm is an approach for maximum likelihood estimation in the presence of latent variables. It is an appropriate approach to use to estimate the parameters of the distributions.
 
 Because our recommendation system should take consideration the games hasn't been played. We could create a rating system for games based on distribution of playing hours. Such like hours of some free bad games could have a distribution under 2 hours. As following, We use the EM algorithm rather than percentiles to present the distribution. In the EM algorithm, We use 5 groups as 5 stars to distinguish the good from the bad.
+
+**It would be good to explain what the code does in few lines. Add units to plot.**
 
 ```python
 def game_hrs_density(GAME, nclass, print_vals=True):
@@ -238,11 +244,25 @@ print(analy_game)
 
 ![Image text](plots/EM_SingleAnalysis.png?raw=true)
 
-According to the plot, we could see the there are most of the users of The Witcher 3 distribute in group 5. However there are some users quickly lost their interests. It make sense to request a refund for the game that have benn played less than 2 hours. As you can see EM algorithm does a great job finding the groups of people with similar gaming habits and would potentially rate the game in a similar way. 
+*New:*
+
+As we can see in the plot above for 'The Witcher 3', the EM algorithm does a great job finding groups (5) of people with similar gaming habits and that would potentially rate a game in a similar way. We can see several users played 'The Witcher 3' game for very few hours. It's possible these users lost their interest into the game after playing some hours, possibly requesting a refund for it.
+
+*Old:*
+
+According to the plot, we could see the there are most of the users of The Witcher 3 distribute in group 5. However there are some users quickly lost their interests. It make sense to request a refund for the game that have been played less than 2 hours. As you can see EM algorithm does a great job finding the groups of people with similar gaming habits and would potentially rate the game in a similar way.  
 
 ##### Create User-Game Matrix <a name="c_2"></a>
 
-A user-item matrix is created with the users being the rows and games being the columns. The missing values are set to zero. The observed values are the log hours for each observed user-game combination. The data was subset to games which have greater than 50 users and users which played the game for greater than 2 hours. 
+*New:*
+
+A user-item matrix is created with the users as rows and games as columns. The missing values are set to zero. The values stored in the matrix correspond to the `log(hours)` for each user-game combination. The data used to create the user-item matrix considers only games with more than 50 users and users that played a game for more than 2 hours. 
+
+The following lines of code are used to create the user-item matrix.
+
+*Old:*
+
+A user-item matrix is created with the users being the rows and games being the columns. The missing values are set to zero. The observed values are the log hours for each observed user-game combination. The data was subset to games which have greater than 50 users and users which played the game for greater than 2 hours.
 
 ```python
 np.random.seed(910)
@@ -269,6 +289,22 @@ for i in range(test.shape[0]):
     line = test.iloc[i]
     ui_train[line['user_id'], line['game_id']] = 0
 
+print("Dimensions of training user-item matrix:", ui_train.shape)
+```
+```python
+Dimensions of training user-item matrix:（8206，492)
+```
+
+##### Basic SVD <a name="c_3"></a>
+*New:*
+
+
+
+*Old:*
+
+At first we use the basic SVD to factorize a matrix, into singular vectors and singular values. The SVD allows us to discover some of the same kind of information as the eigendecomposition. Since the missing values are set to 0 the factorisation will try and recreate them which is not quite what we want. For this example we will simply impute the missing observations with a mean value.
+
+```python
 # root mean squared error function
 def rmse(pred, test, data_frame=False):
     test_pred = np.array([np.nan] * len(test))
@@ -278,14 +314,7 @@ def rmse(pred, test, data_frame=False):
     if data_frame:
         return pd.DataFrame({'test_pred': test_pred, 'loghrs': test['loghrs']})
     return np.sqrt(1/(len(test)-1)*np.sum((test_pred - test['loghrs']) ** 2))
-print("Dimensions of training user-item matrix:", ui_train.shape)
-```
-	Dimensions of training user-item matrix:（8206，492)
 
-##### Basic SVD <a name="c_3"></a>
-At first we use the basic SVD to factorize a matrix, into singular vectors and singular values. The SVD allows us to discover some of the same kind of information as the eigendecomposition. Since the missing values are set to 0 the factorisation will try and recreate them which is not quite what we want. For this example we will simply impute the missing observations with a mean value.
-
-```python
 # Basic svd
 Y = pd.DataFrame(ui_train).copy()
 
