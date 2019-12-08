@@ -197,7 +197,7 @@ It is to note that for some users, the model fails to produce recommendations. T
 
 #### c. Collaborative recommender with EM and SVD <a name="em"></a>
 
-##### EM algorithm <a name="c_1"></a>
+##### EM Algorithm <a name="c_1"></a>
 *New:*
 
 The Expectation-Maximization (EM) algorithm is an approach for maximum likelihood estimation in the presence of latent variables. It is an appropriate approach to use to estimate the parameters of a given data distribution.
@@ -205,6 +205,11 @@ The Expectation-Maximization (EM) algorithm is an approach for maximum likelihoo
 In order to come up with a rating system (since the user dataset has implicit data), we decided to use the distributions of hours played for each game with the EM algorithm rather than using percentiles.
 
 For our recommender system, games that were not played ('play' set to 0) are not considered. We create the rating system based on the distribution of hours played, this for each game available in the user dataset. We use 5 groups (equivalent to a 5 stars rating system) in order to define a rating users would give to a game they played based on the amount of hours each one played each game relative to that of everyone else.
+
+To complete for: 
+
+- Some Games like these add noise to the dataset.
+- Such like hours of some free bad games could have a distribution under 2 hours. 
 
 *Old:*
 
@@ -298,7 +303,7 @@ Dimensions of training user-item matrix:（8206，492)
 ##### Basic SVD <a name="c_3"></a>
 *New:*
 
-
+We first use the basic SVD algorithm to factorize the user-item matrix into singular vectors and singular values, similar to what the eigendecomposition does . Since the missing values were set to zero, the factorization will try to recreate them, which is not something we want. We decided to simply replace the missing values with a mean value computed by using the observations considered.
 
 *Old:*
 
@@ -337,9 +342,23 @@ rmse(pred, test, True).head()
 ```
 ![Image text](plots/Leading_Component.png?raw=true)
 
-It seems like not the best prediction for us.
+**Missing plot**
 
-##### SVD via gradient descent <a name="c_4"></a>
+As we see in the plot above, it seems like the basic SVD approach does not give the best prediction for us.
+
+##### SVD via Gradient Descent <a name="c_4"></a>
+*New:*
+
+We decided to additionally consider a gradient descent approach in order to find optimal U and V matrices that can accurately represent the actual data stored in the user-item matrix.
+
+We set the learning rate to *0.001* and the number of iteration to *200* while tracking the Root Mean Square Error (RMSE). The U and V matrices are initialized with a random values draw from a [0, 0.01] normal distribution. 
+
+to complete for:
+
+- Predict the missing values by drawing on the information between similar users and games.
+
+*Old:*
+
 Then we decide to use a gradient descent approach to find optimal U and V matrices which retain the actual observations with predict the missing values by drawing on the information between similar users and games. I have chosen a learning rate of 0.001 and will run for 200 iterations tracking the RMSE. The objective function is the squared error between the actual observed values and the predicted values. The U and V matrices are initialised with a random draw from a ~N(0, 0.01) distibution. This may take a few minutes to run.
 
 ```python
@@ -384,7 +403,9 @@ print(ggplot(path1gg, aes('itr', 'value', color = 'variable')) + geom_line())
 ```
 ![Image text](plots/SVD_Compare.png?raw=true)
 
-A large improvement on the basic SVD approach. The output shows the objective function converged to 0 on the training data, while the error in the test set essentially halved. Interestingly after the 75th iteration the accuracy in the test set decreased. This could be improved by using more leading components, the trade off being computation timej. Or perhaps stopping after 75 to 100 iterations for this data. After all it is the prediction of the unobserved which is the ultimate goal.
+**Improve plot: axis names and legend**
+
+We can see there is a large improvement using the SVD with gradient descent over the basic SVD approach. The output shows the objective function converged to 0 on the training data, while the error in the test set essentially halved. Interestingly after the 75th iteration the accuracy in the test set decreased. This could be improved by using more leading components, the trade off being computation timej. Or perhaps stopping after 75 to 100 iterations for this data. After all it is the prediction of the unobserved which is the ultimate goal.
 
 ##### EM Compare <a name="c_5"></a>
 After Using the predicted user-item matrix, let's look at the distribution of hours again for The Witcher 3 and apply an EM algoritm to find a reasonable 1-5 star rating
