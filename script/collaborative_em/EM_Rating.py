@@ -232,7 +232,7 @@ def game_hrs_density_p(pred, GAME=None, nclass=1, print_vals=True):
     return game_plt
 
 a = game_hrs_density_p(pred, "TheWitcher3WildHunt", 5)
-#print(a)
+print(a)
 
 # Export recommend games
 user_dict = dict(users.values)
@@ -267,7 +267,7 @@ def top(n, user, print_value=True):
         for i in range(n):
             result.append(reverse_game_dict[top_games[i]])
         return result
-top(20, 5250)
+#top(20, 5250)
 
 top_N = 20
 result = []
