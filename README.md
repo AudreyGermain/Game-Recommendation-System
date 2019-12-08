@@ -3,9 +3,12 @@
 # Recommendation System for Steam Game Store: An overview of recommender systems
 
 ## Team:<br/>
-- Doo Hyodan, Department Of Information System, Hanyang University, ammissyouyou@gmail.com<br/>
-- Audrey Germain, Computer Engineering, Department of Software Engineering and Computer Engineering, Polytechnique Montreal<br/>
-- Geordan Jove, Aerospace Engineering, Department of Mechanical Engineering, Polytechnique Montreal<br/>
+- Doo Hyodan,
+  Department Of Information System, Hanyang University, ammissyouyou@gmail.com<br/>
+- Audrey Germain,
+  Computer Engineering, Department of Software Engineering and Computer Engineering, Polytechnique Montreal<br/>
+- Geordan Jove,
+  Aerospace Engineering, Department of Mechanical Engineering, Polytechnique Montreal<br/>
 
 ## Table of content
 
@@ -24,28 +27,20 @@
 [VI. Conclusion: Discussion](#conclusion)<br/>
 
 ## I. Introduction <a name="introduction"></a>
-Like many young people, all member of this team have an interest in video games, more particularly in computer games.
-Therefore, this project has for goal to build a recommender system for computer game.<br/>
+Like many young people, all member of this team have an interest in video games, more particularly in computer games. Therefore, the project developed throughout this blog has for goal to build a recommender system for computer games.
 
-This project was implemented as our final project for the course Introduction to Artificial Intelligence (ITE351) at Hanyang University.<br/>
+For this project we are using the data from Steam, one of the biggest video game digital distribution service for computer games. We will be using two datasets, having each user and game data. These are explained in detail further in this blog.
 
-For this project we are using the data from Steam the biggest video game digital distribution service for computer games.
-We will be using some user data and game data, the datasets used will be explained in detail further in this blog.<br/>
+This project is implemented as our final project for the course "Introduction to Artificial Intelligence" (ITE3051) at Hanyang University during for the Fall 2019 semester.
 
-The primary focus of this project is to build a recommendation system that will recommend games for each user based on
-their preferences and gaming habits. In order to make our recommendation system the best possible, multiple algorithms
+The primary focus of this project is to build a recommender system used to recommend games to users based on their preferences and their gaming habits. In order to implement the best recommender system we possible can, multiple algorithms and approaches are developed in order to compare the recommendations produced by each one of them, allowing us to assess which algorithm produces more relevant recommendations for each user.
 
-will be implemented and compared to make the recommendation the most relevant possible for each users.<br/>
+Recommender systems are widely used these days to recommend items users may potentially like. There are three main types of recommender system: collaborative filtering, content-based filtering and hybrid recommender system. 
 
-There are three main types of recommendation system: collaborative filtering, content-based filtering and hybrid recommendation system. 
 The collaborative filtering is based on the principle that if two people liked the same things in the past, 
-if one of them like something the other is likely to like it too. 
-The advantage of this filtering method is that the algorithm doesn’t need to understand or process the content 
-of the items it recommends. The content-based filtering is based on the description of the items to recommend 
-similar items and recommend items similar to what a user likes. 
-Finally, the hybrid recommendation system consists of combining content based and collaborative filtering, 
-either by using an algorithm that uses both or by combining the recommendation found by both methods. 
-According to research combining both results is a better recommendation than using only one of them. <br/>
+if one of them likes something new, the others are likely to like it too. The advantage of the collaborative filtering method is that the algorithm doesn’t need to understand or process the content 
+of the items it recommends. The content-based filtering uses the description of the items in order to recommend items similar to what a user likes. The hybrid recommender system consists on combining the content-based and the collaborative filtering, either by using an algorithm that uses both or by combining the recommendations produced by both methods which, according to research, results in better recommendations than those obtained by using only one of them.
+The collaborative filtering is based on the principle that if two people liked the same things in the past, 
 
 The data used for a recommendation system can be explicit, such as comment or rating, 
 or implicit, such as behavior and events like order history, search logs, clicks, etc. 
@@ -61,13 +56,13 @@ For this project, 2 differents datasets are used. Both dataset are available for
 
 ### a. User Dataset <a name="user"></a>
 
-[//]: # (User Dataset description)
+[//]: # "User Dataset description"
 The first dataset is the [user](https://www.kaggle.com/tamber/steam-video-games) dataset. It contains the user id, the game, the behavior and the amount of hours played.
 So each row of the dataset represent the behavior (play or purchase) of a user towards a game.
 The amount of hours played is also specify, the column contains 1 if it's a purchase.
 The dataset contains a total of 200000 rows, including 5155 different games and 12393 different users.
 
-[//]: # (Reformat with purchase/play columns)
+[//]: # "Reformat with purchase/play columns"
 The third dataset is a list we split out the purchase/play column into two columns. Because The raw 'purchase' row records 1 hour, Clearly this doesn't make any sense so we remove it during the process of splitting the column and calculate the correct 'play' hours.
 
 | index |                                       game  |  user|       hrs|
@@ -93,18 +88,18 @@ The third dataset is a list we split out the purchase/play column into two colum
 |  4885 |                                  War Thunder|   590|   14381.6|
 |  3222 |                                       Portal|   588|    2282.8|
 
-[//]: # (Histogram 1: all users: play + purchase)
+[//]: # "Histogram 1: all users: play + purchase"
 Then we count the number of users for each games, and output a histograph to make the data visualization and color represents the total hours of each games. 
 
 ![Image text](plots/Histogram_AllUsersHrs.png?raw=true)<a name="h_1"></a>
 
-[//]: # (Histogram 2: only users: play)
+[//]: # "Histogram 2: only users: play"
 After we removed the users who just purchased the games but hasn't played. Some games fell from the top 20.
 
 ![Image text](plots/Histogram_UsersHrs.png?raw=true)<a name="h_2"></a>
 
 
-[//]: # (Box plot)
+[//]: # "Box plot"
 In order to have a better understanding of the user data distribution and user's playing habits, a box plot is produced for the top 20 most played games.
 
 ![Image text](plots/boxplot_top_20_games.png?raw=true)
@@ -112,7 +107,7 @@ In order to have a better understanding of the user data distribution and user's
 As we can see, the data distribution for each game considered is not symmetrical. Even more, 75% of data points for each game is in the range of the hundreds hours, with several games having very large outliers. We can see for example a user played more than 10,000 hours "Dota 2". Another interesting example, a user played almost 12,000 hours "Sid Meier's Civilization V".
 
 ### b. Game Dataset <a name="game"></a>
-[//]: # (Game Dataset description)
+[//]: # "Game Dataset description"
 The second dataset contains a list of [games](https://www.kaggle.com/trolukovich/steam-games-complete-dataset/version/1) and their descriptions. It contains the url (directed to Steam store),
 the type of package (app, bundle…), the name of the game, a short description, recent reviews, all reviews, release date,
 developper, publisher, popular tags (Gore, Action, Shooter, PvP…), game detail (Multi-player, Single-player, Full controller support…),
@@ -146,7 +141,7 @@ one using the ALS and one using the EM and SVD algorithms and we use one content
 ### Collaborative Recommender <a name="collaborative"></a>
 
 #### a. Training and Test Datasets <a name="training-test"></a>
-[//]: # (Describe splitting of user dataset into training and testing)
+[//]: # "Describe splitting of user dataset into training and testing"
 To create a training and testing dataset, we started by combining the information about play and purchase in a single row,
 in this new form, the columns are user ID, name of the game, amount of hours of play time, play (0 if never played
 and 1 if played) and purchase (technically always 1), this created a total of 128804 rows. Then we extracted 20% of
@@ -168,16 +163,13 @@ As described on its documentation [here](https://implicit.readthedocs.io/en/late
 In order to generate recommendations, the class ImplicitCollaborativeRecommender is implemented in a python script. The code is available here below.
 
 <script src="https://gist.github.com/g30rdan/d992457bf34607493c19341c96761387.js"></script>
-
 The collaborative recommender model is created using the training user data with the following lines of code.
 
 <script src="https://gist.github.com/g30rdan/ae0a11c3715295c3fd88cb5ee6e7ee57.js"></script>
-
 With me model successfully loaded, we can start generating recommendations for all the users for which user/items interactions were hidden during the process of 
 training and testing data splitting. For each user, 20 recommendations are generated using the following lines of code. Recommendations are stored in a Pandas dataframe, which is later on exported as a csv file.
 
 <script src="https://gist.github.com/g30rdan/8f225e83ae3249fa051d8c4beba5e202.js"></script>
-
 It is to note that for some users, the model fails to produce recommendations. This is  due to the fact that many users have only one user/interactions which ended up in the testing dataset. Hence, since the model has no knowledge about these users preferences, it cannot produce any recommendations. For these cases, the output values are set equal to '-999'.
 
 
@@ -187,12 +179,12 @@ It is to note that for some users, the model fails to produce recommendations. T
 
 #### c. Collaborative recommender with EM and SVD <a name="em"></a>
 
-####  [EM algorithm](#c_1)</br>
-####  [Create User-Game Matrix](#c_2)</br>
-####  [Basic SVD](#c_3)</br>
-####  [SVD via gradient descent](#c_4)</br>
-####  [EM Compare](#c_5)</br>
-####  [Output](#c_6)</br>
+#### * [EM algorithm](#c_1)</br>
+#### * [Create User-Game Matrix](#c_2)</br>
+#### * [Basic SVD](#c_3)</br>
+#### * [SVD via gradient descent](#c_4)</br>
+#### * [EM Compare](#c_5)</br>
+#### * [Output](#c_6)</br>
 
 ##### EM algorithm <a name="c_1"></a>
 According to the Historgram [1](#h_1) and [2](#h_2), you can see Dota 2 has the highest number of players and the highest number of total hours played so undeniably the most popular game. Where as other games such as "Half-Life 2 Lost Coast" have 981 users but a total of 184.4 hours played. I expect this game is in most cases a free bundle game. 
