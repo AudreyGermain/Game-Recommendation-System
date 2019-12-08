@@ -85,6 +85,8 @@ With out reformatted user dataset, we start exploring and analyzing the user and
 
 Then we try to asses if the most purchased games correspond to the most played games. For each game, we compute the total number of users and the total time the game was played by all users. The results are displayed in the table below in decreasing order based on the number of users, this for the top 20 games with most users. 
 
+<center>
+
 |                     game                     | user |   hrs    |
 | :------------------------------------------: | :--: | :------: |
 |                    Dota 2                    | 4841 | 981684.6 |
@@ -107,6 +109,8 @@ Then we try to asses if the most purchased games correspond to the most played g
 |          Sid Meier's Civilization V          | 596  | 99821.3  |
 |                 War Thunder                  | 590  | 14381.6  |
 |                    Portal                    | 588  |  2282.8  |
+
+</center>
 
 We can see that for some games, there is a relation between most played and most purchased. For example, 'Dota 2' is undeniably the most popular game, it has the most number of users and the most total of hours played. However, this is not always the case, an interesting example is 'Half-Life 2 Lost Coast' which has high number of users (981 users), but the total of hours played is quite low (184.4 hours). A possible explanation for this could be that this game was purchased as part of a game bundle. 
 
