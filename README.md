@@ -351,7 +351,7 @@ As we see in the plot above, it seems like the basic SVD approach does not give 
 
 We decided to additionally consider a gradient descent approach in order to find optimal U and V matrices that can accurately represent the actual data stored in the user-item matrix.
 
-We set the learning rate to *0.001* and the number of iteration to *200* while tracking the Root Mean Square Error (RMSE). The U and V matrices are initialized with a random values draw from a [0, 0.01] normal distribution. 
+We set the learning rate to *0.001* and the number of iteration to *200* while tracking the Root Mean Square Error (RMSE). The U and V matrices are initialized with random values draw from a [0, 0.01] normal distribution. The tracked function measures the RMSE between the actual values and the predicted values.
 
 to complete for:
 
@@ -405,10 +405,20 @@ print(ggplot(path1gg, aes('itr', 'value', color = 'variable')) + geom_line())
 
 **Improve plot: axis names and legend**
 
-We can see there is a large improvement using the SVD with gradient descent over the basic SVD approach. The output shows the objective function converged to 0 on the training data, while the error in the test set essentially halved. Interestingly after the 75th iteration the accuracy in the test set decreased. This could be improved by using more leading components, the trade off being computation timej. Or perhaps stopping after 75 to 100 iterations for this data. After all it is the prediction of the unobserved which is the ultimate goal.
+*New:*
+
+We can see there is a large improvement using the SVD with gradient descent over the basic SVD approach. The plot shows that the tracked function (RMSE) converges to zero on the train dataset, while on the test dataset, the error is around 0.72.
+
+Interestingly, we see that after the 75th iteration, the accuracy on the test dataset stops improving (the RMSE remains around the same value). The accuracy on the test data could be improved by using more leading components, the trade-off being more computation time required.
+
+For the data used, we could stop the computation after the *75* or *100* iterations since the accuracy on the test data set does not improve anymore. After all, it is the prediction of the unobserved which is the ultimate goal.
+
+*Old:*
+
+We can see there is a large improvement using the SVD with gradient descent over the basic SVD approach. The output shows the objective function converged to 0 on the training data, while the error in the test set essentially halved. Interestingly after the 75th iteration the accuracy in the test set decreased. This could be improved by using more leading components, the trade off being computation time. Or perhaps stopping after 75 to 100 iterations for this data. After all it is the prediction of the unobserved which is the ultimate goal.
 
 ##### EM Compare <a name="c_5"></a>
-After Using the predicted user-item matrix, let's look at the distribution of hours again for The Witcher 3 and apply an EM algoritm to find a reasonable 1-5 star rating
+With the predicted user-item matrix, let's look again at the distribution of hours for 'The Witcher 3' game, and apply to it the EM algorithm in order to find a reasonable 1-5 star rating.
 
 ```python
 def game_hrs_density_p(pred, GAME=None, nclass=1, print_vals=True):
@@ -444,10 +454,22 @@ print(a)
 ```
 ![Image text](plots/EM_SVD_Analysis.png?raw=true)
 
-Perhaps not quite as appropriate this time as all the new predictions create a dense distribution. However the 2-4 distributions look like they fit fairly well. The 5 on the otherhand is rather flat and only picks up the very end of the tail.
+**Axis names**
 
-##### Ouput <a name="c_6"></a>
-At last we use a percentile approach to recommend the top 20 games for each user
+*New:*
+
+However, distributions 2-to-4 look like they fit the data fairly well. Distribution 5, on the other hand, is rather flat taking place the very end of the tail, on the right side of the plot.
+
+To complete for:
+
+- Perhaps not quite as appropriate this time as all the new predictions create a dense distribution. 
+
+*Old:*
+
+Perhaps not quite as appropriate this time as all the new predictions create a dense distribution. However the 2-4 distributions look like they fit fairly well. The 5 on the other hand is rather flat and only picks up the very end of the tail.
+
+##### Output <a name="c_6"></a>
+At last, we use a percentile approach to generate the top 20 game recommendations for each user listed in the test dataset.
 
 ```python
 user_dict = dict(users.values)
@@ -468,10 +490,6 @@ def top(n, user, print_value=True):
     t_user = user
     user = user_dict[user]
     top_games = (pred_percentile*not_purchased).iloc[user]
-    #     line = I_pred[user]
-    #     for i, v in enumerate(line):
-    #         if v == 1:
-    #             top_games[i] = 0
     top_games = list(top_games.sort_values(ascending=False)[:20].index)
     if print_value:
         print('top {} recommended games for user {}: '.format(n, t_user))
@@ -482,8 +500,8 @@ def top(n, user, print_value=True):
         for i in range(n):
             result.append(reverse_game_dict[top_games[i]])
         return result
-#top(20, 5250)
 
+#top(20, 5250)
 top_N = 20
 result = []
 for idx, user in tqdm(enumerate(users['user'].values)):
@@ -493,54 +511,51 @@ for idx, user in tqdm(enumerate(users['user'].values)):
 df = pd.DataFrame(result)
 columns = ['user_id'] + ['{}'.format(i+1) for i in range(top_N)]
 df.columns = columns
-df.to_csv('D:/Game-Recommendation-System/data/output_data/Collaborative_EM_output.csv', index=None)
+df.to_csv('../../data/output_data/Collaborative_EM_output.csv', index=None)
 ```
-	top 20 recommended games for user 5250:
-	0 ) DontStarve
-	1 ) FTLFasterThanLight
-	2 ) Warhammer40000DawnofWarIIRetribution
-	3 ) SMITE
-	4 ) FistfulofFrags
-	5 ) KerbalSpaceProgram
-	6 ) StarWarsRepublicCommando
-	7 ) RIFT
-	8 ) CompanyofHeroesTalesofValor
-	9 ) CounterStrikeConditionZero
-	10 ) PlanetSide2
-	11 ) PrisonArchitect
-	12 ) EmpireTotalWar
-	13 ) DeadSpace
-	14 ) Tropico4
-	15 ) Warhammer40000DawnofWarII
-	16 ) TombRaiderLegend
-	17 ) Warhammer40000SpaceMarine
-	18 ) TheWolfAmongUs
-	19 ) AmnesiaTheDarkDescent
+For example, here below the top 20 game recommendations for user '5250'.
+
+```python
+Top 20 recommended games for user 5250:
+0 ) DontStarve
+1 ) FTLFasterThanLight
+2 ) Warhammer40000DawnofWarIIRetribution
+3 ) SMITE
+4 ) FistfulofFrags
+5 ) KerbalSpaceProgram
+6 ) StarWarsRepublicCommando
+7 ) RIFT
+8 ) CompanyofHeroesTalesofValor
+9 ) CounterStrikeConditionZero
+10 ) PlanetSide2
+11 ) PrisonArchitect
+12 ) EmpireTotalWar
+13 ) DeadSpace
+14 ) Tropico4
+15 ) Warhammer40000DawnofWarII
+16 ) TombRaiderLegend
+17 ) Warhammer40000SpaceMarine
+18 ) TheWolfAmongUs
+19 ) AmnesiaTheDarkDescent
+```
 
 
 ### Content-based Recommender <a name="content-based"></a>
 
-The content-base recommender system gives recommendation based on the similarity between the game a user has and the other games.
-In order to build the recommender system, we first need to prepare the data and the build the algorithm.
-First, we need to preprocess the game dataset with all the useful information to give as 
-an input to the recommender algorithm formated in an easier wait. We will also extract the percentage from the reviews
-since we will need it. Then we will build the function used to give recommendation of games similar to another game and
-we will finish by getting the recommendation for all user based on the games the user has.
+The content-base recommender system gives recommendation based on the similarity between the game a user already has and other games.
 
-To prepare the data for the content based recommender we started by selecting the information we thought would be the 
-most useful to find similar games. We read the useful column using the following code.
+In order to build the recommender system, we need to prepare the data and build the algorithm. In order to do so, we first need to preprocess the game dataset described in [subsection II.b](#game) with all the useful information to give as an input to the recommender algorithm, formatted in an simpler way. The percentage from the reviews are extracted since they are used. Then, we implement a function used to give game recommendations similar to another game. Lastly, we produce recommendations for all user based on the games users already posses.
+
+To prepare the data for the content based recommender, we start by selecting the information we think would be the most useful to find similar games. We read the useful column from the game dataset by using the following code.
 
 ```python
 dataGames = read_csv(locationGamesFile, usecols=["name", "genre", "game_details", "popular_tags", "publisher", "developer"])
 ```
 
-We decided to only keep the games that were both in the game dataset and the user dataset.
-We chose to do it this way because there is a lot of games in the game dataset that have never been played or purchased by any user,
-so there's no use in considering them in the recommender.
-Also the dataset was too big to create the matrix of cosine similarity (this will be explain later)
-since it took too much memory. To match the games from both dataset together, we created an ID for the games by removing
-all symbols the weren't alphanumeric, removing all capital letters and removing all spaces using to following code. 
-We did the same on the games in the user dataset.
+We decide to only keep the games that are present in both the game dataset and the user dataset. We choose to proceed in this way since there are a lot of games in the game dataset that have never been played or purchased by any user in the user dataset, so there's no use in considering them in the recommender system. Also, the game dataset is too large to create the matrix of cosine similarity (this is be explain later) since it takes too much memory.
+
+In order to match the games from both dataset together, we create an ID for each game by removing
+all non-alphanumeric symbols and spaces, and changing all capital letters to lowercase by using to following code. We do the same for the games in the user dataset.
 
 ```python
 # remove spaces and special character from game name in both dataset
