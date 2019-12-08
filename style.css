@@ -6,3 +6,7 @@
     max-height:500px; // Any height
     overflow-y: scroll;
 }
+
+table {
+    width:100%;
+}
