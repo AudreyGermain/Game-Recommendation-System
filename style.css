@@ -8,5 +8,7 @@
 }
 
 table {
-    font-size:12px !important;
+    font-size:14px !important;
+	max-height:500px;
+	line-height: 24px;
 }
