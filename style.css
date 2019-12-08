@@ -9,4 +9,6 @@
 
 table {
     font-size:14px !important;
+	vertical-align: middle;
+	word-wrap: break-all;
 }
