@@ -72,7 +72,7 @@ The third dataset is a list we split out the purchase/play column into two colum
 
 | index |                                       game  |  user|       hrs|
 | :---: | :------------------------------------------ | ---: | -------: |
-|  1336 |                                       Dota 2|   484|  981684.6|
+|  1336 |                                       Dota 2|  4841|  981684.6|
 |  4257 |                              Team Fortress 2|  2323|  173673.3|
 |  4788 |                                     Unturned|  1563|   16096.4|
 |   981 |             Counter-Strike Global Offensive |  1412|  322771.6|
@@ -93,18 +93,16 @@ The third dataset is a list we split out the purchase/play column into two colum
 |  4885 |                                  War Thunder|   590|   14381.6|
 |  3222 |                                       Portal|   588|    2282.8|
 
-As you can see Dota 2 has the highest number of players and the highest number of total hours played so undeniably the most popular game. Where as other games such as "Half-Life 2 Lost Coast" have 981 users but a total of 184.4 hours played. I expect this game is in most cases a free bundle game. 
-
 [//]: # (Histogram 1: all users: play + purchase)
-Then we count the number of users for each games, and output a histograph to make the data visualization. 
+Then we count the number of users for each games, and output a histograph to make the data visualization and color represents the total hours of each games. 
 
-![Image text](plots/Histogram_AllUsersHrs.png?raw=true)
+![Image text](plots/Histogram_AllUsersHrs.png?raw=true)<a name="h_1"></a>
 
 [//]: # (Histogram 2: only users: play)
 After we removed the users who just purchased the games but hasn't played. Some games fell from the top 20.
 
-![Image text](plots/Histogram_UsersHrs.png?raw=true)
-Some Games like these add noise to the dataset. So that's one of the reasons we use EM algorithms to create rating system for the games.
+![Image text](plots/Histogram_UsersHrs.png?raw=true)<a name="h_2"></a>
+
 
 [//]: # (Box plot)
 In order to have a better understanding of the user data distribution and user's playing habits, a box plot is produced for the top 20 most played games.
@@ -189,7 +187,21 @@ It is to note that for some users, the model fails to produce recommendations. T
 
 #### c. Collaborative recommender with EM and SVD <a name="em"></a>
 
-Becaused our recommendation system should take consideration the games hasn't been played. We could create a rating system for games based on distribution of playing hours. Such like hours of some free bad games could have a distribution under 2 hours. As following, We use the EM algorithm rather than percentiles to present the distribution. In the EM algorithm, We use 5 groups as 5 stars to distinguish the good from the bad.
+####  [EM algorithm](#c_1)</br>
+####  [Create User-Game Matrix](#c_2)</br>
+####  [Basic SVD](#c_3)</br>
+####  [SVD via gradient descent](#c_4)</br>
+####  [EM Compare](#c_5)</br>
+####  [Output](#c_6)</br>
+
+##### EM algorithm <a name="c_1"></a>
+According to the Historgram [1](#h_1) and [2](#h_2), you can see Dota 2 has the highest number of players and the highest number of total hours played so undeniably the most popular game. Where as other games such as "Half-Life 2 Lost Coast" have 981 users but a total of 184.4 hours played. I expect this game is in most cases a free bundle game. 
+
+Some Games like these add noise to the dataset. So that's one of the reasons we use EM algorithms to create rating system for the games.
+
+The Expectation-Maximization Algorithm is an approach for maximum likelihood estimation in the presence of latent variables. It is an appropriate approach to use to estimate the parameters of the distributions.
+
+Because our recommendation system should take consideration the games hasn't been played. We could create a rating system for games based on distribution of playing hours. Such like hours of some free bad games could have a distribution under 2 hours. As following, We use the EM algorithm rather than percentiles to present the distribution. In the EM algorithm, We use 5 groups as 5 stars to distinguish the good from the bad.
 
 ```python
 def game_hrs_density(GAME, nclass, print_vals=True):
@@ -210,15 +222,18 @@ def game_hrs_density(GAME, nclass, print_vals=True):
                geom_area(dens, aes(x='x', y='gaussian', fill = 'variable'), alpha = 0.5, position = position_dodge(width=0.2)) + geom_density()+ \
                ggtitle(GAME)
     return game_plt
-
-a = game_hrs_density('Fallout4', 5, True)
+    
+analy_game = game_hrs_density('TheWitcher3WildHunt', 5, True)
+print(analy_game)
 ```
 
 ![Image text](plots/EM_SingleAnalysis.png?raw=true)
 
-According to the plot, we could see the there are most of the users of Fallout 4 distribute in 4-5 groups. However there are a few users quickly lost their interests. It make sense to request a refund for the game that have benn played less than 2 hours. As you can see EM algorithm does a great job finding the groups of people with similar gaming habits and would potentially rate the game in a similar way. 
+According to the plot, we could see the there are most of the users of The Witcher 3 distribute in group 5. However there are some users quickly lost their interests. It make sense to request a refund for the game that have benn played less than 2 hours. As you can see EM algorithm does a great job finding the groups of people with similar gaming habits and would potentially rate the game in a similar way. 
 
-It does have some trouble converging which iThis example will use a gradient descent approach to find optimal U and V matrices which retain the actual observations with predict the missing values by drawing on the information between similar users and games. I have chosen a learning rate of 0.001 and will run for 200 iterations tracking the RMSE. The objective function is the squared error between the actual observed values and the predicted values. The U and V matrices are initialised with a random draw from a ~N(0, 0.01) distibution. This may take a few minutes to run.sn't surprising however the resulting distributions look very reasonable. 
+##### Create User-Game Matrix <a name="c_2"></a>
+
+A user-item matrix is created with the users being the rows and games being the columns. The missing values are set to zero. The observed values are the log hours for each observed user-game combination. The data was subset to games which have greater than 50 users and users which played the game for greater than 2 hours. 
 
 ```python
 np.random.seed(910)
@@ -238,12 +253,33 @@ ui_mat = np.zeros([len(users), len(games)])
 for i in range(steam_clean_pos.shape[0]):
     line = steam_clean_pos.iloc[i]
     ui_mat[line['user_id'], line['game_id']] = line['loghrs']
+
+test=steam_train
+ui_train = ui_mat
+for i in range(test.shape[0]):
+    line = test.iloc[i]
+    ui_train[line['user_id'], line['game_id']] = 0
+
+# root mean squared error function
+def rmse(pred, test, data_frame=False):
+    test_pred = np.array([np.nan] * len(test))
+    for i in range(len(test)):
+        line = test.iloc[i]
+        test_pred[i] = pred[line['user_id'], line['game_id']]
+    if data_frame:
+        return pd.DataFrame({'test_pred': test_pred, 'loghrs': test['loghrs']})
+    return np.sqrt(1/(len(test)-1)*np.sum((test_pred - test['loghrs']) ** 2))
+print("Dimensions of training user-item matrix:", ui_train.shape)
 ```
-   
-A user-item matrix is created with the users being the rows and games being the columns. The missing values are set to zero. The observed values are the log hours for each observed user-game combination. The data was subset to games which have greater than 50 users and users which played the game for greater than 2 hours. This was chosen as 2 hours is the limit in which Steam will offer a return if you did not like the purchased game (a shout out to the Australian Competition and Consumer Commission for that one!).
+	Dimensions of training user-item matrix:（8206，492)
+
+##### Basic SVD <a name="c_3"></a>
+At first we use the basic SVD to factorize a matrix, into singular vectors and singular values. The SVD allows us to discover some of the same kind of information as the eigendecomposition. Since the missing values are set to 0 the factorisation will try and recreate them which is not quite what we want. For this example we will simply impute the missing observations with a mean value.
 
 ```python
+# Basic svd
 Y = pd.DataFrame(ui_train).copy()
+
 # mean impute
 means = np.mean(Y)
 for i, col in enumerate(Y.columns):
@@ -251,21 +287,28 @@ for i, col in enumerate(Y.columns):
 U, D, V = np.linalg.svd(Y)
 
 p_df = pd.DataFrame({'x': range(1, len(D)+1), 'y': D/np.sum(D)})
-ggplot(p_df, aes(x='x', y='y')) + \
+print(ggplot(p_df, aes(x='x', y='y')) + \
 geom_line() + \
-labs(x = "Leading component", y = "")
+labs(x = "Leading component", y = ""))
+
 lc = 60
 pred = np.dot(np.dot(U[:, :lc], np.diag(D[:lc])), V[:lc, :])
-#print(rmse(pred, test))
+
+print(rmse(pred, test))
 rmse(pred, test, True).head()
 ```
-The basic SVD approach will perform matrix factorisation using the first 60 leading components. Since the missing values are set to 0 the factorisation will try and recreate them which is not quite what we want. For this example we will simply impute the missing observations with a mean value.
+![Image text](plots/Leading_Component.png?raw=true)
+
+It seems like not the best prediction for us.
+
+##### SVD via gradient descent <a name="c_4"></a>
+Then we decide to use a gradient descent approach to find optimal U and V matrices which retain the actual observations with predict the missing values by drawing on the information between similar users and games. I have chosen a learning rate of 0.001 and will run for 200 iterations tracking the RMSE. The objective function is the squared error between the actual observed values and the predicted values. The U and V matrices are initialised with a random draw from a ~N(0, 0.01) distibution. This may take a few minutes to run.
 
 ```python
 # SVD via gradient descent
 # Setting matricies
 leading_components=60
-leading_components=60
+
 Y = pd.DataFrame(ui_train)
 I = Y.copy()
 for col in I.columns:
@@ -279,6 +322,7 @@ def dfu(U):
     return np.dot((2*I.values*(np.dot(U, V.T)-Y.values)), V)
 def dfv(V):
     return np.dot((2*I.values*(np.dot(U, V.T)-Y.values)).T, U)
+    
 # gradient descent
 N = 200
 alpha = 0.001
@@ -297,13 +341,124 @@ fojb = np.array(fobj)
 rmsej = np.array(rmsej)
 path1 = pd.DataFrame({'itr': range(1, N+2), 'fobj': fobj, 'fobjp': fobj/max(fobj), 'rmse': rmsej, 'rmsep': rmsej/max(rmsej)})
 path1gg = pd.melt(path1[["itr", "fobjp", "rmsep"]], id_vars=['itr'])
+print(path1.tail(1))
+print(ggplot(path1gg, aes('itr', 'value', color = 'variable')) + geom_line())
 ```
 ![Image text](plots/SVD_Compare.png?raw=true)
-This example will use a gradient descent approach to find optimal U and V matrices which retain the actual observations with predict the missing values by drawing on the information between similar users and games. I have chosen a learning rate of 0.001 and will run for 200 iterations tracking the RMSE. The objective function is the squared error between the actual observed values and the predicted values. The U and V matrices are initialised with a random draw from a ~N(0, 0.01) distibution. This may take a few minutes to run.
 
+A large improvement on the basic SVD approach. The output shows the objective function converged to 0 on the training data, while the error in the test set essentially halved. Interestingly after the 75th iteration the accuracy in the test set decreased. This could be improved by using more leading components, the trade off being computation timej. Or perhaps stopping after 75 to 100 iterations for this data. After all it is the prediction of the unobserved which is the ultimate goal.
+
+##### EM Compare <a name="c_5"></a>
+After Using the predicted user-item matrix, let's look at the distribution of hours again for The Witcher 3 and apply an EM algoritm to find a reasonable 1-5 star rating
+
+```python
+def game_hrs_density_p(pred, GAME=None, nclass=1, print_vals=True):
+    game_dict = dict(games.values)
+    t_GAME = GAME
+    if not GAME:
+        GAME = np.random.randint(0, games.shape[0])
+    else:
+        GAME = game_dict[GAME]
+    game_data = pd.Series(pred[:, GAME])
+    game_data = game_data[game_data > 0]
+
+    # em algorithm
+    mu_init = np.linspace(min(game_data), max(game_data), nclass).reshape(-1, 1)
+    sigma_init = np.array([1] * nclass).reshape(-1, 1, 1)
+    gaussian = GaussianMixture(n_components=nclass, means_init=mu_init, precisions_init=sigma_init).fit(game_data.values.reshape([-1, 1]))
+    if print_vals:
+        print(' lambda: {}\n mean: {}\n sigma: {}\n'.format(gaussian.weights_, gaussian.means_, gaussian.covariances_))
+    # building data frame for plotting
+    x = np.linspace(min(game_data), max(game_data), 1000)
+    dens = pd.DataFrame({'x': x})
+    for i in range(nclass):
+        dens['y{}'.format(i+1)] = gaussian.weights_[i]* scipy.stats.norm(gaussian.means_[i][0], gaussian.covariances_[i][0][0]).pdf(x)
+    dens = dens.melt('x', value_name='gaussian')
+    game_data = pd.DataFrame(game_data, columns=['game_daat'])
+    game_plt = ggplot(aes(x='game_data', y='stat(density)'), game_data) + geom_histogram(bins=45, colour = "black", alpha = 0.7, size = 0.1) + \
+               geom_area(dens, aes(x='x', y='gaussian', fill = 'variable'), alpha = 0.5, position = position_dodge(width=0.2)) + geom_density()+ \
+               ggtitle(t_GAME)
+    return game_plt
+
+a = game_hrs_density_p(pred, "TheWitcher3WildHunt", 5)
+print(a)
+```
 ![Image text](plots/EM_SVD_Analysis.png?raw=true)
 
- 
+Perhaps not quite as appropriate this time as all the new predictions create a dense distribution. However the 2-4 distributions look like they fit fairly well. The 5 on the otherhand is rather flat and only picks up the very end of the tail.
+
+##### Ouput <a name="c_6"></a>
+At last we use a percentile approach to recommend the top 20 games for each user
+
+```python
+user_dict = dict(users.values)
+game_dict = {games.iloc[i, 0]: games.iloc[i, 1] for i in range(games.shape[0])}
+I_pred = np.zeros_like(I)
+for i in range(steam_clean.shape[0]):
+    line = steam_clean.iloc[i]
+    if line['user'] in user_dict and line['game1'] in game_dict:
+        I_pred[user_dict[line['user']], game_dict[line['game1']]] = 1
+
+reverse_game_dict = {games.iloc[i, 1]: games.iloc[i, 0] for i in range(games.shape[0])}
+pred_percentile = pd.DataFrame(pred)
+for col in pred_percentile.columns:
+    pred_percentile[col] = pred_percentile[col].rank(pct=True)
+pred_percentile = pred_percentile.values
+def top(n, user, print_value=True):
+    not_purchased = (I - 1) % 2
+    t_user = user
+    user = user_dict[user]
+    top_games = (pred_percentile*not_purchased).iloc[user]
+    #     line = I_pred[user]
+    #     for i, v in enumerate(line):
+    #         if v == 1:
+    #             top_games[i] = 0
+    top_games = list(top_games.sort_values(ascending=False)[:20].index)
+    if print_value:
+        print('top {} recommended games for user {}: '.format(n, t_user))
+        for i in range(n):
+            print(i, ")", reverse_game_dict[top_games[i]])
+    else:
+        result = [t_user]
+        for i in range(n):
+            result.append(reverse_game_dict[top_games[i]])
+        return result
+#top(20, 5250)
+
+top_N = 20
+result = []
+for idx, user in tqdm(enumerate(users['user'].values)):
+      result.append(top(top_N, user, False))
+      if idx > 8204:
+         break
+df = pd.DataFrame(result)
+columns = ['user_id'] + ['{}'.format(i+1) for i in range(top_N)]
+df.columns = columns
+df.to_csv('D:/Game-Recommendation-System/data/output_data/Collaborative_EM_output.csv', index=None)
+```
+	top 20 recommended games for user 5250:
+	0 ) DontStarve
+	1 ) FTLFasterThanLight
+	2 ) Warhammer40000DawnofWarIIRetribution
+	3 ) SMITE
+	4 ) FistfulofFrags
+	5 ) KerbalSpaceProgram
+	6 ) StarWarsRepublicCommando
+	7 ) RIFT
+	8 ) CompanyofHeroesTalesofValor
+	9 ) CounterStrikeConditionZero
+	10 ) PlanetSide2
+	11 ) PrisonArchitect
+	12 ) EmpireTotalWar
+	13 ) DeadSpace
+	14 ) Tropico4
+	15 ) Warhammer40000DawnofWarII
+	16 ) TombRaiderLegend
+	17 ) Warhammer40000SpaceMarine
+	18 ) TheWolfAmongUs
+	19 ) AmnesiaTheDarkDescent
+
+
 ### Content-based Recommender <a name="content-based"></a>
 
 The content-base recommender system gives recommendation based on the similarity between the game a user has and the other games.
@@ -549,13 +704,13 @@ Genre, publisher & developer | 1.8198 | 0.105782 | 2.190587
 Genre, publisher, developer & game details | 1.6764 | 0.104169 | 2.190587
 
 We calculated the ratio in the same way for both of the collaborative algorithm, the result are in the following table.
-As we can see, the collaborative recommender with ALS is the best one, followed by the content based recommender.
-The performance of the collaborative recommendation system with EM and SVD is far behind the other 2.
+As we can see, the collaborative recommender with ALS is the best one.
+The performance of the collaborative recommendation system with EM and SVD and the content-based recommender system are far behind it.
 
 Algorithm| Ratio [10<sup>2</sup>] | Number of Game in the Recommendation the User has in Test Dataset | Number of Game the User has in Test Dataset
 ------------ | ------------- | ------------- | -------------
-Collaborative with ALS| 2.6707 | 1.226195 | 27.357905
-Collaborative with EM and SVD | 0.3652 | 0.024349 | 2.907840
+Collaborative with ALS| 9.3402 | 0.444216 | 4.414910
+Collaborative with EM and SVD | 0.4143 | 0.024372 | 2.909578
 Content-based (Genre, publisher & developer) | 1.8198 | 0.105782 | 2.190587
 
 ## V. Related Work <a name="related-work"></a>
