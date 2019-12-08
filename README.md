@@ -179,12 +179,12 @@ It is to note that for some users, the model fails to produce recommendations. T
 
 #### c. Collaborative recommender with EM and SVD <a name="em"></a>
 
-#### * [EM algorithm](#c_1)</br>
-#### * [Create User-Game Matrix](#c_2)</br>
-#### * [Basic SVD](#c_3)</br>
-#### * [SVD via gradient descent](#c_4)</br>
-#### * [EM Compare](#c_5)</br>
-#### * [Output](#c_6)</br>
+#### 1. [EM algorithm](#c_1)</br>
+#### 2. [Create User-Game Matrix](#c_2)</br>
+#### 3. [Basic SVD](#c_3)</br>
+#### 4. [SVD via gradient descent](#c_4)</br>
+#### 5. [EM Compare](#c_5)</br>
+#### 6. [Output](#c_6)</br>
 
 ##### EM algorithm <a name="c_1"></a>
 According to the Historgram [1](#h_1) and [2](#h_2), you can see Dota 2 has the highest number of players and the highest number of total hours played so undeniably the most popular game. Where as other games such as "Half-Life 2 Lost Coast" have 981 users but a total of 184.4 hours played. I expect this game is in most cases a free bundle game. 
