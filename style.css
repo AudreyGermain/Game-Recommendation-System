@@ -14,3 +14,7 @@ table {
     margin-right:auto;
 	word-wrap: break-all;
 }
+
+img {
+   align:center !important;
+}
