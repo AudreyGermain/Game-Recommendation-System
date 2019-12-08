@@ -91,12 +91,12 @@ The third dataset is a list we split out the purchase/play column into two colum
 [//]: # "Histogram 1: all users: play + purchase"
 Then we count the number of users for each games, and output a histograph to make the data visualization and color represents the total hours of each games. 
 
-![Image text](plots/Histogram_AllUsersHrs.png?raw=true)<a name="h_1"></a>
+![Image text](plots/Histogram_AllUsersHrs.png)<a name="h_1"></a>
 
 [//]: # "Histogram 2: only users: play"
 After we removed the users who just purchased the games but hasn't played. Some games fell from the top 20.
 
-![Image text](plots/Histogram_UsersHrs.png?raw=true)<a name="h_2"></a>
+![Image text](plots/Histogram_UsersHrs.png)<a name="h_2"></a>
 
 
 [//]: # "Box plot"
