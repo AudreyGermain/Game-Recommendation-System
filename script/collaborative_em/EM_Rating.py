@@ -9,7 +9,6 @@ from tqdm import tqdm
 import time
 import matplotlib.pyplot as plt
 from sklearn.mixture import GaussianMixture
-from sklearn.model_selection import train_test_split
 
 
 locationUsersFile=pathlib.Path(r'D:/Game-Recommendation-System/data/raw_data/steam_users_purchase_play.csv')
@@ -29,7 +28,7 @@ top20 = game_freq.sort_values(by='user',ascending=False)[:20].reset_index()
 steam_clean['game1'] = steam_clean['game'].apply(lambda x: re.sub('[^a-zA-Z0-9]', '', x))
 steam_traind['game1'] = steam_traind['game'].apply(lambda x: re.sub('[^a-zA-Z0-9]', '', x))
 #steam_clean.head()
-
+'''
 #First EM Algorithm
 def game_hrs_density(GAME, nclass, print_vals=True):
     game_data = steam_clean[(steam_clean['game1'] == GAME) & (steam_clean['hrs'] > 2)]
@@ -51,7 +50,29 @@ def game_hrs_density(GAME, nclass, print_vals=True):
     return game_plt
 
 a = game_hrs_density('Fallout4', 5, True)
+print(a)
+'''
+def game_hrs_density(GAME, nclass, print_vals=True):
+    game_data = steam_clean[(steam_clean['game1'] == GAME) & (steam_clean['hrs'] > 2)]
+    game_data['loghrs'] = np.log(steam_clean['hrs'])
+    mu_init = np.linspace(min(game_data['loghrs']), max(game_data['loghrs']), nclass).reshape(-1, 1)
+    sigma_init = np.array([1] * nclass).reshape(-1, 1, 1)
+    gaussian = GaussianMixture(n_components=nclass, means_init=mu_init, precisions_init=sigma_init).fit(game_data['loghrs'].values.reshape([-1, 1]))
+    if print_vals:
+        print(' lambda: {}\n mean: {}\n sigma: {}\n'.format(gaussian.weights_, gaussian.means_, gaussian.covariances_))
+    # building data frame for plotting
+    x = np.linspace(min(game_data['loghrs']), max(game_data['loghrs']), 1000)
+    dens = pd.DataFrame({'x': x})
+    for i in range(nclass):
+        dens['y{}'.format(i+1)] = gaussian.weights_[i]* scipy.stats.norm(gaussian.means_[i][0], gaussian.covariances_[i][0][0]).pdf(x)
+    dens = dens.melt('x', value_name='gaussian')
+    game_plt = ggplot(aes(x='loghrs', y='stat(density)'), game_data) + geom_histogram(bins=25, colour = "black", alpha = 0.7, size = 0.1) + \
+               geom_area(dens, aes(x='x', y='gaussian', fill = 'variable'), alpha = 0.5, position = position_dodge(width=0.2)) + geom_density()+ \
+               ggtitle(GAME)
+    return game_plt
 
+analy_game = game_hrs_density('TheWitcher3WildHunt', 5, True)
+print(analy_game)
 
 # Create user item matrix
 np.random.seed(910)
@@ -70,7 +91,7 @@ games = pd.DataFrame({'game1': sorted(steam_clean_pos['game1'].unique()), 'game_
 users = pd.DataFrame({'user': sorted(steam_clean_pos['user'].unique()), 'user_id': range(len(steam_clean_pos['user'].unique()))})
 steam_clean_pos = pd.merge(steam_clean_pos, games, on=['game1'])
 steam_clean_pos = pd.merge(steam_clean_pos, users, on=['user'])
-print(steam_clean_pos)
+
 
 #test dataset user
 users_test = pd.DataFrame({'user': sorted(steam_test['user'].unique()), 'user_id': range(len(steam_test['user'].unique()))})
@@ -128,15 +149,14 @@ for i, col in enumerate(Y.columns):
 U, D, V = np.linalg.svd(Y)
 
 p_df = pd.DataFrame({'x': range(1, len(D)+1), 'y': D/np.sum(D)})
-ggplot(p_df, aes(x='x', y='y')) + \
+print(ggplot(p_df, aes(x='x', y='y')) + \
 geom_line() + \
-labs(x = "Leading component", y = "")
+labs(x = "Leading component", y = ""))
 
 lc = 60
 pred = np.dot(np.dot(U[:, :lc], np.diag(D[:lc])), V[:lc, :])
 
-#print(rmse(pred, test))
-print(test)
+print(rmse(pred, test))
 rmse(pred, test, True).head()
 
 # SVD via gradient descent
@@ -176,10 +196,10 @@ fojb = np.array(fobj)
 rmsej = np.array(rmsej)
 path1 = pd.DataFrame({'itr': range(1, N+2), 'fobj': fobj, 'fobjp': fobj/max(fobj), 'rmse': rmsej, 'rmsep': rmsej/max(rmsej)})
 path1gg = pd.melt(path1[["itr", "fobjp", "rmsep"]], id_vars=['itr'])
-#print(path1.tail(1))
+print(path1.tail(1))
 
 
-#print(ggplot(path1gg, aes('itr', 'value', color = 'variable')) + geom_line())
+print(ggplot(path1gg, aes('itr', 'value', color = 'variable')) + geom_line())
 
 
 # Create a rating based on time played
@@ -211,8 +231,8 @@ def game_hrs_density_p(pred, GAME=None, nclass=1, print_vals=True):
                ggtitle(t_GAME)
     return game_plt
 
-a = game_hrs_density_p(pred, "Fallout4", 5)
-#print(a)
+a = game_hrs_density_p(pred, "TheWitcher3WildHunt", 5)
+print(a)
 
 # Export recommend games
 user_dict = dict(users.values)
@@ -247,7 +267,7 @@ def top(n, user, print_value=True):
         for i in range(n):
             result.append(reverse_game_dict[top_games[i]])
         return result
-top(20, 5250)
+#top(20, 5250)
 
 top_N = 20
 result = []
