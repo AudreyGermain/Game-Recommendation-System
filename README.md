@@ -116,6 +116,24 @@ languages, achievements, genre (Action, Adventure, RPG, Strategy…), game descr
 minimum requirement to run the game, recommended requirement, original price and price with discount.
 There is a total of 51920 games in the dataset.<br/>
 
+To understand better how the game reviews are distibuted here is a plot showing the amount of games with their 
+percentage of positive reviews. 
+
+![Image text](plots/Histogram_GameReviews.png)
+
+This is all the genre of the games in the game dataset and the number of game associated to the genre.
+
+![Image text](plots/Histogram_GameGenre.png)
+
+This is the 20 most popular tags in the game dataset and the number of game associated to them.
+
+![Image text](plots/Histogram_GamePopularTags.png)
+
+This is the 20 most recurrent game details in the game dataset and the number of game associated to them.
+
+![Image text](plots/Histogram_GameDetails.png)
+
+
 ## III. Methodology <a name="methodology"></a>
 
 We decided to use 3 differents algorithms to generate recommendation by user. We use 2 collaborative algorithm,
@@ -279,8 +297,142 @@ This example will use a gradient descent approach to find optimal U and V matric
 
 ### Content-based Recommender <a name="content-based"></a>
 
+The content-base recommender system gives recommendation based on the similarity between the game a user has and the other games.
+In order to build the recommender system, we first need to prepare the data and the build the algorithm.
+First, we need to preprocess the game dataset with all the useful information to give as 
+an input to the recommender algorithm formated in an easier wait. We will also extract the percentage from the reviews
+since we will need it. Then we will build the function used to give recommendation of games similar to another game and
+we will finish by getting the recommendation for all user based on the games the user has.
+
+To prepare the data for the content based recommender we started by selecting the information we thought would be the 
+most useful to find similar games. We read the useful column using the following code.
+
+```python
+dataGames = read_csv(locationGamesFile, usecols=["name", "genre", "game_details", "popular_tags", "publisher", "developer"])
+```
+
+We decided to only keep the games that were both in the game dataset and the user dataset.
+We chose to do it this way because there is a lot of games in the game dataset that have never been played or purchased by any user,
+so there's no use in considering them in the recommender.
+Also the dataset was too big to create the matrix of cosine similarity (this will be explain later)
+since it took too much memory. To match the games from both dataset together, we created an ID for the games by removing
+all symbols the weren't alphanumeric, removing all capital letters and removing all spaces using to following code. 
+We did the same on the games in the user dataset.
+
+```python
+# remove spaces and special character from game name in both dataset
+for i, row in dataGames.iterrows():
+    clean = re.sub('[^A-Za-z0-9]+', '', row["name"])
+    clean = clean.lower()
+    dataGames.at[i, 'ID'] = clean
+```
+
+After this, we found all the uniques ID from the user dataset and kept only the rows in the games dataset where the ID 
+matched one of the ID in the user dataset. This way we were able to get 3036 games of the game dataset that matched 
+some of the 5152 games from the user dataset. Without the ID we only were able to find 71 games that matched only 
+using the names. Since we have less games in the new game dataset, the recommender system will not be able to find 
+recommendation for every games in the user dataset. This will surely affect its performance.<br/>
+
+With the new smaller game dataset, we made sure to remove the spaces from the useful column we chose to use.
+By removing the spaces, we ensure that, for exemple, Steam Achievement and Steam Cloud don't get a match because they 
+both contain Steam. Therefore we apply the following function to all the columns like this.
+
+```python
+def clean_data(x):
+    if isinstance(x, str):
+        return x.replace(" ", "")
+    else:
+        print(x)
+        return x
+
+
+usedGames.loc[:, 'genre'] = usedGames['genre'].apply(clean_data)
+```
+
+Finally, we created some custom columns by combining multiple column to try and find the combination of information 
+that will give us the best recommendation system possible. The results of the different columns will be compared in the 
+[Evaluation & Analysis](#evaluation-analysis) section of this article.
+
+```python
+# create some column containing a mix of different information
+usedGames["genre_publisher_developer"] = usedGames['genre'] + usedGames['publisher'] + usedGames['developer']
+usedGames["genre_popular_tags_developer"] = usedGames['genre'] + usedGames['popular_tags'] + usedGames['developer']
+usedGames["genre_popular_tags_game_details"] = usedGames['genre'] + usedGames['popular_tags'] + usedGames['game_details']
+usedGames["genre_publisher_developer_game_details"] = usedGames['genre'] + usedGames['publisher'] + usedGames['developer'] + usedGames['game_details']
+```
+
+With all of those manipulations, the new game dataset that is going to be use by the algorithm looks like this.
+
+name|developer|publisher|popular_tags|game_details|genre|ID|genre_publisher_developer|genre_popular_tags_developer|genre_popular_tags_game_details|genre_publisher_developer_game_details
+---|---|---|---|---|---|---|---|---|---|---|
+DayZ|BohemiaInteractive|"BohemiaInteractive,BohemiaInteractive"|"Survival,Zombies,OpenWorld,Multiplayer,PvP,MassivelyMultiplayer,Action,EarlyAccess,Simulation,FPS,Post-apocalyptic,SurvivalHorror,Shooter,Sandbox,Adventure,Indie,Co-op,Atmospheric,Horror,Military"|"Multi-player,OnlineMulti-Player,SteamWorkshop,SteamCloud,ValveAnti-Cheatenabled"|"Action,Adventure,MassivelyMultiplayer"|dayz|"Action,Adventure,MassivelyMultiplayerBohemiaInteractive,BohemiaInteractiveBohemiaInteractive"|"Action,Adventure,MassivelyMultiplayerSurvival,Zombies,OpenWorld,Multiplayer,PvP,MassivelyMultiplayer,Action,EarlyAccess,Simulation,FPS,Post-apocalyptic,SurvivalHorror,Shooter,Sandbox,Adventure,Indie,Co-op,Atmospheric,Horror,MilitaryBohemiaInteractive"|"Action,Adventure,MassivelyMultiplayerSurvival,Zombies,OpenWorld,Multiplayer,PvP,MassivelyMultiplayer,Action,EarlyAccess,Simulation,FPS,Post-apocalyptic,SurvivalHorror,Shooter,Sandbox,Adventure,Indie,Co-op,Atmospheric,Horror,MilitaryMulti-player,OnlineMulti-Player,SteamWorkshop,SteamCloud,ValveAnti-Cheatenabled"|"Action,Adventure,MassivelyMultiplayerBohemiaInteractive,BohemiaInteractiveBohemiaInteractiveMulti-player,OnlineMulti-Player,SteamWorkshop,SteamCloud,ValveAnti-Cheatenabled"
+EVE Online|CCP|"CCP,CCP"|"Space,MassivelyMultiplayer,Sci-fi,Sandbox,MMORPG,OpenWorld,RPG,PvP,Multiplayer,FreetoPlay,Economy,Strategy,SpaceSim,Simulation,Action,Difficult,Tactical,Capitalism,PvE,Atmospheric"|"Multi-player,OnlineMulti-Player,MMO,Co-op,OnlineCo-op,SteamTradingCards"|"Action,FreetoPlay,MassivelyMultiplayer,RPG,Strategy"|eveonline|"Action,FreetoPlay,MassivelyMultiplayer,RPG,StrategyCCP,CCPCCP"|"Action,FreetoPlay,MassivelyMultiplayer,RPG,StrategySpace,MassivelyMultiplayer,Sci-fi,Sandbox,MMORPG,OpenWorld,RPG,PvP,Multiplayer,FreetoPlay,Economy,Strategy,SpaceSim,Simulation,Action,Difficult,Tactical,Capitalism,PvE,AtmosphericCCP"|"Action,FreetoPlay,MassivelyMultiplayer,RPG,StrategySpace,MassivelyMultiplayer,Sci-fi,Sandbox,MMORPG,OpenWorld,RPG,PvP,Multiplayer,FreetoPlay,Economy,Strategy,SpaceSim,Simulation,Action,Difficult,Tactical,Capitalism,PvE,AtmosphericMulti-player,OnlineMulti-Player,MMO,Co-op,OnlineCo-op,SteamTradingCards"|"Action,FreetoPlay,MassivelyMultiplayer,RPG,StrategyCCP,CCPCCPMulti-player,OnlineMulti-Player,MMO,Co-op,OnlineCo-op,SteamTradingCards"
+TERA|"Bluehole,Inc."|"EnMasseEntertainment,EnMasseEntertainment"|"FreetoPlay,MMORPG,MassivelyMultiplayer,RPG,OpenWorld,Action,Fantasy,Adventure,Anime,ThirdPerson,CharacterCustomization,ActionRPG,Multiplayer,Co-op,PvP,HackandSlash,PvE,Cute,Controller,Nudity"|"Multi-player,MMO,Co-op,SteamTradingCards,PartialControllerSupport"|"Action,Adventure,FreetoPlay,MassivelyMultiplayer,RPG"|tera|"Action,Adventure,FreetoPlay,MassivelyMultiplayer,RPGEnMasseEntertainment,EnMasseEntertainmentBluehole,Inc."|"Action,Adventure,FreetoPlay,MassivelyMultiplayer,RPGFreetoPlay,MMORPG,MassivelyMultiplayer,RPG,OpenWorld,Action,Fantasy,Adventure,Anime,ThirdPerson,CharacterCustomization,ActionRPG,Multiplayer,Co-op,PvP,HackandSlash,PvE,Cute,Controller,NudityBluehole,Inc."|"Action,Adventure,FreetoPlay,MassivelyMultiplayer,RPGFreetoPlay,MMORPG,MassivelyMultiplayer,RPG,OpenWorld,Action,Fantasy,Adventure,Anime,ThirdPerson,CharacterCustomization,ActionRPG,Multiplayer,Co-op,PvP,HackandSlash,PvE,Cute,Controller,NudityMulti-player,MMO,Co-op,SteamTradingCards,PartialControllerSupport"|"Action,Adventure,FreetoPlay,MassivelyMultiplayer,RPGEnMasseEntertainment,EnMasseEntertainmentBluehole,Inc.Multi-player,MMO,Co-op,SteamTradingCards,PartialControllerSupport"
+Stonehearth|RadiantEntertainment|"(none),(none)"|"CityBuilder,Building,Sandbox,Strategy,Survival,Simulation,Crafting,Voxel,EarlyAccess,Indie,Singleplayer,OpenWorld,RPG,Management,Multiplayer,Fantasy,Cute,Adventure,GodGame,RTS"|"Single-player,Multi-player,OnlineMulti-Player,LocalMulti-Player,Co-op,OnlineCo-op,LocalCo-op,SteamTradingCards,SteamWorkshop"|"Indie,Simulation,Strategy"|stonehearth|"Indie,Simulation,Strategy(none),(none)RadiantEntertainment"|"Indie,Simulation,StrategyCityBuilder,Building,Sandbox,Strategy,Survival,Simulation,Crafting,Voxel,EarlyAccess,Indie,Singleplayer,OpenWorld,RPG,Management,Multiplayer,Fantasy,Cute,Adventure,GodGame,RTSRadiantEntertainment"|"Indie,Simulation,StrategyCityBuilder,Building,Sandbox,Strategy,Survival,Simulation,Crafting,Voxel,EarlyAccess,Indie,Singleplayer,OpenWorld,RPG,Management,Multiplayer,Fantasy,Cute,Adventure,GodGame,RTSSingle-player,Multi-player,OnlineMulti-Player,LocalMulti-Player,Co-op,OnlineCo-op,LocalCo-op,SteamTradingCards,SteamWorkshop"|"Indie,Simulation,Strategy(none),(none)RadiantEntertainmentSingle-player,Multi-player,OnlineMulti-Player,LocalMulti-Player,Co-op,OnlineCo-op,LocalCo-op,SteamTradingCards,SteamWorkshop"
+Call of Duty®: Black Ops|Treyarch|"Activision,Activision"|"Action,FPS,Zombies,Multiplayer,Shooter,Singleplayer,ColdWar,First-Person,War,Military,OnlineCo-Op,Co-op,Gore,StoryRich,Adventure,Controller,Linear,Masterpiece,Horror,MassivelyMultiplayer"|"Single-player,Multi-player,Co-op,SteamAchievements,PartialControllerSupport,ValveAnti-Cheatenabled"|Action|callofdutyblackops|"ActionActivision,ActivisionTreyarch"|"ActionAction,FPS,Zombies,Multiplayer,Shooter,Singleplayer,ColdWar,First-Person,War,Military,OnlineCo-Op,Co-op,Gore,StoryRich,Adventure,Controller,Linear,Masterpiece,Horror,MassivelyMultiplayerTreyarch"|"ActionAction,FPS,Zombies,Multiplayer,Shooter,Singleplayer,ColdWar,First-Person,War,Military,OnlineCo-Op,Co-op,Gore,StoryRich,Adventure,Controller,Linear,Masterpiece,Horror,MassivelyMultiplayerSingle-player,Multi-player,Co-op,SteamAchievements,PartialControllerSupport,ValveAnti-Cheatenabled"|"ActionActivision,ActivisionTreyarchSingle-player,Multi-player,Co-op,SteamAchievements,PartialControllerSupport,ValveAnti-Cheatenabled"
+
+
+To obtain the reviews, we had to do some manipulations on the review column in the game dataset to extract the 
+percentage and other possibly useful information. We created the following script to do this and print the 
+result in a CSV file. We read it from the content-based recommender script to get the reviews.
+
+```python
+for i, row in dataGames.iterrows():
+    if type(row["all_reviews"]) == str:
+
+        # extract % of positive reviews
+        x = re.findall(r'- [0,1,2,3,4,5,6,7,8,9]*%', row["all_reviews"])
+        if len(x) != 0:
+            dataGames.at[i, 'percentage_positive_review'] = x[0].translate({ord(i): None for i in '- %'})
+
+        # extract qualification of reviews
+        reviewParse = row["all_reviews"].split(",")
+        if 'user reviews' in reviewParse[0]:
+            dataGames.at[i, 'review_qualification'] = ""
+        else:
+            dataGames.at[i, 'review_qualification'] = reviewParse[0]
+```
+
+We used the fact that all reviews follow this format:
+"Mostly Positive,(11,481),- 74% of the 11,481 user reviews for this game are positive." 
+to extract the information we wanted. 
+We start by getting the percentage of good reviews by using regex to get the "- 74%" part of the reviews and we then keep the number only.
+We also got the qualitative review by splitting the reviews at the comma and keeping the first one.
+We ignore the qualification that contains the words 'user reviews' because it means not enough user reviewed the game
+and the format is different. 
+
+The review dataset created by this script looks like this:
+
+name|percentage_positive_review|review_qualification|all_reviews
+---|---|---|---|
+DOOM|92|Very Positive|"Very Positive,(42,550),- 92% of the 42,550 user reviews for this game are positive."
+PLAYERUNKNOWN'S BATTLEGROUNDS|49|Mixed|"Mixed,(836,608),- 49% of the 836,608 user reviews for this game are positive."
+BATTLETECH|71|Mostly Positive|"Mostly Positive,(7,030),- 71% of the 7,030 user reviews for this game are positive."
+DayZ|61|Mixed|"Mixed,(167,115),- 61% of the 167,115 user reviews for this game are positive."
+EVE Online|74|Mostly Positive|"Mostly Positive,(11,481),- 74% of the 11,481 user reviews for this game are positive."
+
+
+For the recommender system, we generate the cosine similarity matrix with the following code. First it calculate the matrix of frequency of each
+words in the chosen column (column_name) of each of the games, then it calculate the cosine similarity function.<br/>
+
+```python
+# Compute the Cosine Similarity matrix using the column
+count = CountVectorizer(stop_words='english')
+count_matrix = count.fit_transform(dataGames[column_name])
+cosine_sim_matrix = cosine_similarity(count_matrix, count_matrix)
+```
+
+The variable indices is a reverse map that use the name as key, it will be useful to get the index of each game in the cosine similarity matrix.<br/>
+
+```python
+# Construct a reverse map of indices and game names
+indices = Series(dataGames.index, index=dataGames['name']).drop_duplicates()
+```
+
 To generate the recommendation for each game, the following function is used. The input of the function is the title of
-the game as a string and the cosine matrix (explained later) and the output is a list of recommended game title.<br/>
+the game as a string and the cosine matrix and the output is a list of recommended game title ordered by similarity.
+The code for this function as well as the code to generate de cosine similarity matrix are taken from 
+[this tutorial](https://www.datacamp.com/community/tutorials/recommender-systems-python?fbclid=IwAR1fz9YLOgZ95KHwoLpgb-hTdV2MekujDGBngRTG3kYmBJYxwSK3UWvNJDg).<br/>
 
 ```python
 def get_recommendations(title, cosine_sim):
@@ -310,33 +462,14 @@ def get_recommendations(title, cosine_sim):
 
 	# Return the top most similar games
 	return dataGames['name'].iloc[movie_indices].tolist()
-
 ```
+
 The variable listGames is a list of all the games that are in both of the dataset (user and game dataset).
-We use this because there is a lot of games in the game dataset that have never been played or purchased by any user,
-so there's no use in considering them in the recommender and some of the games in the user dataset are not in the game dataset.
-To maximize the amount of match between the game titles in the datasets we removed all symboles and spaces and put
-every letters in lower case. We were able to find 3036 games in the game dataset that match some of the 5152 games that are in the user dataset.<br/>
-
-The variable indices is a reverse map that use the name as key to get the index of each game in the cosine similarity matrix.
-We make sure that the idx is not a Series, it can happen in the case where 2 different games have the same name (in our dataset 2 games have the name "RUSH").<br/>
-```python
-# Construct a reverse map of indices and game names
-indices = Series(dataGames.index, index=dataGames['name']).drop_duplicates()
-```
+We make sure that the idx is not a Series, it can happen in the case where 2 different games have the same name (in our dataset 2 games have the name "RUSH").
 Then we get the similarity score of each games from the matrix and we order it from the most similar to the less similar.
 Finally we just need to extract the amount of recommendation that we want and return the list.
 The variable n_recommendation contains the amount of recommendation we want to get, we decided to set it to 20.<br/>
 
-To generate the cosine similarity matrix we use the following code. First it calculate the matrix of frequency of each
-words in the chosen column (column_name) of each of the games, then it calculate the cosine similarity function.<br/>
-
-```python
-# Compute the Cosine Similarity matrix using the column
-count = CountVectorizer(stop_words='english')
-count_matrix = count.fit_transform(dataGames[column_name])
-cosine_sim_matrix = cosine_similarity(count_matrix, count_matrix)
-```
 To get the recommendation for each user, we implemented a function that combines the recommendations and get the
 recommendation with the best reviews (extracted from the game dataset). This function takes the ID of each user,
 the list of recommendation (the recommendation function explained previously is applied to all the games a user
@@ -373,96 +506,11 @@ If it wasn't because of that problem, we thought of taking into account the prop
 recommend similar games to games that are most played. Using the reviews still ensure that the recommended games are
 considered good in general by all the users.<br/>
 
-To obtain the reviews, we had to do some manipulations on the review column in the game dataset to extract the 
-percentage and other possibly useful information. We created the following script to do this and print the 
-result in a CSV file. We read it from the content-based recommender script to get the reviews.
-
-```python
-for i, row in dataGames.iterrows():
-    if type(row["all_reviews"]) == str:
-
-        # extract % of positive reviews
-        x = re.findall(r'- [0,1,2,3,4,5,6,7,8,9]*%', row["all_reviews"])
-        if len(x) != 0:
-            dataGames.at[i, 'percentage_positive_review'] = x[0].translate({ord(i): None for i in '- %'})
-
-        # extract qualification of reviews
-        reviewParse = row["all_reviews"].split(",")
-        if 'user reviews' in reviewParse[0]:
-            dataGames.at[i, 'review_qualification'] = ""
-        else:
-            dataGames.at[i, 'review_qualification'] = reviewParse[0]
-```
-
-We used the fact that all reviews follow this format:
-"Mostly Positive,(11,481),- 74% of the 11,481 user reviews for this game are positive." 
-to extract the information we wanted. 
-We start by getting the percentage of good reviews by using regex to get the "- 74%" part of the reviews and we then keep the number only.
-We also got the qualitative review by splitting the reviews at the comma and keeping the first one.
-We ignore the qualification that contains the words 'user reviews' because it means not enough user reviewed the game
-and the format is different. 
-
 All the dataframe rows produced by the function 'make_recommendation_for_user' are combine and are printed in a CSV file.<br/>
 
 The whole script is arranged in a function to let us run it with multiple different input.
-The different input of the content based recommender are generated in a script that rearrange the data in an easy 
-to use it for the algorithm, it correspond to the varible column_name in the code above.<br/>
+Those columns correspond to the variable column_name in the code that generate the cosine similarity matrix.<br/>
 
-To prepare the data for the content based recommender we started by selecting the information we thought would be the 
-most useful to find similar games. We read the useful column using the following code.
-
-```python
-dataGames = read_csv(locationGamesFile, usecols=["name", "genre", "game_details", "popular_tags", "publisher", "developer"])
-```
-
-Like mentioned previously, we decided to only keep the games that were both in the game dataset and the user dataset.
-We chose to do it this way because there is no point in recommending games the user don't have and it will affect the 
-performance of the algorithm compare to the other too. Also the dataset was too big to create matrix of cosine similarity
-since it took to much memory. To match the games from both dataset together, we created an ID for the games by removing
-all symbols the weren't alphanumeric, removing all capital letters and removing all spaces using to following code. 
-We did the same on the games in the user dataset.
-
-```python
-# remove spaces and special character from game name in both dataset
-for i, row in dataGames.iterrows():
-    clean = re.sub('[^A-Za-z0-9]+', '', row["name"])
-    clean = clean.lower()
-    dataGames.at[i, 'ID'] = clean
-```
-After this, we found all the uniques ID from the user dataset and kept only the rows in the games dataset where the ID 
-matched one of the ID in the user dataset. This way we were able to get 3036 games of the game dataset that matched 
-some of the 5152 games from the user dataset. Without the ID we only were able to find 71 games that matched only 
-using the names. Since we have less games in the new game dataset, the recommender system will not be able to find 
-recommendation for every games in the user dataset. This will surly affect its performance.<br/>
-
-With the new smaller game dataset, we made sure to remove the spaces from le useful column we chose to use.
-By removing the spaces, we ensure that, for exemple, Steam Achievement and Steam Cloud dont get a match because they 
-both contain Steam. Therefor we apply the following function to all the columns like this.
-
-```python
-def clean_data(x):
-    if isinstance(x, str):
-        return x.replace(" ", "")
-    else:
-        print(x)
-        return x
-
-
-usedGames.loc[:, 'genre'] = usedGames['genre'].apply(clean_data)
-```
-
-Finally, we created some custom columns by combining multiple column to try and find the combination of information 
-that will give us the best recommendation system possible. 
-
-```python
-# create some column containing a mix of different information
-usedGames["genre_publisher_developer"] = usedGames['genre'] + usedGames['publisher'] + usedGames['developer']
-usedGames["genre_popular_tags_developer"] = usedGames['genre'] + usedGames['popular_tags'] + usedGames['developer']
-usedGames["genre_popular_tags_game_details"] = usedGames['genre'] + usedGames['popular_tags'] + usedGames['game_details']
-usedGames["genre_publisher_developer_game_details"] = usedGames['genre'] + usedGames['publisher'] + usedGames['developer'] + usedGames['game_details']
-```
-
-The results of the different columns will be compared in the Evaluation & Analysis section of this article.
 ## IV. Evaluation & Analysis <a name="evaluation-analysis"></a>
 
 To compare the different algorithms we created a script that calculate the ratio of games the user has 
@@ -492,13 +540,13 @@ Genre, publisher & developer | 1.8198 | 0.105782 | 2.190587
 Genre, publisher, developer & game details | 1.6764 | 0.104169 | 2.190587
 
 We calculated the ratio in the same way for both of the collaborative algorithm, the result are in the following table.
-As we can see, the collaborative recommender with ALS is the best one, followed by the content based recommender.
-The performance of the collaborative recommendation system with EM and SVD is far behind the other 2.
+As we can see, the collaborative recommender with ALS is the best one.
+The performance of the collaborative recommendation system with EM and SVD and the content-based recommender system are far behind it.
 
 Algorithm| Ratio [10<sup>2</sup>] | Number of Game in the Recommendation the User has in Test Dataset | Number of Game the User has in Test Dataset
 ------------ | ------------- | ------------- | -------------
-Collaborative with ALS| 2.6707 | 1.226195 | 27.357905
-Collaborative with EM and SVD | 0.3652 | 0.024349 | 2.907840
+Collaborative with ALS| 9.3402 | 0.444216 | 4.414910
+Collaborative with EM and SVD | 0.4143 | 0.024372 | 2.909578
 Content-based (Genre, publisher & developer) | 1.8198 | 0.105782 | 2.190587
 
 ## V. Related Work <a name="related-work"></a>
@@ -522,6 +570,14 @@ gave us the idea to calculate the ratio the way we did to compare the algorithms
 In conclusion, we implemented 3 different algorithm for recommendation system, one content-based and two collaborative,
 one with the ALS algorithm and the other with the EM and SVD algorithm. The collaborative recommender with the ALS
 algorithm seems to give the best recommendation based on our evaluation.<br/>
+
+When the project was started using the 2 datasets, it was expected, since the both came from Steam, that every game in 
+the user dataset would match a game in the training dataset, but as the project progressed we realized it wasn't the case. 
+This caused a major issue for the content-based algorithm since it really relies on the fact that the game dataset 
+have information about the games that are in the user dataset. Because of this issue, it was not possible to generate 
+recommendation for every games the users have. Because of this, a lot of user don't have recommendation and it probably 
+affect the performance of the algorithm. If we had to do a similar project on recommender system again, it would be 
+important to make sure we have information about every product when choosing the datasets.<br/>
 
 It would be interesting to create an hybrid recommender system using the collaborative recommender with the ALS 
 algorithm and the content based algorithm using the genre, publisher and developer as input to see if we can make 
