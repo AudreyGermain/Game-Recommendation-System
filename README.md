@@ -247,7 +247,7 @@ analy_game = game_hrs_density('TheWitcher3WildHunt', 5, True)
 print(analy_game)
 ```
 
-![Image text](plots/EM_SingleAnalysis.png?raw=true)
+![Image text](plots/EM_SingleAnalysis.png?raw=true) {align=center}
 
 *New:*
 
