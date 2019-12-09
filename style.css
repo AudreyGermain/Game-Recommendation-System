@@ -3,7 +3,7 @@
 
 @import "{{ site.theme }}";
 .gist-data{
-    max-height:500px; // Any height
+    max-height:700px; // Any height
     overflow-y: scroll;
 }
 

@@ -175,23 +175,27 @@ The data used for this recommender system is that of the steam users described i
 The Alternating Least Squares (ALS) is the model used to fit the data and generate recommendations. The ALS model is already implemented in the [implicit](https://github.com/benfred/implicit) python library thanks to [Ben Frederickson](http://www.benfrederickson.com/fast-implicit-matrix-factorization/).  
 As described on its documentation [here](https://implicit.readthedocs.io/en/latest/als.html), the ALS algorithm available through the implicit library is a Recommendation Model based on the algorithms described in the paper [Collaborative Filtering for Implicit Feedback Datasets](http://yifanhu.net/PUB/cf.pdf) with performance optimizations described in [Applications of the Conjugate Gradient Method for Implicit Feedback Collaborative Filtering](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.379.6473&rep=rep1&type=pdf). The advantage of using the implicit python library versus a manual implementation of the algorithm is the speed required to generate recommendation since the ALS model in the implicit library uses Cython allowing the parallelization of the code among threads.
 
-**(Explain what's ALS and what it does)**
+The ALS algorithm uses *matrix factorization*, which is basically taking a large matrix and factor it into smaller matrices whose product equals the original one. For our case of collaborative recommender system with implicit data, the *matrix factorization* mathematically reduces the original matrix "all users vs all games" into smaller matrices "all users vs some features" and "all games vs some features". The mentioned *features* are learnt from the data and don't necessarily represent any real metadata.
 
-In order to generate recommendations, the class ImplicitCollaborativeRecommender is implemented in a python script. The code is available here below.
+ALS is then an iterative optimization process that tries to arrive to a closer and closer factorized representation (***U*** x ***V***) of the original matrix ***R*** at every iteration.
+
+![image alt ><](plots/ALS_matrix_factorization.png)
+
+In the figure above, ***R*** is the original matrix user-items containing some kind of implicit data within it. ***U*** and ***V*** have weights measuring how each user-item relates to each feature. The goal is to compute the weights of ***U*** and ***V*** such that ***R ≈ U x V***. The ALS (*Alternating Least Squares*) algorithm iteratively *alternates* (hence its name) between optimizing ***U*** and fixing ***V*** and vice versa until a convergence that approximates ***R*** the best it can.
+
+As mentioned before, for our project we use the ALS model implemented in the [implicit](https://github.com/benfred/implicit) python library, which uses two separate magnitudes (*preferences* and *confidence levels*) in order to express the user raw observations. For each user-item interaction within the data, an estimate is computed expressing whether the user likes of dislikes and item (i.e. preference) and couple this estimate with a confidence level, related to the raw implicit observations (higher the more an user has played a game). Further explanations can be found in the paper [Collaborative Filtering for Implicit Feedback Datasets](http://yifanhu.net/PUB/cf.pdf) 
+
+
+In order to produce recommendations using the ALS algorithm described above, the class *ImplicitCollaborativeRecommender* is implemented in a python script. The code is available here below. The class makes all the required data manipulations to the fed DataFrame in order to create the matrices required by the ALS algorithm. In order to produce recommendations, we take advantage of the methods already implemented around the ALS algorithm from the implicit python library. 
 
 <script src="https://gist.github.com/g30rdan/d992457bf34607493c19341c96761387.js"></script>
-The collaborative recommender model is created using the training user dataset with the following lines of code.
+The collaborative recommender model is created using the training user dataset and the *ImplicitCollaborativeRecommender* class with the following lines of code.
 
 <script src="https://gist.github.com/g30rdan/ae0a11c3715295c3fd88cb5ee6e7ee57.js"></script>
-With me model successfully loaded, we can start generating recommendations for all the users for which user/items interactions were hidden during the process of 
-training and testing data splitting. For each user, 20 recommendations are generated using the following lines of code. Recommendations are stored in a Pandas DataFrame, which is later on exported as a csv file.
+With me model successfully loaded, we can start generating recommendations for all users for which user-item interactions were hidden during the process of training and testing data splitting. For each user, 20 recommendations are generated using the following lines of code. Recommendations are stored in a Pandas DataFrame, which is later on outputted as a CSV file.
 
 <script src="https://gist.github.com/g30rdan/8f225e83ae3249fa051d8c4beba5e202.js"></script>
-It is to note that for some users, the model fails to produce recommendations. This is  due to the fact that many users have only one user/interactions which ended up in the testing dataset. Hence, since the model has no knowledge about these users preferences, it cannot produce any recommendations. For these cases, the output values are set equal to '-999'.
-
-
-
-
+It is to note that for some users, the model fails to produce recommendations. This is  due to the fact that many users have only one user-item interactions which ended up in the testing dataset. Hence, since the model has no knowledge about these users observations, it cannot produce any recommendation. For these cases, the output values are set equal to '-999'.
 
 
 #### c. Collaborative recommender with EM and SVD <a name="em"></a>
