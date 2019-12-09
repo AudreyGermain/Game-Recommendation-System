@@ -4,15 +4,12 @@
 
 ## Team:
 - Doo Hyodan,
-  
   Department Of Information System, Hanyang University, ammissyouyou@gmail.com
   
 - Audrey Germain,
-  
   Computer Engineering, Department of Software Engineering and Computer Engineering, Polytechnique Montreal
   
 - Geordan Jove,
-  
   Aerospace Engineering, Department of Mechanical Engineering, Polytechnique Montreal
 
 ## Table of content
@@ -763,7 +760,6 @@ All the related work used as reference for the development of our project are li
 
 - To understand what a recommender system is and the different types, we used the article ["How do Recommendation Engines work? And What are the Benefits?"](https://marutitech.com/recommendation-engine-benefits/).
 - For the collaborative recommender using the ALS algorithm, we used the work presented in the following articles: ["ALS Implicit Collaborative Filtering"](https://medium.com/radon-dev/als-implicit-collaborative-filtering-5ed653ba39fe "ALS Implicit Collaborative Filtering") and ["A Gentle Introduction to Recommender Systems with Implicit Feedback"](https://jessesw.com/Rec-System/ "A Gentle Introduction to Recommender Systems with Implicit Feedback").
-
 - For the collaborative recommender using the EM algorithm we used the article ["Machine Learning with Python: Exception Maximization and Gaussian Mixture Models in Python"](https://www.python-course.eu/expectation_maximization_and_gaussian_mixture_models.php).
 - For the content-based recommender system we used some code from the blog post ["Recommender Systems in Python: Beginner Tutorial"](https://www.datacamp.com/community/tutorials/recommender-systems-python?fbclid=IwAR1fz9YLOgZ95KHwoLpgb-hTdV2MekujDGBngRTG3kYmBJYxwSK3UWvNJDg) to implement the function that produces recommendations for each game.
 - The KDD research paper ["Real-time Attention Based Look-alike Model for Recommender System"](https://www.kdd.org/kdd2019/accepted-papers/view/real-time-attention-based-look-alike-model-for-recommender-system)
