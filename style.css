@@ -22,3 +22,8 @@ img[alt$="><"] {
   margin: auto;
   float: none!important;
 }
+
+table {
+    font-size:15px !important;
+	width:auto;
+}
