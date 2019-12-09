@@ -726,25 +726,18 @@ Those columns correspond to the variable column_name in the code that generate t
 
 ## IV. Evaluation & Analysis <a name="evaluation-analysis"></a>
 
-To compare the different algorithms we created a script that calculate the ratio of games the user has 
-(in the test dataset) that are in the top 20 recommendations and the amount of games the user has in the
-test dataset. The mean of the ratio for all users is the calculated. The ratio is a bit low because for some
-user in the training dataset it was not possible to get the recommendations and some user don't have games
-in the test dataset, in those cases the ratio will be 0. <br>
+In order to compare the different algorithms used to produce recommendations, we create a script that calculates, for each user, the ratio of the number of games in the user test dataset that are among the top 20 recommendations over the total number of games in the user test dataset. The mean of the ratio from all users is then calculated. The ration is a bit low because whenever recommendations couldn't be produced for a given user, the computed ratio is set to 0. **TO COMPLETE**
 
-The idea of calculating the ratio in this way was inspired but the precision at K metric used in the KDD reseach paper: 
-[Real-time Attention Based Look-alike Model for Recommender System](https://www.kdd.org/kdd2019/accepted-papers/view/real-time-attention-based-look-alike-model-for-recommender-system).
+*The ratio is a bit low because for some user in the training dataset it was not possible to get the recommendations and some user don't have games in the test dataset, in those cases the ratio will be 0.*
 
-![image text](plots/ratio_equation.png)
+The idea of calculating the ratio this way was inspired by the precision at K metric used in the KDD research paper: [Real-time Attention Based Look-alike Model for Recommender System](https://www.kdd.org/kdd2019/accepted-papers/view/real-time-attention-based-look-alike-model-for-recommender-system).
+$$
+ratio = \frac{Number\; of\; Games\; User\; has\; in\; Test\; Dataset\; that\; are\; among\; Recommendations}{Number\; of\; Games\; User\; has\; in\; Test\; Dataset}
+$$
+First of all, we compare the content-based recommender algorithm using different inputs. These are either a column from the original dataset or a combination of different columns. We can see in the table below the ratio computed by using different inputs. For our case, the best result correspond to that using the combination of columns: genre, publisher and developer. It is this implementation of the content-based recommender that is used during the comparison against the other two collaborative filtering recommenders.
 
-First of all, we compared the content based algorithm with different input. 
-Those input are either column from the original dataset or a combination of different columns. 
-In the following table we ca see the ratio for the different inputs. 
-As we can see, the best algorithm is the one that uses the genre, publisher and developer of the game as input.
-This version will be used to compare the other 2 algorithms.
-
-Content-Based Algorithm Input| Ratio [10<sup>2</sup>] | Number of Game in the Recommendation the User has in Test Dataset | Number of Game the User has in Test Dataset
------------- | ------------- | ------------- | -------------
+Content-Based Algorithm Input| Ratio [10<sup>-2</sup>] | Number of Games User has in Test Dataset that are among Recommendations | Number of Games User has in Test Dataset 
+:----------: | :-----------: | :-----------: | :-----------:
 Popular tags| 0.6455 | 0.074316 | 2.190587
 Genre | 1.0847 | 0.069745 | 2.190587
 Genre, popular tags & developer | 0.6992 | 0.075571 | 2.190587
@@ -752,31 +745,29 @@ Genre, popular tags & game details | 0.9144 | 0.093949 | 2.190587
 Genre, publisher & developer | 1.8198 | 0.105782 | 2.190587
 Genre, publisher, developer & game details | 1.6764 | 0.104169 | 2.190587
 
-We calculated the ratio in the same way for both of the collaborative algorithm, the result are in the following table.
-As we can see, the collaborative recommender with ALS is the best one.
-The performance of the collaborative recommendation system with EM and SVD and the content-based recommender system are far behind it.
+We calculated the ratio for both collaborative filtering recommenders in the same way as described previously. Their results with that of the retained content-based recommender are shown in the table below.
 
-Algorithm| Ratio [10<sup>2</sup>] | Number of Game in the Recommendation the User has in Test Dataset | Number of Game the User has in Test Dataset
------------- | ------------- | ------------- | -------------
+Algorithm| Ratio [10<sup>-2</sup>] | Number of Games User has in Test Dataset that are among Recommendations | Number of Games User has in Test Dataset 
+:----------: | :-----------: | :-----------: | :-----------:
 Collaborative with ALS| 9.3402 | 0.444216 | 4.414910
 Collaborative with EM and SVD | 0.4143 | 0.024372 | 2.909578
 Content-based (Genre, publisher & developer) | 1.8198 | 0.105782 | 2.190587
 
+As we can see, the collaborative recommender with ALS is the best one. The performance of the collaborative recommendation system with EM and SVD and the content-based recommender system are far behind it.
+
 ## V. Related Work <a name="related-work"></a>
 
-To understand what a recommender system is and the different types, we used [this article](https://marutitech.com/recommendation-engine-benefits/).<br/>
+All the related work used as reference for the development of our project are listed here below:
 
-To manipulate the datasets, we used the [pandas](https://pandas.pydata.org/) library.<br/>
 
-For the content-based recommender system we used the some code from the blog post
-[Recommender Systems in Python: Beginner Tutorial](https://www.datacamp.com/community/tutorials/recommender-systems-python?fbclid=IwAR1fz9YLOgZ95KHwoLpgb-hTdV2MekujDGBngRTG3kYmBJYxwSK3UWvNJDg)
-to implement the function that give the recommendation for each games.<br/>
 
-For the EM algorithm we used the article
-[Machine Learning with Python: Exception Maximization and Gaussian Mixture Models in Python](https://www.python-course.eu/expectation_maximization_and_gaussian_mixture_models.php).<br/>
+- To understand what a recommender system is and the different types, we used [this article](https://marutitech.com/recommendation-engine-benefits/).<br/>
 
-The KDD research paper [Real-time Attention Based Look-alike Model for Recommender System](https://www.kdd.org/kdd2019/accepted-papers/view/real-time-attention-based-look-alike-model-for-recommender-system)
-gave us the idea to calculate the ratio the way we did to compare the algorithms.
+- For the collaborative recommender with the EM algorithm we used the article [Machine Learning with Python: Exception Maximization and Gaussian Mixture Models in Python](https://www.python-course.eu/expectation_maximization_and_gaussian_mixture_models.php).
+- For the content-based recommender system we used some code from the blog post '[Recommender Systems in Python: Beginner Tutorial](https://www.datacamp.com/community/tutorials/recommender-systems-python?fbclid=IwAR1fz9YLOgZ95KHwoLpgb-hTdV2MekujDGBngRTG3kYmBJYxwSK3UWvNJDg)' to implement the function that produces recommendations for each game.
+
+- The KDD research paper [Real-time Attention Based Look-alike Model for Recommender System](https://www.kdd.org/kdd2019/accepted-papers/view/real-time-attention-based-look-alike-model-for-recommender-system)
+  gave us the idea to come up with the ratio used to compare the three algorithms implemented.
 
 ## VI. Conclusion: Discussion <a name="conclusion"></a>
 
