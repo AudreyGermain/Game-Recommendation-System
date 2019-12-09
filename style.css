@@ -9,9 +9,8 @@
 
 table {
     font-size:15px !important;
-    width:100% !important;
-    table-layout: fixed;
-    overflow-wrap: break-word;
+    display: block;
+    max-width: 100%;
 }
 
 img[alt$=">"] {

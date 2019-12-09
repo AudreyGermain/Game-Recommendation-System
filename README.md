@@ -113,18 +113,18 @@ We can see that for some games, there is a relation between most played and most
 
 We use a histogram plot in order to better visualize the results displayed in the table above. Game titles are ordered in decreasing order based on the number of users. The color gradient represents the total of hours played, from most played to least played.
 
-![img](plots/Histogram_AllUsersHrs.png) <a name="h_1"></a>
+![image alt ><](plots/Histogram_AllUsersHrs.png) <a name="h_1"></a>
 
 We can clearly see that for some cases there is no relation between the total number of users and the total of hours played, meaning that a high number of users does not represent an equivalent high total of hours played.
 
 We recreate the same kind of plot, but this time considering only the users who actually played the games. Thus, for each game, we removed users who purchased it but never played it.
-![img](plots/Histogram_UsersHrs.png?raw=true) <a name="h_2"></a>
+![image alt ><](plots/Histogram_UsersHrs.png?raw=true) <a name="h_2"></a>
 
 When comparing this new plot against the previous one, we can see that some games fell down from the top 20 games based on the number of users. For example 'Counter-Strike Condition Zero', top 15 in the plot considering all users that purchased the game, does not appear in the top 20 of games considering only the users that actually played the game. An opposite example is that of 'Terraria' that appears in the second plot as top 11 while it's not listed in the first plot. As mentioned before, a possible explanations for this difference could  could be that several games were purchased as part of a game bundle. 
 
 In order to have a better understanding of the user data distribution and user's playing habits, a box plot is produced for the top 20 most played game, based in the total of hours played.
 
-![img](plots/boxplot_top_20_games.png?raw=true)
+![image alt ><](plots/boxplot_top_20_games.png?raw=true)
 
 As we can see, the data distribution for each game considered is not symmetrical. Even more, 75% of data points for each game is in the range of the hundreds hours, with several games having very large outliers. We can see for example a user played more than 10,000 hours "Dota 2". Another interesting example, a user played almost 12,000 hours "Sid Meier's Civilization V".
 
@@ -138,15 +138,15 @@ respective percentage of positive reviews.
 
 The plot below list all the game genres available in the game dataset with their respective number of games associated to each game genre.
 
-![img](plots/Histogram_GameGenre.png)
+![image alt ><](plots/Histogram_GameGenre.png)
 
 We generated a similar plot, showing the top 20 most popular game tags available in the game dataset with their respective number of games associated to each game tag.
 
-![img](plots/Histogram_GamePopularTags.png)
+![image alt ><](plots/Histogram_GamePopularTags.png)
 
 Lastly, the following plot shows the top 20 most recurrent game details available in the game dataset with their respective number of games associated to each game detail.
 
-![img](plots/Histogram_GameDetails.png)
+![image alt ><](plots/Histogram_GameDetails.png)
 
 
 ## III. Methodology <a name="methodology"></a>
@@ -246,7 +246,7 @@ analy_game = game_hrs_density('TheWitcher3WildHunt', 5, True)
 print(analy_game)
 ```
 
-![img](plots/EM_SingleAnalysis.png?raw=true)
+![image alt ><](plots/EM_SingleAnalysis.png?raw=true)
 
 *New:*
 
@@ -339,7 +339,7 @@ pred = np.dot(np.dot(U[:, :lc], np.diag(D[:lc])), V[:lc, :])
 print(rmse(pred, test))
 rmse(pred, test, True).head()
 ```
-![img](plots/Leading_Component.png?raw=true)
+![image alt ><](plots/Leading_Component.png?raw=true)
 
 **To complete explanation from plot, not too clear**
 
@@ -400,7 +400,7 @@ path1gg = pd.melt(path1[["itr", "fobjp", "rmsep"]], id_vars=['itr'])
 print(path1.tail(1))
 print(ggplot(path1gg, aes('itr', 'value', color = 'variable')) + geom_line())
 ```
-![img](plots/SVD_Compare.png?raw=true)
+![image alt ><](plots/SVD_Compare.png?raw=true)
 
 **Improve plot: axis names and legend**
 
@@ -451,7 +451,7 @@ def game_hrs_density_p(pred, GAME=None, nclass=1, print_vals=True):
 a = game_hrs_density_p(pred, "TheWitcher3WildHunt", 5)
 print(a)
 ```
-![img](plots/EM_SVD_Analysis.png?raw=true)
+![image alt ><](plots/EM_SVD_Analysis.png?raw=true)
 
 **Axis names**
 
