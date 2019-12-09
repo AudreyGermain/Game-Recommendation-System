@@ -767,18 +767,14 @@ All the related work used as reference for the development of our project are li
 
 ## VI. Conclusion: Discussion <a name="conclusion"></a>
 
-In conclusion, we implemented 3 different algorithm for recommendation system, one content-based and two collaborative,
-one with the ALS algorithm and the other with the EM and SVD algorithm. The collaborative recommender with the ALS
-algorithm seems to give the best recommendation based on our evaluation.<br/>
+In conclusion, we implemented three different recommender system algorithms, one content-based and two collaborative filtering (one with the ALS algorithm and the other with the EM and SVD algorithm). As shown in the [Evaluation & Analysis](#evaluation-analysis) section, for our project, the collaborative recommender system with the ALS algorithm gives the best recommendations based on our evaluation.
 
-When the project was started using the 2 datasets, it was expected, since the both came from Steam, that every game in 
-the user dataset would match a game in the training dataset, but as the project progressed we realized it wasn't the case. 
-This caused a major issue for the content-based algorithm since it really relies on the fact that the game dataset 
-have information about the games that are in the user dataset. Because of this issue, it was not possible to generate 
-recommendation for every games the users have. Because of this, a lot of user don't have recommendation and it probably 
-affect the performance of the algorithm. If we had to do a similar project on recommender system again, it would be 
-important to make sure we have information about every product when choosing the datasets.<br/>
+Based on our experience with this project, we understand better how a collaborative filtering system works. It indeed doesn't use any information about the items, but relies entirely on the user-items interactions and matrix operations in order to produce recommendations. We had to find an approach to deal with our dataset (only user dataset for collaborative recommender) since it contains only implicit data. Both approaches describes throughout this blog handles the implicit dataset in different way in order to produce recommendations.
 
-It would be interesting to create an hybrid recommender system using the collaborative recommender with the ALS 
-algorithm and the content based algorithm using the genre, publisher and developer as input to see if we can make 
-a recommender system even more effective then the 2 on their own.
+On the other hand, we see clearly how the content-based approach requires indeed the description of the items in order to produce recommendation. We encountered some challenges when implementing the content-based recommender since it uses two different datasets. When the project started using the two datasets (user and game datasets), we expected to find all games available in the user dataset in the game dataset, since they both come from Steam. However, as the project progressed, we realized this was not the case. Among the 5152 game titles available in the user dataset, we were able to find only 3036 game titles within the game dataset. This causes a major issue for the content-based recommender since it relies on the assumption that all game titles available in the user dataset have information in the game dataset. Because of this, it was not possible to generate recommendations for every game a user purchased. Even more, it was not possible to produce recommendations for several users due to this issue. It probably affects the performance of the content-based algorithm. If we had to do a similar project on a content-based recommender system again, it would be important to make sure we have information about every item when choosing the datasets.
+
+We understand better to what point computing time is an important aspect to keep in mind. Even though our project doesn't use relatively large datasets, computing recommendations took considerable time, more or less depending on what recommender system we were using. Real-time is an important requirement when talking about recommender systems.
+
+As our first project on recommender systems within the scope of our course "Introduction to Artificial Intelligence" (ITE3051) at Hanyang University, we are satisfied with the knowledge acquired. Even more, we understand better the complexity, the tight requirements and importance of recommender systems in real life. Several companies use them to suggest new items to potential buyers.
+
+It would be interesting to create an hybrid recommender system using the collaborative filtering recommender with the ALS algorithm and the content based recommender algorithm using the genre, publisher and developer as input to evaluate if the hybrid recommender performs better than the mentioned two on their own.

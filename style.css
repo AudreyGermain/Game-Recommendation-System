@@ -9,7 +9,7 @@
 
 table {
     font-size:15px !important;
-    width:100%;
+    width:100% !important;
     table-layout: fixed;
     overflow-wrap: break-word;
 }
