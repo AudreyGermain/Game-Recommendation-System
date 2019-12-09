@@ -3,12 +3,12 @@
 # Recommendation System for Steam Game Store: An overview of recommender systems
 
 ## Team:
-- Doo Hyodan,
-  Department Of Information System, Hanyang University, ammissyouyou@gmail.com<br/>
-- Audrey Germain,
-  Computer Engineering, Department of Software Engineering and Computer Engineering, Polytechnique Montreal<br/>
+- Doo Hyodan,</br>
+  Department Of Information System, Hanyang University, ammissyouyou@gmail.com
+- Audrey Germain,</br>
+  Computer Engineering, Department of Software Engineering and Computer Engineering, Polytechnique Montreal
 - Geordan Jove,
-  Aerospace Engineering, Department of Mechanical Engineering, Polytechnique Montreal<br/>
+  Aerospace Engineering, Department of Mechanical Engineering, Polytechnique Montreal
 
 ## Table of content
 
@@ -563,7 +563,7 @@ for i, row in dataGames.iterrows():
     dataGames.at[i, 'ID'] = clean
 ```
 
-After this, we find all unique IDs from the user dataset and use them to filter the rows in the game dataset, keeping those where IDs match those from the user dataset. As a result, we obtain 3036 games from the game dataset that match some of the 5152 games from the user dataset. Initially, without the ID approach and using only the game titles, we obtained only 71 games from the game dataset that matched those from the user dataset. Since we have less games in the new game dataset compared to the user dataset, the recommender system will not be able to find recommendations for every game in the user dataset. This surely affects its performance.
+After this, we find all unique IDs from the user dataset and use them to filter the rows in the game dataset, keeping those where IDs match those from the user dataset. As a result, we obtain 3036 games from the game dataset that match some of the 5152 games from the user dataset. Initially, without the ID approach and using only the game titles, we obtained only 71 games from the game dataset that matched those from the user dataset. Since we have less games in the new game dataset compared to the user dataset, the recommender system will not be able to find recommendations for every game in the user dataset. This surely affects its performance. <a name="match_games"></a>
 
 With the new smaller game dataset, we remove the spaces from the useful columns we chose to use. By doing so, we ensure that, for example, 'Steam Achievement' and 'Steam Cloud' don't get a match because they  both contain 'Steam'. Therefore we apply the following function to all the columns that are used.
 
@@ -648,7 +648,7 @@ The variable 'indices', in the code below, is useful to get the index of each ga
 indices = Series(dataGames.index, index=dataGames['name']).drop_duplicates()
 ```
 
-To generate recommendations for each game, the function below is used. The input of the function is a game title as a string and the cosine similarity matrix created just before. The output is a list of recommended game titles ordered by similarity. 
+To generate recommendations for each game, the function '*get_recommendations*' shown below is used. The input of the function is a game title as a string and the cosine similarity matrix created just before. The output is a list of recommended game titles ordered by similarity. 
 
 The code for this function as well as the code to generate de cosine similarity matrix are taken from 
 [this tutorial](https://www.datacamp.com/community/tutorials/recommender-systems-python?fbclid=IwAR1fz9YLOgZ95KHwoLpgb-hTdV2MekujDGBngRTG3kYmBJYxwSK3UWvNJDg).
@@ -684,18 +684,10 @@ def get_recommendations(title, cosine_sim):
 	return dataGames['name'].iloc[movie_indices].tolist()
 ```
 
-The variable 'listGames' is a list of all the games that exist in both datasets: the user dataset and the game dataset. We verify that 'idx' is not a Series, this can be the case when two different games have the same title (in our dataset, two games have the name "RUSH"). Then, we get the similarity score for each recommended game from the cosine similarity matrix  in order to order them from the most similar to the less similar. Finally, we extract the amount of recommendations that we want and return them in a list.
+The variable 'listGames' is a list of all the games that exist in both datasets: the user dataset and the game dataset. We verify that 'idx' is not a Series, this can be the case when two different games have the same title (for example, in our dataset, two games have the name 'RUSH'). Then, we get the similarity score for each recommended game from the cosine similarity matrix to order them from the most similar to the less similar. Finally, we extract the amount of recommendations that we want and return them in a list.
 The variable 'n_recommendation', set to 20, defines the amount of recommendations we want to generate.
 
-
-
-
-
-
-
-
-
-To get recommendations for each user, we implement a function that combines the recommendations produced for each game using the function described above, getting the recommendations with the best reviews (extracted from the game dataset). This function takes the ID of each user, the list of recommendation (the recommendation function explained previously is applied to all the games a user has and a list of all the recommendations is made) and the list of all the game the user already has. The function return a dataframe containing the user ID in the first column and then 20 column with the top recommendations.<br/>
+To get recommendations for each user, we implement the function '*make_recommendation_for_user*' displayed below. This function combines the recommendations produced for each game using the function 'get_recommendations', keeping the recommendations with best reviews (extracted from the game dataset). This function takes three inputs: a user ID, a list of recommendations for the given user (the 'get_recommendations' function explained previously is applied to all the games a user already has, the results are returned as a list having all the recommendations) and a list of all the game the user already posses. The function returns a Pandas DataFrame containing the user ID in the first column and then 20 column with the top recommendations.
 
 ```python
 def make_recommendation_for_user(user_id, game_list, game_user_have):
@@ -716,21 +708,16 @@ def make_recommendation_for_user(user_id, game_list, game_user_have):
     	    return DataFrame(data=[[user_id] + recommendation_reviews["name"].tolist()[0:n_recommendation]],
                      	     columns=col_names)
 ```
-First, if the list of recommendation is empty (can happen if none of the game the user has are in the game dataset)
-or not valid, a dataframe without recommendation is returned. If there is no problem with the recommendation list,
-we get a dataframe of the name of the recommended games and the review (percentage of positive review) and we remove
-the games that the user already has (no need to recommend a game the user already has). Then the recommendation are
-ordered from the best review to the worst. If there is less recommendations then needed, empty spaces fill the rest of the column.
-The reviews are used to order the recommendation since it's the easiest way to order them particularly considering that
-not every games the user has produce recommendation because of the games in both datasets do not match totally like mentionned above.
-If it wasn't because of that problem, we thought of taking into account the proportion of play time of each games to
-recommend similar games to games that are most played. Using the reviews still ensure that the recommended games are
-considered good in general by all the users.<br/>
+In case the list of recommendations is empty (it could happen if none of the games the user already posses are in the game dataset) or not valid, a DataFrame without recommendations is returned. In case of a valid recommendation list, the returned DataFrame has the recommended game titles with their corresponding review (percentage of positive review). Games that the user already posses are removed (no need to recommend a game the user already purchased). 
 
-All the dataframe rows produced by the function 'make_recommendation_for_user' are combine and are printed in a CSV file.<br/>
+Subsequently, the recommendations are ordered according to their reviews, from best to worst. We decided to proceed this way since it's the easiest way to order the recommendations, particularly considering that it's not possible to produce recommendations for every game the user posses since games in both datasets do not match perfectly as mentioned previously [here](#match_games). If it weren't because of this mismatch, we considered taking into account the proportion of play time of each game relatively to the others a user played in order to recommend similar games to those that are most played. Using the reviews  to sort the recommendations still ensures that the recommended games are considered good in general by all users.
+
+If there are less recommendations than the desired number of recommendations requested, empty spaces fill in the rest of the columns. All the DataFrame rows produced by the function '*make_recommendation_for_user*' are combined and then outputted as a CSV file.
+
+*Not sure about this:*
 
 The whole script is arranged in a function to let us run it with multiple different input.
-Those columns correspond to the variable column_name in the code that generate the cosine similarity matrix.<br/>
+Those columns correspond to the variable column_name in the code that generate the cosine similarity matrix.
 
 ## IV. Evaluation & Analysis <a name="evaluation-analysis"></a>
 
