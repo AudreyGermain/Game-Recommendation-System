@@ -733,9 +733,10 @@ In order to compare the different algorithms used to produce recommendations, we
 *The ratio is a bit low because for some user in the training dataset it was not possible to get the recommendations and some user don't have games in the test dataset, in those cases the ratio will be 0.*
 
 The idea of calculating the ratio this way was inspired by the precision at K metric used in the KDD research paper: [Real-time Attention Based Look-alike Model for Recommender System](https://www.kdd.org/kdd2019/accepted-papers/view/real-time-attention-based-look-alike-model-for-recommender-system).
-$$
-ratio = \frac{Number\; of\; Games\; User\; has\; in\; Test\; Dataset\; that\; are\; among\; Recommendations}{Number\; of\; Games\; User\; has\; in\; Test\; Dataset}
-$$
+
+![image alt ><](plots/ratio_equation.png?raw=true)
+
+
 First of all, we compare the content-based recommender algorithm using different inputs. These are either a column from the original dataset or a combination of different columns. We can see in the table below the ratio computed by using different inputs. For our case, the best result correspond to that using the combination of columns: genre, publisher and developer. It is this implementation of the content-based recommender that is used during the comparison against the other two collaborative filtering recommenders.
 
 Content-Based Algorithm Input| Ratio [10<sup>-2</sup>] | Number of Games User has in Test Dataset that are among Recommendations | Number of Games User has in Test Dataset 
