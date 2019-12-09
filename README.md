@@ -588,7 +588,7 @@ usedGames["genre_popular_tags_game_details"] = usedGames['genre'] + usedGames['p
 usedGames["genre_publisher_developer_game_details"] = usedGames['genre'] + usedGames['publisher'] + usedGames['developer'] + usedGames['game_details']
 ```
 
-With all of the data manipulations explained above, the new game dataset that is used by the content-based algorithm looks like this.
+With all of the data manipulations explained above, the new game dataset that is used by the content-based algorithm looks like this:
 
 | name                     | developer            | publisher                                   | popular_tags                                                 | game_details                                                 | genre                                                  | ID                 | genre_publisher_developer                                    | genre_popular_tags_developer                                 | genre_popular_tags_game_details                              | genre_publisher_developer_game_details                       |
 | :----------------------- | :------------------- | :------------------------------------------ | :----------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------ | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -598,8 +598,11 @@ With all of the data manipulations explained above, the new game dataset that is
 | Stonehearth              | RadiantEntertainment | "(none),(none)"                             | "CityBuilder,Building,Sandbox,Strategy,Survival,Simulation,Crafting,Voxel,EarlyAccess,Indie,Singleplayer,OpenWorld,RPG,Management,Multiplayer,Fantasy,Cute,Adventure,GodGame,RTS" | "Single-player,Multi-player,OnlineMulti-Player,LocalMulti-Player,Co-op,OnlineCo-op,LocalCo-op,SteamTradingCards,SteamWorkshop" | "Indie,Simulation,Strategy"                            | stonehearth        | "Indie,Simulation,Strategy(none),(none)RadiantEntertainment" | "Indie,Simulation,StrategyCityBuilder,Building,Sandbox,Strategy,Survival,Simulation,Crafting,Voxel,EarlyAccess,Indie,Singleplayer,OpenWorld,RPG,Management,Multiplayer,Fantasy,Cute,Adventure,GodGame,RTSRadiantEntertainment" | "Indie,Simulation,StrategyCityBuilder,Building,Sandbox,Strategy,Survival,Simulation,Crafting,Voxel,EarlyAccess,Indie,Singleplayer,OpenWorld,RPG,Management,Multiplayer,Fantasy,Cute,Adventure,GodGame,RTSSingle-player,Multi-player,OnlineMulti-Player,LocalMulti-Player,Co-op,OnlineCo-op,LocalCo-op,SteamTradingCards,SteamWorkshop" | "Indie,Simulation,Strategy(none),(none)RadiantEntertainmentSingle-player,Multi-player,OnlineMulti-Player,LocalMulti-Player,Co-op,OnlineCo-op,LocalCo-op,SteamTradingCards,SteamWorkshop" |
 | Call of Duty®: Black Ops | Treyarch             | "Activision,Activision"                     | "Action,FPS,Zombies,Multiplayer,Shooter,Singleplayer,ColdWar,First-Person,War,Military,OnlineCo-Op,Co-op,Gore,StoryRich,Adventure,Controller,Linear,Masterpiece,Horror,MassivelyMultiplayer" | "Single-player,Multi-player,Co-op,SteamAchievements,PartialControllerSupport,ValveAnti-Cheatenabled" | Action                                                 | callofdutyblackops | "ActionActivision,ActivisionTreyarch"                        | "ActionAction,FPS,Zombies,Multiplayer,Shooter,Singleplayer,ColdWar,First-Person,War,Military,OnlineCo-Op,Co-op,Gore,StoryRich,Adventure,Controller,Linear,Masterpiece,Horror,MassivelyMultiplayerTreyarch" | "ActionAction,FPS,Zombies,Multiplayer,Shooter,Singleplayer,ColdWar,First-Person,War,Military,OnlineCo-Op,Co-op,Gore,StoryRich,Adventure,Controller,Linear,Masterpiece,Horror,MassivelyMultiplayerSingle-player,Multi-player,Co-op,SteamAchievements,PartialControllerSupport,ValveAnti-Cheatenabled" | "ActionActivision,ActivisionTreyarchSingle-player,Multi-player,Co-op,SteamAchievements,PartialControllerSupport,ValveAnti-Cheatenabled" |
 
+We do additional manipulations on the review column from the game dataset to extract the percentage and any other possible useful information. In order to do so, we use the fact that all reviews follow this format "Mostly Positive,(11,481),- 74% of the 11,481 user reviews for this game are positive.".
 
-We do additional manipulations on the review column from the game dataset to extract the percentage and any other possible useful information. We use the following script to do this, outputting the result in a CSV file. This CSV file is read by the content-based recommender script to get the reviews.
+We start by getting the percentage of good reviews by using regex to get the "- 74%" part of the review, keeping the number only. We also extract the qualitative review information by splitting the reviews using comma as delimiter, and keeping only the first element. Qualifications that contain the words 'user reviews'  are ignored because it means not enough users reviewed the game and the format is different. 
+
+We use the following script to do this, outputting the result in a CSV file. This CSV file is read by the content-based recommender script to get the reviews.
 
 ```python
 for i, row in dataGames.iterrows():
@@ -618,14 +621,6 @@ for i, row in dataGames.iterrows():
             dataGames.at[i, 'review_qualification'] = reviewParse[0]
 ```
 
-We used the fact that all reviews follow this format:
-"Mostly Positive,(11,481),- 74% of the 11,481 user reviews for this game are positive." 
-to extract the information we wanted. 
-We start by getting the percentage of good reviews by using regex to get the "- 74%" part of the reviews and we then keep the number only.
-We also got the qualitative review by splitting the reviews at the comma and keeping the first one.
-We ignore the qualification that contains the words 'user reviews' because it means not enough user reviewed the game
-and the format is different. 
-
 The review dataset created by this script looks like this:
 
 name|percentage_positive_review|review_qualification|all_reviews
@@ -637,8 +632,7 @@ DayZ|61|Mixed|"Mixed,(167,115),- 61% of the 167,115 user reviews for this game a
 EVE Online|74|Mostly Positive|"Mostly Positive,(11,481),- 74% of the 11,481 user reviews for this game are positive."
 
 
-For the recommender system, we generate the cosine similarity matrix with the following code. First it calculate the matrix of frequency of each
-words in the chosen column (column_name) of each of the games, then it calculate the cosine similarity function.<br/>
+For the recommender system, we generate a cosine similarity matrix with the code below. First, we create a matrix of frequency for each word in the chosen column (column_name) and for each game. Then, using the matrix of frequency, we create the cosine similarity matrix.
 
 ```python
 # Compute the Cosine Similarity matrix using the column
@@ -647,17 +641,17 @@ count_matrix = count.fit_transform(dataGames[column_name])
 cosine_sim_matrix = cosine_similarity(count_matrix, count_matrix)
 ```
 
-The variable indices is a reverse map that use the name as key, it will be useful to get the index of each game in the cosine similarity matrix.<br/>
+The variable 'indices', in the code below, is useful to get the index of each game in the cosine similarity matrix. It is a reverse map that use the name as key.
 
 ```python
 # Construct a reverse map of indices and game names
 indices = Series(dataGames.index, index=dataGames['name']).drop_duplicates()
 ```
 
-To generate the recommendation for each game, the following function is used. The input of the function is the title of
-the game as a string and the cosine matrix and the output is a list of recommended game title ordered by similarity.
+To generate recommendations for each game, the function below is used. The input of the function is a game title as a string and the cosine similarity matrix created just before. The output is a list of recommended game titles ordered by similarity. 
+
 The code for this function as well as the code to generate de cosine similarity matrix are taken from 
-[this tutorial](https://www.datacamp.com/community/tutorials/recommender-systems-python?fbclid=IwAR1fz9YLOgZ95KHwoLpgb-hTdV2MekujDGBngRTG3kYmBJYxwSK3UWvNJDg).<br/>
+[this tutorial](https://www.datacamp.com/community/tutorials/recommender-systems-python?fbclid=IwAR1fz9YLOgZ95KHwoLpgb-hTdV2MekujDGBngRTG3kYmBJYxwSK3UWvNJDg).
 
 ```python
 def get_recommendations(title, cosine_sim):
@@ -679,7 +673,8 @@ def get_recommendations(title, cosine_sim):
 	sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
 
 	# Get the scores of the most similar games
-	# (not the first one because this games as a score of 1 (perfect score) similarity with itself)
+	# (not the first one because this games as a score of 1 (perfect score) similarity
+    # with itself)
 	sim_scores = sim_scores[1:n_recommendation + 1]
 
 	# Get the games indices
@@ -689,17 +684,18 @@ def get_recommendations(title, cosine_sim):
 	return dataGames['name'].iloc[movie_indices].tolist()
 ```
 
-The variable listGames is a list of all the games that are in both of the dataset (user and game dataset).
-We make sure that the idx is not a Series, it can happen in the case where 2 different games have the same name (in our dataset 2 games have the name "RUSH").
-Then we get the similarity score of each games from the matrix and we order it from the most similar to the less similar.
-Finally we just need to extract the amount of recommendation that we want and return the list.
-The variable n_recommendation contains the amount of recommendation we want to get, we decided to set it to 20.<br/>
+The variable 'listGames' is a list of all the games that exist in both datasets: the user dataset and the game dataset. We verify that 'idx' is not a Series, this can be the case when two different games have the same title (in our dataset, two games have the name "RUSH"). Then, we get the similarity score for each recommended game from the cosine similarity matrix  in order to order them from the most similar to the less similar. Finally, we extract the amount of recommendations that we want and return them in a list.
+The variable 'n_recommendation', set to 20, defines the amount of recommendations we want to generate.
 
-To get the recommendation for each user, we implemented a function that combines the recommendations and get the
-recommendation with the best reviews (extracted from the game dataset). This function takes the ID of each user,
-the list of recommendation (the recommendation function explained previously is applied to all the games a user
-has and a list of all the recommendations is made) and the list of all the game the user already has. The function
-return a dataframe containing the user ID in the first column and then 20 column with the top recommendations.<br/>
+
+
+
+
+
+
+
+
+To get recommendations for each user, we implement a function that combines the recommendations produced for each game using the function described above, getting the recommendations with the best reviews (extracted from the game dataset). This function takes the ID of each user, the list of recommendation (the recommendation function explained previously is applied to all the games a user has and a list of all the recommendations is made) and the list of all the game the user already has. The function return a dataframe containing the user ID in the first column and then 20 column with the top recommendations.<br/>
 
 ```python
 def make_recommendation_for_user(user_id, game_list, game_user_have):
