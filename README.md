@@ -3,11 +3,16 @@
 # Recommendation System for Steam Game Store: An overview of recommender systems
 
 ## Team:
-- Doo Hyodan,</br>
+- Doo Hyodan,
+  
   Department Of Information System, Hanyang University, ammissyouyou@gmail.com
-- Audrey Germain,</br>
+  
+- Audrey Germain,
+  
   Computer Engineering, Department of Software Engineering and Computer Engineering, Polytechnique Montreal
+  
 - Geordan Jove,
+  
   Aerospace Engineering, Department of Mechanical Engineering, Polytechnique Montreal
 
 ## Table of content
