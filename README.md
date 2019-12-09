@@ -728,6 +728,8 @@ Those columns correspond to the variable column_name in the code that generate t
 
 In order to compare the different algorithms used to produce recommendations, we create a script that calculates, for each user, the ratio of the number of games in the user test dataset that are among the top 20 recommendations over the total number of games in the user test dataset. The mean of the ratio from all users is then calculated. The ration is a bit low because whenever recommendations couldn't be produced for a given user, the computed ratio is set to 0. **TO COMPLETE**
 
+*Not too sure about this:**
+
 *The ratio is a bit low because for some user in the training dataset it was not possible to get the recommendations and some user don't have games in the test dataset, in those cases the ratio will be 0.*
 
 The idea of calculating the ratio this way was inspired by the precision at K metric used in the KDD research paper: [Real-time Attention Based Look-alike Model for Recommender System](https://www.kdd.org/kdd2019/accepted-papers/view/real-time-attention-based-look-alike-model-for-recommender-system).
@@ -759,11 +761,10 @@ As we can see, the collaborative recommender with ALS is the best one. The perfo
 
 All the related work used as reference for the development of our project are listed here below:
 
+- To understand what a recommender system is and the different types, we used [this article](https://marutitech.com/recommendation-engine-benefits/).
+- For the collaborative recommender using the ALS algorithm, we used the work presented in the following articles: ["ALS Implicit Collaborative Filtering"](https://medium.com/radon-dev/als-implicit-collaborative-filtering-5ed653ba39fe "ALS Implicit Collaborative Filtering") and ["A Gentle Introduction to Recommender Systems with Implicit Feedback"](https://jessesw.com/Rec-System/ "A Gentle Introduction to Recommender Systems with Implicit Feedback").
 
-
-- To understand what a recommender system is and the different types, we used [this article](https://marutitech.com/recommendation-engine-benefits/).<br/>
-
-- For the collaborative recommender with the EM algorithm we used the article [Machine Learning with Python: Exception Maximization and Gaussian Mixture Models in Python](https://www.python-course.eu/expectation_maximization_and_gaussian_mixture_models.php).
+- For the collaborative recommender using the EM algorithm we used the article [Machine Learning with Python: Exception Maximization and Gaussian Mixture Models in Python](https://www.python-course.eu/expectation_maximization_and_gaussian_mixture_models.php).
 - For the content-based recommender system we used some code from the blog post '[Recommender Systems in Python: Beginner Tutorial](https://www.datacamp.com/community/tutorials/recommender-systems-python?fbclid=IwAR1fz9YLOgZ95KHwoLpgb-hTdV2MekujDGBngRTG3kYmBJYxwSK3UWvNJDg)' to implement the function that produces recommendations for each game.
 
 - The KDD research paper [Real-time Attention Based Look-alike Model for Recommender System](https://www.kdd.org/kdd2019/accepted-papers/view/real-time-attention-based-look-alike-model-for-recommender-system)
