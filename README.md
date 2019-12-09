@@ -340,7 +340,7 @@ rmse(pred, test, True).head()
 ```
 ![img](plots/Leading_Component.png?raw=true)
 
-**Missing plot**
+**To complete explanation from plot, not too clear**
 
 As we see in the plot above, it seems like the basic SVD approach does not give the best prediction for us.
 
@@ -542,17 +542,17 @@ Top 20 recommended games for user 5250:
 
 The content-base recommender system gives recommendation based on the similarity between the game a user already has and other games.
 
-In order to build the recommender system, we need to prepare the data and build the algorithm. In order to do so, we first need to preprocess the game dataset described in [subsection II.b](#game) with all the useful information to give as an input to the recommender algorithm, formatted in an simpler way. The percentage from the reviews are extracted since they are used. Then, we implement a function used to give game recommendations similar to another game. Lastly, we produce recommendations for all user based on the games users already posses.
+In order to build the recommender system, we need to prepare the data and build the algorithm. In order to do so, we first need to preprocess the game dataset described in [subsection II.b](#game) with all the useful information to give as input to the recommender algorithm, formatted in an simpler way. The percentage from the reviews are extracted since they are used. Then, we implement a function used to give game recommendations similar to another game. Lastly, we produce recommendations for all user based on the games users already posses.
 
-To prepare the data for the content based recommender, we start by selecting the information we think would be the most useful to find similar games. We read the useful column from the game dataset by using the following code.
+To prepare the data for the content based recommender, we start by selecting the information we think would be the most useful to find similar games. We read the useful columns from the game dataset by using the following code.
 
 ```python
 dataGames = read_csv(locationGamesFile, usecols=["name", "genre", "game_details", "popular_tags", "publisher", "developer"])
 ```
 
-We decide to only keep the games that are present in both the game dataset and the user dataset. We choose to proceed in this way since there are a lot of games in the game dataset that have never been played or purchased by any user in the user dataset, so there's no use in considering them in the recommender system. Also, the game dataset is too large to create the matrix of cosine similarity (this is be explain later) since it takes too much memory.
+We decide to only keep the games that are present in both the game dataset and the user dataset. We choose to proceed in this way since there are a lot of games in the game dataset that have never been played or purchased by any user in the user dataset, so there's no use in considering them in the recommender system. Also, the game dataset is too large to create the matrix of cosine similarity (this is explain later) since it takes too much memory.
 
-In order to match the games from both dataset together, we create an ID for each game by removing
+In order to match the games from both datasets together, we create an ID for each game by removing
 all non-alphanumeric symbols and spaces, and changing all capital letters to lowercase by using to following code. We do the same for the games in the user dataset.
 
 ```python
@@ -563,15 +563,9 @@ for i, row in dataGames.iterrows():
     dataGames.at[i, 'ID'] = clean
 ```
 
-After this, we found all the uniques ID from the user dataset and kept only the rows in the games dataset where the ID 
-matched one of the ID in the user dataset. This way we were able to get 3036 games of the game dataset that matched 
-some of the 5152 games from the user dataset. Without the ID we only were able to find 71 games that matched only 
-using the names. Since we have less games in the new game dataset, the recommender system will not be able to find 
-recommendation for every games in the user dataset. This will surely affect its performance.<br/>
+After this, we find all unique IDs from the user dataset and use them to filter the rows in the game dataset, keeping those where IDs match those from the user dataset. As a result, we obtain 3036 games from the game dataset that match some of the 5152 games from the user dataset. Initially, without the ID approach and using only the game titles, we obtained only 71 games from the game dataset that matched those from the user dataset. Since we have less games in the new game dataset compared to the user dataset, the recommender system will not be able to find recommendations for every game in the user dataset. This surely affects its performance.
 
-With the new smaller game dataset, we made sure to remove the spaces from the useful column we chose to use.
-By removing the spaces, we ensure that, for exemple, Steam Achievement and Steam Cloud don't get a match because they 
-both contain Steam. Therefore we apply the following function to all the columns like this.
+With the new smaller game dataset, we remove the spaces from the useful columns we chose to use. By doing so, we ensure that, for example, 'Steam Achievement' and 'Steam Cloud' don't get a match because they  both contain 'Steam'. Therefore we apply the following function to all the columns that are used.
 
 ```python
 def clean_data(x):
@@ -581,13 +575,10 @@ def clean_data(x):
         print(x)
         return x
 
-
 usedGames.loc[:, 'genre'] = usedGames['genre'].apply(clean_data)
 ```
 
-Finally, we created some custom columns by combining multiple column to try and find the combination of information 
-that will give us the best recommendation system possible. The results of the different columns will be compared in the 
-[Evaluation & Analysis](#evaluation-analysis) section of this article.
+Finally, we create some custom columns by combining multiple columns in order to find the combination of information that can give us the best possible recommendation system, this is done by using the code below. The results of using the different custom columns to produce recommendations are compared in the [Evaluation & Analysis](#evaluation-analysis) section of this blog.
 
 ```python
 # create some column containing a mix of different information
@@ -597,10 +588,10 @@ usedGames["genre_popular_tags_game_details"] = usedGames['genre'] + usedGames['p
 usedGames["genre_publisher_developer_game_details"] = usedGames['genre'] + usedGames['publisher'] + usedGames['developer'] + usedGames['game_details']
 ```
 
-With all of those manipulations, the new game dataset that is going to be use by the algorithm looks like this.
+With all of the data manipulations explained above, the new game dataset that is used by the content-based algorithm looks like this.
 
 | name                     | developer            | publisher                                   | popular_tags                                                 | game_details                                                 | genre                                                  | ID                 | genre_publisher_developer                                    | genre_popular_tags_developer                                 | genre_popular_tags_game_details                              | genre_publisher_developer_game_details                       |
-| ------------------------ | -------------------- | ------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------ | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| :----------------------- | :------------------- | :------------------------------------------ | :----------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------ | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | DayZ                     | BohemiaInteractive   | "BohemiaInteractive,BohemiaInteractive"     | "Survival,Zombies,OpenWorld,Multiplayer,PvP,MassivelyMultiplayer,Action,EarlyAccess,Simulation,FPS,Post-apocalyptic,SurvivalHorror,Shooter,Sandbox,Adventure,Indie,Co-op,Atmospheric,Horror,Military" | "Multi-player,OnlineMulti-Player,SteamWorkshop,SteamCloud,ValveAnti-Cheatenabled" | "Action,Adventure,MassivelyMultiplayer"                | dayz               | "Action,Adventure,MassivelyMultiplayerBohemiaInteractive,BohemiaInteractiveBohemiaInteractive" | "Action,Adventure,MassivelyMultiplayerSurvival,Zombies,OpenWorld,Multiplayer,PvP,MassivelyMultiplayer,Action,EarlyAccess,Simulation,FPS,Post-apocalyptic,SurvivalHorror,Shooter,Sandbox,Adventure,Indie,Co-op,Atmospheric,Horror,MilitaryBohemiaInteractive" | "Action,Adventure,MassivelyMultiplayerSurvival,Zombies,OpenWorld,Multiplayer,PvP,MassivelyMultiplayer,Action,EarlyAccess,Simulation,FPS,Post-apocalyptic,SurvivalHorror,Shooter,Sandbox,Adventure,Indie,Co-op,Atmospheric,Horror,MilitaryMulti-player,OnlineMulti-Player,SteamWorkshop,SteamCloud,ValveAnti-Cheatenabled" | "Action,Adventure,MassivelyMultiplayerBohemiaInteractive,BohemiaInteractiveBohemiaInteractiveMulti-player,OnlineMulti-Player,SteamWorkshop,SteamCloud,ValveAnti-Cheatenabled" |
 | EVE Online               | CCP                  | "CCP,CCP"                                   | "Space,MassivelyMultiplayer,Sci-fi,Sandbox,MMORPG,OpenWorld,RPG,PvP,Multiplayer,FreetoPlay,Economy,Strategy,SpaceSim,Simulation,Action,Difficult,Tactical,Capitalism,PvE,Atmospheric" | "Multi-player,OnlineMulti-Player,MMO,Co-op,OnlineCo-op,SteamTradingCards" | "Action,FreetoPlay,MassivelyMultiplayer,RPG,Strategy"  | eveonline          | "Action,FreetoPlay,MassivelyMultiplayer,RPG,StrategyCCP,CCPCCP" | "Action,FreetoPlay,MassivelyMultiplayer,RPG,StrategySpace,MassivelyMultiplayer,Sci-fi,Sandbox,MMORPG,OpenWorld,RPG,PvP,Multiplayer,FreetoPlay,Economy,Strategy,SpaceSim,Simulation,Action,Difficult,Tactical,Capitalism,PvE,AtmosphericCCP" | "Action,FreetoPlay,MassivelyMultiplayer,RPG,StrategySpace,MassivelyMultiplayer,Sci-fi,Sandbox,MMORPG,OpenWorld,RPG,PvP,Multiplayer,FreetoPlay,Economy,Strategy,SpaceSim,Simulation,Action,Difficult,Tactical,Capitalism,PvE,AtmosphericMulti-player,OnlineMulti-Player,MMO,Co-op,OnlineCo-op,SteamTradingCards" | "Action,FreetoPlay,MassivelyMultiplayer,RPG,StrategyCCP,CCPCCPMulti-player,OnlineMulti-Player,MMO,Co-op,OnlineCo-op,SteamTradingCards" |
 | TERA                     | "Bluehole,Inc."      | "EnMasseEntertainment,EnMasseEntertainment" | "FreetoPlay,MMORPG,MassivelyMultiplayer,RPG,OpenWorld,Action,Fantasy,Adventure,Anime,ThirdPerson,CharacterCustomization,ActionRPG,Multiplayer,Co-op,PvP,HackandSlash,PvE,Cute,Controller,Nudity" | "Multi-player,MMO,Co-op,SteamTradingCards,PartialControllerSupport" | "Action,Adventure,FreetoPlay,MassivelyMultiplayer,RPG" | tera               | "Action,Adventure,FreetoPlay,MassivelyMultiplayer,RPGEnMasseEntertainment,EnMasseEntertainmentBluehole,Inc." | "Action,Adventure,FreetoPlay,MassivelyMultiplayer,RPGFreetoPlay,MMORPG,MassivelyMultiplayer,RPG,OpenWorld,Action,Fantasy,Adventure,Anime,ThirdPerson,CharacterCustomization,ActionRPG,Multiplayer,Co-op,PvP,HackandSlash,PvE,Cute,Controller,NudityBluehole,Inc." | "Action,Adventure,FreetoPlay,MassivelyMultiplayer,RPGFreetoPlay,MMORPG,MassivelyMultiplayer,RPG,OpenWorld,Action,Fantasy,Adventure,Anime,ThirdPerson,CharacterCustomization,ActionRPG,Multiplayer,Co-op,PvP,HackandSlash,PvE,Cute,Controller,NudityMulti-player,MMO,Co-op,SteamTradingCards,PartialControllerSupport" | "Action,Adventure,FreetoPlay,MassivelyMultiplayer,RPGEnMasseEntertainment,EnMasseEntertainmentBluehole,Inc.Multi-player,MMO,Co-op,SteamTradingCards,PartialControllerSupport" |
@@ -608,9 +599,7 @@ With all of those manipulations, the new game dataset that is going to be use by
 | Call of Duty®: Black Ops | Treyarch             | "Activision,Activision"                     | "Action,FPS,Zombies,Multiplayer,Shooter,Singleplayer,ColdWar,First-Person,War,Military,OnlineCo-Op,Co-op,Gore,StoryRich,Adventure,Controller,Linear,Masterpiece,Horror,MassivelyMultiplayer" | "Single-player,Multi-player,Co-op,SteamAchievements,PartialControllerSupport,ValveAnti-Cheatenabled" | Action                                                 | callofdutyblackops | "ActionActivision,ActivisionTreyarch"                        | "ActionAction,FPS,Zombies,Multiplayer,Shooter,Singleplayer,ColdWar,First-Person,War,Military,OnlineCo-Op,Co-op,Gore,StoryRich,Adventure,Controller,Linear,Masterpiece,Horror,MassivelyMultiplayerTreyarch" | "ActionAction,FPS,Zombies,Multiplayer,Shooter,Singleplayer,ColdWar,First-Person,War,Military,OnlineCo-Op,Co-op,Gore,StoryRich,Adventure,Controller,Linear,Masterpiece,Horror,MassivelyMultiplayerSingle-player,Multi-player,Co-op,SteamAchievements,PartialControllerSupport,ValveAnti-Cheatenabled" | "ActionActivision,ActivisionTreyarchSingle-player,Multi-player,Co-op,SteamAchievements,PartialControllerSupport,ValveAnti-Cheatenabled" |
 
 
-To obtain the reviews, we had to do some manipulations on the review column in the game dataset to extract the 
-percentage and other possibly useful information. We created the following script to do this and print the 
-result in a CSV file. We read it from the content-based recommender script to get the reviews.
+We do additional manipulations on the review column from the game dataset to extract the percentage and any other possible useful information. We use the following script to do this, outputting the result in a CSV file. This CSV file is read by the content-based recommender script to get the reviews.
 
 ```python
 for i, row in dataGames.iterrows():
