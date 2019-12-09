@@ -36,7 +36,6 @@ Recommender systems are widely used these days to recommend items users may pote
 The collaborative filtering is based on the principle that if two people liked the same things in the past, 
 if one of them likes something new, the others are likely to like it too. The advantage of the collaborative filtering method is that the algorithm doesn’t need to understand or process the content 
 of the items it recommends. The content-based filtering uses the description of the items in order to recommend items similar to what a user likes. The hybrid recommender system consists on combining the content-based and the collaborative filtering, either by using an algorithm that uses both or by combining the recommendations produced by both methods which, according to research, results in better recommendations than those obtained by using only one of them.
-The collaborative filtering is based on the principle that if two people liked the same things in the past, 
 
 The data used to implement a recommender system can be explicit, such as reviews or ratings, 
 or implicit, such as behavior and events like order history, search logs, clicks, etc. The implicit data is harder to process because it’s hard to determine which information is useful and useless, but it’s easier to acquire compared to explicit data since the user doesn’t need to do anything more than using the website or app as usual.
@@ -81,7 +80,7 @@ Each row in the reformatted user dataset represents then a unique interaction us
 | 151603712 |     Fallout New Vegas      | 12.1  |    1     |  1   |
 | 151603712 |       Left 4 Dead 2        |  8.9  |    1     |  1   |
 
-With out reformatted user dataset, we start exploring and analyzing the user and game data stored within it. 
+With out reformatted user dataset, we start exploring and analyzing the user and game data stored within the dataset. 
 
 **Display something number purchased vs number play**
 
@@ -135,7 +134,7 @@ The second dataset is the [game](https://www.kaggle.com/trolukovich/steam-games-
 To understand better how the game reviews are distributed, we plotted the amount of games with their 
 respective percentage of positive reviews.
 
-![img](plots/Histogram_GameReviews.png)
+![image alt ><](plots/Histogram_GameReviews.png)
 
 The plot below list all the game genres available in the game dataset with their respective number of games associated to each game genre.
 
