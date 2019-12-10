@@ -195,7 +195,10 @@ It is to note that for some users, the model fails to produce recommendations. T
 
 #### c. Collaborative recommender with EM and SVD <a name="em"></a>
 
+Missing reference: https://www.kaggle.com/danieloehm/steam-game-recommendations
+
 ##### EM Algorithm <a name="c_1"></a>
+
 *New:*
 
 The Expectation-Maximization (EM) algorithm is an approach for maximum likelihood estimation in the presence of latent variables. It is an appropriate approach to use to estimate the parameters of a given data distribution.
