@@ -195,32 +195,20 @@ It is to note that for some users, the model fails to produce recommendations. T
 
 #### c. Collaborative recommender with EM and SVD <a name="em"></a>
 
-Missing reference: https://www.kaggle.com/danieloehm/steam-game-recommendations
+According the blog [Steam Game Recommendation](https://www.kaggle.com/danieloehm/steam-game-recommendations). We try to use EM and SVD to make appropraite game recommendations.
 
 ##### EM Algorithm <a name="c_1"></a>
-
-*New:*
 
 The Expectation-Maximization (EM) algorithm is an approach for maximum likelihood estimation in the presence of latent variables. It is an appropriate approach to use to estimate the parameters of a given data distribution.
 
 In order to come up with a rating system (since the user dataset has implicit data), we decided to use the distributions of hours played for each game with the EM algorithm rather than using percentiles.
 
-For our recommender system, games that were not played ('play' set to 0) are not considered. We create the rating system based on the distribution of hours played, this for each game available in the user dataset. We use 5 groups (equivalent to a 5 stars rating system) in order to define a rating users would give to a game they played based on the amount of hours each one played each game relative to that of everyone else.
+For our recommender system, the hours of games less then 2 hours are not considered. We create the rating system based on the distribution of hours played, this for each game available in the user dataset. We use 5 groups (equivalent to a 5 stars rating system) in order to define a rating users would give to a game they played based on the amount of hours each one played each game relative to that of everyone else.
 
 To complete for: 
 
 - Some Games like these add noise to the dataset.
-- Such like hours of some free bad games could have a distribution under 2 hours. 
-
-*Old:*
-
-According to the Historgram [1](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/README.md#h_1) and [2](https://github.com/AudreyGermain/Game-Recommendation-System/blob/master/README.md#h_2), you can see Dota 2 has the highest number of players and the highest number of total hours played so undeniably the most popular game. Where as other games such as "Half-Life 2 Lost Coast" have 981 users but a total of 184.4 hours played. I expect this game is in most cases a free bundle game.
-
-Some Games like these add noise to the dataset. So that's one of the reasons we use EM algorithms to create rating system for the games.
-
-The Expectation-Maximization Algorithm is an approach for maximum likelihood estimation in the presence of latent variables. It is an appropriate approach to use to estimate the parameters of the distributions.
-
-Because our recommendation system should take consideration the games hasn't been played. We could create a rating system for games based on distribution of playing hours. Such like hours of some free bad games could have a distribution under 2 hours. As following, We use the EM algorithm rather than percentiles to present the distribution. In the EM algorithm, We use 5 groups as 5 stars to distinguish the good from the bad.
+- Such like hours of some free bad games could have a distribution in first 2 groups. 
 
 **It would be good to explain what the code does in few lines. Add units to plot.**
 
@@ -250,25 +238,13 @@ print(analy_game)
 
 ![image alt ><](plots/EM_SingleAnalysis.png?raw=true)
 
-*New:*
-
-As we can see in the plot above for 'The Witcher 3', the EM algorithm does a great job finding groups (5) of people with similar gaming habits and that would potentially rate a game in a similar way. We can see several users played 'The Witcher 3' game for very few hours. It's possible these users lost their interest into the game after playing some hours, possibly requesting a refund for it.
-
-*Old:*
-
-According to the plot, we could see the there are most of the users of The Witcher 3 distribute in group 5. However there are some users quickly lost their interests. It make sense to request a refund for the game that have been played less than 2 hours. As you can see EM algorithm does a great job finding the groups of people with similar gaming habits and would potentially rate the game in a similar way.  
+As we can see in the plot above for 'The Witcher 3', the EM algorithm does a great job finding groups (5) of people with similar gaming habits and that would potentially rate a game in a similar way. We can see several users played 'The Witcher 3' game for very few hours. It's possible these users lost their interest into the game after playing some hours, possibly requesting a refund for it. At the same time, it more distributs between 4-5 groups. So that it shows the majority users are interested in this game.
 
 ##### Create User-Game Matrix <a name="c_2"></a>
-
-*New:*
 
 A user-item matrix is created with the users as rows and games as columns. The missing values are set to zero. The values stored in the matrix correspond to the `log(hours)` for each user-game combination. The data used to create the user-item matrix considers only games with more than 50 users and users that played a game for more than 2 hours. 
 
 The following lines of code are used to create the user-item matrix.
-
-*Old:*
-
-A user-item matrix is created with the users being the rows and games being the columns. The missing values are set to zero. The observed values are the log hours for each observed user-game combination. The data was subset to games which have greater than 50 users and users which played the game for greater than 2 hours.
 
 ```python
 np.random.seed(910)
@@ -305,10 +281,6 @@ Dimensions of training user-item matrix:（8206，492)
 *New:*
 
 We first use the basic SVD algorithm to factorize the user-item matrix into singular vectors and singular values, similar to what the eigendecomposition does . Since the missing values were set to zero, the factorization will try to recreate them, which is not something we want. We decided to simply replace the missing values with a mean value computed by using the observations considered.
-
-*Old:*
-
-At first we use the basic SVD to factorize a matrix, into singular vectors and singular values. The SVD allows us to discover some of the same kind of information as the eigendecomposition. Since the missing values are set to 0 the factorisation will try and recreate them which is not quite what we want. For this example we will simply impute the missing observations with a mean value.
 
 ```python
 # root mean squared error function
@@ -358,9 +330,6 @@ to complete for:
 
 - Predict the missing values by drawing on the information between similar users and games.
 
-*Old:*
-
-Then we decide to use a gradient descent approach to find optimal U and V matrices which retain the actual observations with predict the missing values by drawing on the information between similar users and games. I have chosen a learning rate of 0.001 and will run for 200 iterations tracking the RMSE. The objective function is the squared error between the actual observed values and the predicted values. The U and V matrices are initialised with a random draw from a ~N(0, 0.01) distibution. This may take a few minutes to run.
 
 ```python
 # SVD via gradient descent
@@ -414,10 +383,6 @@ Interestingly, we see that after the 75th iteration, the accuracy on the test da
 
 For the data used, we could stop the computation after the *75* or *100* iterations since the accuracy on the test data set does not improve anymore. After all, it is the prediction of the unobserved which is the ultimate goal.
 
-*Old:*
-
-We can see there is a large improvement using the SVD with gradient descent over the basic SVD approach. The output shows the objective function converged to 0 on the training data, while the error in the test set essentially halved. Interestingly after the 75th iteration the accuracy in the test set decreased. This could be improved by using more leading components, the trade off being computation time. Or perhaps stopping after 75 to 100 iterations for this data. After all it is the prediction of the unobserved which is the ultimate goal.
-
 ##### EM Compare <a name="c_5"></a>
 With the predicted user-item matrix, let's look again at the distribution of hours for 'The Witcher 3' game, and apply to it the EM algorithm in order to find a reasonable 1-5 star rating.
 
@@ -465,9 +430,6 @@ To complete for:
 
 - Perhaps not quite as appropriate this time as all the new predictions create a dense distribution. 
 
-*Old:*
-
-Perhaps not quite as appropriate this time as all the new predictions create a dense distribution. However the 2-4 distributions look like they fit fairly well. The 5 on the other hand is rather flat and only picks up the very end of the tail.
 
 ##### Output <a name="c_6"></a>
 At last, we use a percentile approach to generate the top 20 game recommendations for each user listed in the test dataset.
