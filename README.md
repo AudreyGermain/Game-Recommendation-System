@@ -29,18 +29,15 @@
 [VI. Conclusion: Discussion](#conclusion)<br/>
 
 ## I. Introduction <a name="introduction"></a>
-Like many young people, all member of this team have an interest in video games, more particularly in computer games. Therefore, the project developed throughout this blog has for goal to build a recommender system for computer games.
+Like many young people, all members of this team have an interest in video games, more particularly in computer games. Therefore, the goal of the project developed throughout this blog is to build a recommender system for computer games.
 
 Recommender systems are widely used these days to recommend items users may potentially like. There are three main types of recommender system: collaborative filtering, content-based filtering and hybrid recommender system. 
 
-The collaborative filtering is based on the principle that if two people liked the same things in the past, 
-if one of them likes something new, the others are likely to like it too. The advantage of the collaborative filtering method is that the algorithm doesn’t need to understand or process the content 
-of the items it recommends. The content-based filtering uses the description of the items in order to recommend items similar to what a user likes. The hybrid recommender system consists on combining the content-based and the collaborative filtering, either by using an algorithm that uses both or by combining the recommendations produced by both methods which, according to research, results in better recommendations than those obtained by using only one of them.
+The collaborative filtering is based on the principle that if two people liked the same things in the past, if one of them likes something new, the others are likely to like it too. The advantage of the collaborative filtering method is that the algorithm doesn’t need to understand or process the content of the items it recommends. The content-based filtering uses the description of the items in order to recommend items similar to what a user likes. The hybrid recommender system consists of combining the content-based and the collaborative filtering, either by using an algorithm that uses both or by combining the recommendations produced by both methods. According to research, it results in better recommendations than those obtained by using only one of them.
 
-The data used to implement a recommender system can be explicit, such as reviews or ratings, 
-or implicit, such as behavior and events like order history, search logs, clicks, etc. The implicit data is harder to process because it’s hard to determine which information is useful and useless, but it’s easier to acquire compared to explicit data since the user doesn’t need to do anything more than using the website or app as usual.
+The data used to implement a recommender system can be explicit, such as reviews or ratings, or implicit, such as behavior and events like order history, search logs, clicks, etc. The implicit data is harder to process because it’s hard to determine which information is useful and useless, but it’s easier to acquire compared to explicit data since the user doesn’t need to do anything more than using the website or app as usual.
 
-The primary focus of this project is to build a recommender system used to recommend games to users based on their preferences and their gaming habits. In order to implement the best recommender system we possible can, multiple algorithms and approaches are developed in order to compare the recommendations produced by each one of them, allowing us to assess which algorithm produces more relevant recommendations for each user. Two collaborative filtering and one content-based algorithms are implemented.
+The primary focus of this project is to build a recommender system to recommend games to users based on their preferences and their gaming habits. In order to implement the best recommender system we possibly can, multiple algorithms and approaches are developed in order to compare the recommendations produced by each one of them, allowing us to assess which algorithm produces more relevant recommendations. Two collaborative filtering and one content-based algorithms are implemented.
 
 For this project we are using data from Steam, one of the biggest video game digital distribution service for computer games. We will be using two datasets, having user and game data. These are explained in detail further in this blog.
 
@@ -53,7 +50,7 @@ For this project, two different datasets are used. Both are available for free o
 
 The first dataset is the [user](https://www.kaggle.com/tamber/steam-video-games) dataset. It contains the user id, the game title, the behavior ('purchase' or 'play') and a value associated to the behavior. Each row of the dataset represent the behavior of a user towards a game, either 'play' or 'purchase'. If the behavior is 'play', the value associated to it corresponds to the amount of hours played. If the behavior is 'purchase', the value associated to it is 1, meaning the user purchased the game. In the case of this user dataset, the value associated to 'purchase' is always 1.
 
-A portion of the user dataset is displayed in the table below. It is to note that the original dataset doesn't have headers, and those shown in the table are added for convenience based on the data description.
+A portion of the user dataset is displayed in the table below. It is to note that the original dataset doesn't have headers, and those shown in the table below are added for convenience based on the data description.
 
 |  user_id  |         game_title         | behavior | value |
 | :-------: | :------------------------: | :------: | :---: |
@@ -70,7 +67,7 @@ A portion of the user dataset is displayed in the table below. It is to note tha
 
 The user dataset contains a total of 200,000 rows, including 5,155 unique games and 12,393 unique users. For convenience, we reformatted the user dataset structure by slitting the information stored in the column 'behavior' into two columns: 'purchase' and 'play'. For each row, column 'play' has value 1 if the user actually played the game or 0 if the user has no record of hours played.
 
-Each row in the reformatted user dataset represents then a unique interaction user/game. The reformatted user dataset is displayed in the table below. 
+Each row in the reformatted user dataset represents then a unique interaction user-game. A portion of the reformatted user dataset is displayed in the table below. 
 
 |  user_id  |         game_name          | hours | purchase | play |
 | :-------: | :------------------------: | :---: | :------: | :--: |
@@ -80,7 +77,7 @@ Each row in the reformatted user dataset represents then a unique interaction us
 | 151603712 |     Fallout New Vegas      | 12.1  |    1     |  1   |
 | 151603712 |       Left 4 Dead 2        |  8.9  |    1     |  1   |
 
-With out reformatted user dataset, we start exploring and analyzing the user and game data stored within the dataset. 
+Using our reformatted user dataset, we start exploring and analyzing the data stored within it. 
 
 **Display something number purchased vs number play**
 
@@ -109,7 +106,7 @@ Then we try to asses if the most purchased games correspond to the most played g
 |                 War Thunder                  | 590  | 14381.6  |
 |                    Portal                    | 588  |  2282.8  |
 
-We can see that for some games, there is a relation between most played and most purchased. For example, 'Dota 2' is undeniably the most popular game, it has the most number of users and the most total of hours played. However, this is not always the case, an interesting example is 'Half-Life 2 Lost Coast' which has high number of users (981 users), but the total of hours played is quite low (184.4 hours). A possible explanation for this could be that this game was purchased as part of a game bundle. 
+We can see that for some games, there is a relation between most played and most purchased. For example, 'Dota 2' is undeniably the most popular game, it has the most number of users and the most total of hours played. However, this is not always the case, an interesting example is 'Half-Life 2 Lost Coast' which has a high number of users (981 users), but the total of hours played is quite low (184.4 hours). A possible explanation for this could be that this game was purchased as part of a game bundle. 
 
 We use a histogram plot in order to better visualize the results displayed in the table above. Game titles are ordered in decreasing order based on the number of users. The color gradient represents the total of hours played, from most played to least played.
 
@@ -126,21 +123,20 @@ In order to have a better understanding of the user data distribution and user's
 
 ![image alt ><](plots/boxplot_top_20_games.png?raw=true)
 
-As we can see, the data distribution for each game considered is not symmetrical. Even more, 75% of data points for each game is in the range of the hundreds hours, with several games having very large outliers. We can see for example a user played more than 10,000 hours "Dota 2". Another interesting example, a user played almost 12,000 hours "Sid Meier's Civilization V".
+As we can see, the data distribution for each game considered is not symmetrical. Even more, 75% of data points for each game is in the range of hundreds of hours, with several games having very large outliers. We can see for example a user played more than 10,000 hours "Dota 2". Another interesting example, a user played almost 12,000 hours "Sid Meier's Civilization V".
 
 ### b. Game Dataset <a name="game"></a>
 The second dataset is the [game](https://www.kaggle.com/trolukovich/steam-games-complete-dataset/version/1) dataset. It contains a list of games, their descriptions, the url (directed to the Steam store), the type of package (app, bundle…), the game title, a short description, recent reviews, all reviews, release date, developer, publisher, popular tags (Gore, Action, Shooter, PvP…), game detail (Multi-player, Single-player, Full controller support…), languages, achievements, genre (Action, Adventure, RPG, Strategy…), game description, description of mature content, minimum requirement to run the game, recommended requirement, original price and price with discount. There is a total of 51920 games in the dataset.
 
-To understand better how the game reviews are distributed, we plotted the amount of games with their 
-respective percentage of positive reviews.
+To understand better how the game reviews are distributed, we plotted the amount of games with their respective percentage of positive reviews.
 
 ![image alt ><](plots/Histogram_GameReviews.png)
 
-The plot below list all the game genres available in the game dataset with their respective number of games associated to each game genre.
+The plot below list all the game genres available in the game dataset with their respective number of games.
 
 ![image alt ><](plots/Histogram_GameGenre.png)
 
-We generated a similar plot, showing the top 20 most popular game tags available in the game dataset with their respective number of games associated to each game tag.
+We generate a similar plot, showing the top 20 most popular game tags available in the game dataset with their respective number of games.
 
 ![image alt ><](plots/Histogram_GamePopularTags.png)
 
@@ -158,24 +154,23 @@ All these approaches are to generate recommendations for the same users, allowin
 ### Collaborative Recommender <a name="collaborative"></a>
 
 #### a. Training and Test Datasets <a name="training-test"></a>
-Before implementing the algorithms to be used for the collaborative filtering recommender system, the training and testing dataset are created based on the source user dataset described in section [subsection II.a](#user). 
+Before implementing the algorithms to be used for the collaborative filtering recommender system, the training and testing dataset are created from the reformatted [user dataset](#user).
 
-For this, we use the reformatted version having a total of 128804 rows, each one having unique information regarding the user/game interactions. We decided to extracted 20% of all user/game interactions (25761 rows) for the test dataset and kept the rest (103043 rows) for the training dataset.
+Our reformatted user dataset version has a total of 128804 rows, each one having unique information regarding the user-game interactions. We decide to extract 20% of all user-game interactions (25761 rows) for the test dataset and keep the rest (103043 rows) for the training dataset.
 
-The training dataset is meant to be used to implement the collaborative filtering recommender model. Once accomplished, the model is used to produce recommendations for all the users listed in the test dataset.
+The training dataset is meant to be used to implement the collaborative filtering recommender models. Once accomplished, the models are to be used to produce recommendations for all the users listed in the test dataset.
 
 #### b. Collaborative Recommender with ALS <a name="als"></a>
-This section describes a simple implementation of a collaborative filtering recommendation algorithm using matrix factorization with implicit data.
-The work presented is based on the ["ALS Implicit Collaborative Filtering"](https://medium.com/radon-dev/als-implicit-collaborative-filtering-5ed653ba39fe "ALS Implicit Collaborative Filtering") and the ["A Gentle Introduction to Recommender Systems with Implicit Feedback"](https://jessesw.com/Rec-System/ "A Gentle Introduction to Recommender Systems with Implicit Feedback") blog posts.
+This section describes a simple implementation of a collaborative filtering recommendation algorithm using matrix factorization with implicit data. The work presented is based on the ["ALS Implicit Collaborative Filtering"](https://medium.com/radon-dev/als-implicit-collaborative-filtering-5ed653ba39fe "ALS Implicit Collaborative Filtering") and the ["A Gentle Introduction to Recommender Systems with Implicit Feedback"](https://jessesw.com/Rec-System/ "A Gentle Introduction to Recommender Systems with Implicit Feedback") blog posts.
 
-Collaborative filtering does not require any information about the items or the users in order to provide recommendation. It only uses the interactions between users and items expressed by some kind of rating.
+Collaborative filtering does not require any information about the items or the users in order to provide recommendations. It only uses the interactions between users and items expressed by some kind of rating.
 
-The data used for this recommender system is that of the steam users described in [subsection II.a](#user). The data does not explicitly contains the rating or preference of users towards the games, but rather it is **implicitly** expressed by the amount of hours users played games.
+The data used for this recommender system is that of the reformatted steam [user dataset](#user). The data do not explicitly contains the rating or preference of users towards games, but rather it is **implicitly** expressed by the amount of hours users played games.
 
-The Alternating Least Squares (ALS) is the model used to fit the data and generate recommendations. The ALS model is already implemented in the [implicit](https://github.com/benfred/implicit) python library thanks to [Ben Frederickson](http://www.benfrederickson.com/fast-implicit-matrix-factorization/).  
+The Alternating Least Squares (ALS) is the model used to fit the data and to generate recommendations. The ALS model is already implemented in the [implicit](https://github.com/benfred/implicit) python library thanks to [Ben Frederickson](http://www.benfrederickson.com/fast-implicit-matrix-factorization/).  
 As described on its documentation [here](https://implicit.readthedocs.io/en/latest/als.html), the ALS algorithm available through the implicit library is a Recommendation Model based on the algorithms described in the paper [Collaborative Filtering for Implicit Feedback Datasets](http://yifanhu.net/PUB/cf.pdf) with performance optimizations described in [Applications of the Conjugate Gradient Method for Implicit Feedback Collaborative Filtering](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.379.6473&rep=rep1&type=pdf). The advantage of using the implicit python library versus a manual implementation of the algorithm is the speed required to generate recommendation since the ALS model in the implicit library uses Cython allowing the parallelization of the code among threads.
 
-The ALS algorithm uses *matrix factorization*, which is basically taking a large matrix and factor it into smaller matrices whose product equals the original one. For our case of collaborative recommender system with implicit data, the *matrix factorization* mathematically reduces the original matrix "all users vs all games" into smaller matrices "all users vs some features" and "all games vs some features". The mentioned *features* are learnt from the data and don't necessarily represent any real metadata.
+The ALS algorithm uses *matrix factorization*, which is basically taking a large matrix and factor it into smaller matrices whose product equals the original one. For our case of collaborative recommender system with implicit data, the *matrix factorization* mathematically reduces the original matrix *"all users vs all items"* into smaller matrices *"all users vs some features"* and *"all items vs some features"*. The mentioned *features* are learnt from the data and don't necessarily represent any real metadata.
 
 ALS is then an iterative optimization process that tries to arrive to a closer and closer factorized representation (***U*** x ***V***) of the original matrix ***R*** at every iteration.
 
@@ -183,7 +178,7 @@ ALS is then an iterative optimization process that tries to arrive to a closer a
 
 In the figure above, ***R*** is the original matrix user-items containing some kind of implicit data within it. ***U*** and ***V*** have weights measuring how each user-item relates to each feature. The goal is to compute the weights of ***U*** and ***V*** such that ***R ≈ U x V***. The ALS (*Alternating Least Squares*) algorithm iteratively *alternates* (hence its name) between optimizing ***U*** and fixing ***V*** and vice versa until a convergence that approximates ***R*** the best it can.
 
-As mentioned before, for our project we use the ALS model implemented in the [implicit](https://github.com/benfred/implicit) python library, which uses two separate magnitudes (*preferences* and *confidence levels*) in order to express the user raw observations. For each user-item interaction within the data, an estimate is computed expressing whether the user likes of dislikes and item (i.e. preference) and couple this estimate with a confidence level, related to the raw implicit observations (higher the more an user has played a game). Further explanations can be found in the paper [Collaborative Filtering for Implicit Feedback Datasets](http://yifanhu.net/PUB/cf.pdf) 
+As mentioned before, for our project we use the ALS model implemented in the [implicit](https://github.com/benfred/implicit) python library, which uses two separate magnitudes (*preferences* and *confidence levels*) in order to express the user raw observations. For each user-item interaction within the data, an estimate is computed expressing whether the user likes of dislikes and item (i.e. preference) and couple this estimate with a confidence level, directly associated to the magnitude of raw implicit observations (higher the more a user has played a game). Further explanations can be found in the paper [Collaborative Filtering for Implicit Feedback Datasets](http://yifanhu.net/PUB/cf.pdf).
 
 
 In order to produce recommendations using the ALS algorithm described above, the class *ImplicitCollaborativeRecommender* is implemented in a python script. The code is available here below. The class makes all the required data manipulations to the fed DataFrame in order to create the matrices required by the ALS algorithm. In order to produce recommendations, we take advantage of the methods already implemented around the ALS algorithm from the implicit python library. 
@@ -195,7 +190,7 @@ The collaborative recommender model is created using the training user dataset a
 With me model successfully loaded, we can start generating recommendations for all users for which user-item interactions were hidden during the process of training and testing data splitting. For each user, 20 recommendations are generated using the following lines of code. Recommendations are stored in a Pandas DataFrame, which is later on outputted as a CSV file.
 
 <script src="https://gist.github.com/g30rdan/8f225e83ae3249fa051d8c4beba5e202.js"></script>
-It is to note that for some users, the model fails to produce recommendations. This is  due to the fact that many users have only one user-item interactions which ended up in the testing dataset. Hence, since the model has no knowledge about these users observations, it cannot produce any recommendation. For these cases, the output values are set equal to '-999'.
+It is to note that for some users, the model fails to produce recommendations. This is  due to the fact that many users have only one user-item interactions which ended up in the testing dataset. Hence, since the model has no previous knowledge about these users observations, it cannot produce any recommendation. For these cases, the output values are set equal to '-999'.
 
 
 #### c. Collaborative recommender with EM and SVD <a name="em"></a>
