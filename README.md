@@ -242,7 +242,11 @@ def game_hrs_density(GAME, nclass, print_vals=True):
 a = game_hrs_density('Fallout4', 5, True)
 print(a)
 ```
-
+```python
+gaussian:rating
+destiny:sparse or dense
+loghrs:game hours
+```
 ![image alt ><](plots/EM_SingleAnalysis.png?raw=true)
 
 As we can see in the plot above for 'The Faalout 4', the EM algorithm does a great job finding groups (5) of people with similar gaming habits and that would potentially rate a game in a similar way. We can see several users played 'The Faalout 4' game for very few hours. It's possible these users lost their interest into the game after playing some hours, possibly requesting a refund for it. At the same time, it more distributs between 3-4 groups. So that it shows the majority users are interested in this game.
