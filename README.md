@@ -203,7 +203,7 @@ It is to note that for some users, the model fails to produce recommendations. T
 
 The work presented in this section follows the work and methodology described in the blog post ["Steam Game Recommendation"](https://www.kaggle.com/danieloehm/steam-game-recommendations) for the implementation of a recommender system, considering many of the suggestions mentioned therein. The mentioned blog uses R language to implement its code, we translated some of them into python for our project. Here, the goal is to use the EM and SVD algorithms to implement and appropriate game recommendation system.
 
-##### EM Algorithm <a name="c_1"></a>
+##### EM Algorithm for game hours <a name="c_1"></a>
 
 The Expectation-Maximization (EM) algorithm is an approach for maximum likelihood estimation in the presence of latent variables. It is an appropriate approach to use to estimate the parameters of a given data distribution.
 
@@ -246,7 +246,7 @@ print(a)
 ```
 ![image alt ><](plots/EM_SingleAnalysis_new.png?raw=true)
 
-As we can see in the plot above for 'The Fallout 4', the EM algorithm does a great job finding groups (5) of people with similar gaming habits and that would potentially rate a game in a similar way. **We can see several users played 'The Fallout 4' game for very few hours. It's possible these users lost their interest into the game after playing some hours, possibly requesting a refund for it.** We can see the distribution is denser for groups 3 and 4. This shows that the majority of users are interested in this game.
+As we can see in the plot above for 'The Fallout 4', the EM algorithm does a great job finding groups (5) of people with similar gaming habits and that would potentially rate a game in a similar way. We can see several users played 'The Fallout 4' game for very few hours. It's possible these users lost their interest into the game after playing few hours. But the distribution is denser for groups 3 and 4. This shows that the majority of users are interested in this game.
 
 ##### Create User-Game Matrix <a name="c_2"></a>
 
@@ -315,9 +315,7 @@ The value shown above is the computed RMSE. It seems like the basic SVD approach
 
 ##### SVD via Gradient Descent <a name="c_4"></a>
 
-**Because the SVD based on having a complete matrix. (does that mean SVD requires a complete matrix - no missing data?)**
-
-We decided to additionally consider a gradient descent approach in order to deal well with missing data. Gradient descent is a convex optimization method which we use to find optimal U and V matrices that represent the original user-item matrix, replacing the missing values by new ones estimated by using similar users and games.
+Because the basic SVD use mean value to fill the matix, it will influence the accuracy during the matrix decomposition.We decided to additionally consider a gradient descent approach in order to deal well with missing data. Gradient descent is a convex optimization method which we use to find optimal U and V matrices that represent the original user-item matrix, replacing the missing values by new ones estimated by using similar users and games.
 
 Similar to what was done in our reference, we set the learning rate to *0.001* and the number of iteration to *200* while tracking the Root Mean Square Error (RMSE). The U and V matrices are initialized with random values draw from a [0, 0.01] normal distribution. The tracked function measures the RMSE between the actual values and the predicted values.
 
@@ -375,10 +373,10 @@ Interestingly, we see that after the 75th iteration, the accuracy on the train d
 
 Similar to the results obtained in our reference for this section, for the data used, we could stop the computation after the *75* or *100* iterations since the accuracy on the test data set does not improve anymore.
 
-##### EM Compare <a name="c_5"></a>
+##### EM Algorithm after gradient descent <a name="c_5"></a>
 With the predicted user-item matrix, let's look again at the distribution of hours for 'Fallout 4' game, and apply to it the EM algorithm in order to find a reasonable 1-5 star rating.
 
-We use EM algorithm to show the plot of relationship for one game with others in the folllowing codes.
+We use EM algorithm to show the plot of the hours distribution of game after gradient descent in the folllowing codes.
 
 ```python
 # Create a rating based on time played after gradient descent
@@ -421,7 +419,7 @@ destiny:sparse or dense
 game_data:similarity
 ```
 
-Although distributions 2-to-3 look like they fit the data fairly well. Perhaps not quite as appropriate, not alll the groups create a dense distribution.
+Although distributions 2-to-3 look like they fit the data fairly well. Perhaps not quite as appropriate, not all the groups create a dense distribution.
 
 
 ##### Output <a name="c_6"></a>
