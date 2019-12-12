@@ -1,6 +1,9 @@
 <link rel="stylesheet" href="style.css">
 
 # Recommendation System for Steam Game Store: An overview of recommender systems
+<p align="right">
+  <a href="https://youtu.be/B6_cj70Gd3w">Youtube Link</a>  :shipit:
+</p>
 
 ## Team:
 - Doo Hyodan,
