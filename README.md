@@ -109,20 +109,12 @@ We can see that for some games, there is a relation between most played and most
 We use a histogram plot in order to better visualize the results displayed in the table above. Game titles are ordered in decreasing order based on the number of users. The color gradient represents the total of hours played, from most played to least played.
 
 ![image alt ><](plots/Histogram_AllUsersHrs.png) <a name="h_1"></a>
-```python
-X axis:number of users
-Y axis:game name
-colors:amount of hour
-```
+
 We can clearly see that for some cases there is no relation between the total number of users and the total of hours played, meaning that a high number of users does not represent an equivalent high total of hours played.
 
 We recreate the same kind of plot, but this time considering only the users who actually played the games. Thus, for each game, we removed users who purchased it but never played it.
 ![image alt ><](plots/Histogram_UsersHrs.png?raw=true) <a name="h_2"></a>
-```python
-X axis:number of users
-Y axis:game name
-colors:amount of hour
-```
+
 When comparing this new plot against the previous one, we can see that some games fell down from the top 20 games based on the number of users. For example 'Counter-Strike Condition Zero', top 15 in the plot considering all users that purchased the game, does not appear in the top 20 of games considering only the users that actually played the game. An opposite example is that of 'Terraria' that appears in the second plot as top 11 while it's not listed in the first plot. As mentioned before, a possible explanations for this difference could be that several games were purchased as part of a game bundle. 
 
 In order to have a better understanding of the user data distribution and user's playing habits, a box plot is produced for the top 20 most played game, based in the total of hours played.
@@ -201,9 +193,9 @@ It is to note that for some users, the model fails to produce recommendations. T
 
 #### c. Collaborative recommender with EM and SVD <a name="em"></a>
 
-The work presented in this section follows the work and methodology described in the blog post ["Steam Game Recommendation"](https://www.kaggle.com/danieloehm/steam-game-recommendations) for the implementation of a recommender system, considering many of the suggestions mentioned therein. The mentioned blog uses R language to implement its code, we translated some of them into python for our project. Here, the goal is to use the EM and SVD algorithms to implement and appropriate game recommendation system.
+The work presented in this section follows the work described in the blog post ["Steam Game Recommendation"](https://www.kaggle.com/danieloehm/steam-game-recommendations) for the implementation of a recommender system, considering many of the suggestions mentioned therein. The mentioned blog uses R language to implement its code, we translated some of them into python for our project. Here, the goal is to use the EM and SVD algorithms to implement and appropriate game recommendation system.
 
-##### EM Algorithm for game hours <a name="c_1"></a>
+##### EM Algorithm: Game Hours' Distribution <a name="c_1"></a>
 
 The Expectation-Maximization (EM) algorithm is an approach for maximum likelihood estimation in the presence of latent variables. It is an appropriate approach to use to estimate the parameters of a given data distribution.
 
@@ -246,11 +238,11 @@ print(a)
 ```
 ![image alt ><](plots/EM_SingleAnalysis_new.png?raw=true)
 
-As we can see in the plot above for 'The Fallout 4', the EM algorithm does a great job finding groups (5) of people with similar gaming habits and that would potentially rate a game in a similar way. We can see several users played 'The Fallout 4' game for very few hours. It's possible these users lost their interest into the game after playing few hours. But the distribution is denser for groups 3 and 4. This shows that the majority of users are interested in this game.
+As we can see in the plot above for 'The Fallout 4', the EM algorithm does a great job finding groups (5) of people with similar gaming habits and that would potentially rate a game in a similar way. We can see few users played 'The Fallout 4' game for very few hours. It's possible some of these users lost their interest into the game shortly after starting playing it. The distribution is denser for groups 3 and 4. This shows that the majority of users are interested in this game.
 
-##### Create User-Game Matrix <a name="c_2"></a>
+##### User-Game Matrix Creation <a name="c_2"></a>
 
-A user-item matrix is created with the users as rows and games as columns. The missing values are set to zero. The values stored in the matrix correspond to the `log(hours)` for each user-game combination. Following the suggestions from the used reference, the data used to create the user-item matrix considers only games with more than 50 users and users that played a game for more than 2 hours.
+A user-item matrix is created with the users as rows and games as columns. The missing values are set to zero. The values stored in the matrix correspond to the `log(hours)` for each user-game combination. Following the suggestions from the used [reference](https://www.kaggle.com/danieloehm/steam-game-recommendations), the data used to create the user-item matrix considers only games with more than 50 users and users that played a game for more than 2 hours.
 
 The following lines of code are used to create the user-item matrix.
 
@@ -285,39 +277,13 @@ print("Dimensions of training user-item matrix:", ui_train.shape)
 Dimensions of training user-item matrix:（8084，391)
 ```
 
-##### Basic SVD <a name="c_3"></a>
-
-We first use the basic SVD algorithm to factorize the user-item matrix into singular vectors and singular values, similar to what the eigendecomposition does . Since the missing values were set to zero, the factorization will try to recreate them, which is not something we want. We decide to simply replace the missing values with a mean value computed by using the observations considered.
-
-The following code is used to process our data through the Basic SVD algorithm.
-```python
-# Basic svd
-Y = pd.DataFrame(ui_train).copy()
-
-# Impute the missing observations with a mean value
-means = np.mean(Y)
-for i, col in enumerate(Y.columns):
-    Y[col] = Y[col].apply(lambda x: means[i] if x == 0 else x)
-U, D, V = np.linalg.svd(Y)
-p_df = pd.DataFrame({'x': range(1, len(D)+1), 'y': D/np.sum(D)})
-
-#Set the latent factor as 60
-lc = 60
-pred = np.dot(np.dot(U[:, :lc], np.diag(D[:lc])), V[:lc, :])
-print(rmse(pred, test))
-rmse(pred, test, True).head()
-```
-
-```python
-3.2785930374294123
-```
-The value shown above is the computed RMSE. It seems like the basic SVD approach would not give the best recommendations for us since the RMSE value is quite high. The SVD algorithm performance is better the lower the RMSE is. 
-
 ##### SVD via Gradient Descent <a name="c_4"></a>
 
-Because the basic SVD use mean value to fill the matix, it will influence the accuracy during the matrix decomposition.We decided to additionally consider a gradient descent approach in order to deal well with missing data. Gradient descent is a convex optimization method which we use to find optimal U and V matrices that represent the original user-item matrix, replacing the missing values by new ones estimated by using similar users and games.
+According to our [reference](https://www.kaggle.com/danieloehm/steam-game-recommendations), a basic SVD algorithm implementation does not produce good enough recommendations based on our dataset. Hence, we decide to implement the SDV algorithm via a Gradient Descent approach, as proposed therein.
 
-Similar to what was done in our reference, we set the learning rate to *0.001* and the number of iteration to *200* while tracking the Root Mean Square Error (RMSE). The U and V matrices are initialized with random values draw from a [0, 0.01] normal distribution. The tracked function measures the RMSE between the actual values and the predicted values.
+We use the SVD algorithm to factorize the user-item matrix into singular vectors and singular values (similar to what the eigendecomposition does) and the gradient descent approach to deal with missing data. Gradient descent is a convex optimization method which we use to find optimal U and V matrices that represent the original user-item matrix, replacing the missing values by new ones estimated by using similar users and games.
+
+Similar to what was done in our [reference](https://www.kaggle.com/danieloehm/steam-game-recommendations), we set the learning rate to *0.001* and the number of iteration to *200* while tracking the Root Mean Square Error (RMSE). The U and V matrices are initialized with random values draw from a [0, 0.01] normal distribution. The tracked function measures the RMSE between the actual values and the predicted values.
 
 ```python
 #SVD via gradient descent
@@ -367,16 +333,14 @@ print(ggplot(path1gg, aes('itr', 'value', color = 'variable')) + geom_line())
 ```
 ![image alt ><](plots/SVD_Compare_new.png?raw=true)
 
-We can see there is a large improvement using the SVD with gradient descent over the basic SVD approach. The plot shows that the after gradient descent SVD function converges to zero on the train dataset.
+The plot shows that the SVD via gradient descent converges to zero on the train dataset, while the RMSE for our train dataset stays around 0.68 approximately .
 
-Interestingly, we see that after the 75th iteration, the accuracy on the train dataset stops improving (the RMSE remains around the same value). The accuracy on the train data could be improved by using more leading components, the trade-off being more computation time required.
+Interestingly, we see that after the *75 - 100th* iteration, the accuracy on the test dataset stops improving (the RMSE remains around the same value). The accuracy on the test data could be improved by using more leading components, the trade-off being more computation time required. Hence, for the data used, we could stop the computation after the *75 - 100* iterations since the accuracy on the test data set does not improve anymore. This behavior is consistent with the results presented in our [reference](https://www.kaggle.com/danieloehm/steam-game-recommendations).
 
-Similar to the results obtained in our reference for this section, for the data used, we could stop the computation after the *75* or *100* iterations since the accuracy on the test data set does not improve anymore.
+##### EM Algorithm: Post SVD via Gradient Descent <a name="c_5"></a>
+With the predicted user-item matrix, let's look again at the distribution of hours for the 'Fallout 4' game, using the EM algorithm in order to find a reasonable 1-5 star rating.
 
-##### EM Algorithm after gradient descent <a name="c_5"></a>
-With the predicted user-item matrix, let's look again at the distribution of hours for 'Fallout 4' game, and apply to it the EM algorithm in order to find a reasonable 1-5 star rating.
-
-We use EM algorithm to show the plot of the hours distribution of game after gradient descent in the folllowing codes.
+The following code is used to plot the EM algorithm output for a given game, this time using our predicted user-item matrix obtained by using the SVD algorithm via Gradient Descent.
 
 ```python
 # Create a rating based on time played after gradient descent
@@ -411,19 +375,13 @@ def game_hrs_density_p(pred, GAME=None, nclass=1, print_vals=True):
 a = game_hrs_density_p(pred, "Fallout4", 5)
 print(a)
 ```
-![image alt ><](plots/EM_SVD_Analysis.png?raw=true)
+![image alt ><](plots/EM_SVD_Analysis_new.png?raw=true)
 
-```python
-gaussian:rating
-destiny:sparse or dense
-game_data:similarity
-```
-
-Although distributions 2-to-3 look like they fit the data fairly well. Perhaps not quite as appropriate, not all the groups create a dense distribution.
+As we can see in the figure above, distributions 2-4 look like they fit the data fairly well. However, this is not the case for distribution 1. On the other hand, distribution 5 is pretty much flat on the right side on our figure.
 
 
 ##### Output <a name="c_6"></a>
-At last, we generate the top 20 game recommendations for each user listed in the test dataset.
+At last, we use our SVD algorithm via gradient descent recommender to generate the top 20 game recommendations for each user listed in the test dataset. For this, we use the following code.
 
 ```python
 # Export recommend games
@@ -471,7 +429,9 @@ columns = ['user_id'] + ['{}'.format(i+1) for i in range(top_N)]
 df.columns = columns
 df.to_csv('../../data/output_data/Collaborative_EM_output.csv', index=None)
 ```
-For example, here below the top 20 game recommendations for user '5250'.
+Similar to the Collaborative recommender with the ALS algorithm, the recommender implemented in this section fails to produce recommendations for users that exist only in the test dataset. Hence, since the model has no previous knowledge about these users observations, it cannot produce any recommendation. For these cases, the output values are set equal to '0'.
+
+Here below, as example, the top 20 game recommendations for user '5250'.
 
 ```python
 Top 20 recommended games for user 5250:
