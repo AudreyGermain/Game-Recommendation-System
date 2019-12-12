@@ -81,7 +81,7 @@ Using our reformatted user dataset, we start exploring and analyzing the data st
 
 **Display something number purchased vs number play**
 
-Then we try to asses if the most purchased games correspond to the most played games. For each game, we compute the total number of users and the total time the game was played by all users. The results are displayed in the table below in decreasing order based on the number of users, this for the top 20 games with most users. 
+Then we try to assess if the most purchased games correspond to the most played games. For each game, we compute the total number of users and the total time the game was played by all users. The results are displayed in the table below in decreasing order based on the number of users, this for the top 20 games with most users. 
 
 |                     game                     | user |   hrs    |
 | :------------------------------------------: | :--: | :------: |
@@ -678,11 +678,6 @@ In case the list of recommendations is empty (it could happen if none of the gam
 Subsequently, the recommendations are ordered according to their reviews, from best to worst. We decided to proceed this way since it's the easiest way to order the recommendations, particularly considering that it's not possible to produce recommendations for every game the user posses since games in both datasets do not match perfectly as mentioned previously [here](#match_games). If it weren't because of this mismatch, we considered taking into account the proportion of play time of each game relatively to the others a user played in order to recommend similar games to those that are most played. Using the reviews  to sort the recommendations still ensures that the recommended games are considered good in general by all users.
 
 If there are less recommendations than the desired number of recommendations requested, empty spaces fill in the rest of the columns. All the DataFrame rows produced by the function '*make_recommendation_for_user*' are combined and then outputted as a CSV file.
-
-*Not sure about this:*
-
-The whole script is arranged in a function to let us run it with multiple different input.
-Those columns correspond to the variable column_name in the code that generate the cosine similarity matrix.
 
 ## IV. Evaluation & Analysis <a name="evaluation-analysis"></a>
 
