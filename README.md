@@ -151,7 +151,7 @@ All these approaches are to generate recommendations for the same users, allowin
 
 ### Collaborative Recommender <a name="collaborative"></a>
 
-#### a. Training and Test Datasets <a name="training-test"></a>
+#### a. Train and Test Datasets <a name="training-test"></a>
 Before implementing the algorithms to be used for the collaborative filtering recommender system, the training and testing dataset are created from the reformatted [user dataset](#user).
 
 Our reformatted user dataset version has a total of 128804 rows, each one having unique information regarding the user-game interactions. We decide to extract 20% of all user-game interactions (25761 rows) for the test dataset and keep the rest (103043 rows) for the training dataset.
