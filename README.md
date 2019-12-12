@@ -187,7 +187,7 @@ In the figure above, ***R*** is the original matrix user-items containing some k
 As mentioned before, for our project we use the ALS model implemented in the [implicit](https://github.com/benfred/implicit) python library, which uses two separate magnitudes (*preferences* and *confidence levels*) in order to express the user raw observations. For each user-item interaction within the data, an estimate is computed expressing whether the user likes of dislikes and item (i.e. preference) and couple this estimate with a confidence level, directly associated to the magnitude of raw implicit observations (higher the more a user has played a game). Further explanations can be found in the paper [Collaborative Filtering for Implicit Feedback Datasets](http://yifanhu.net/PUB/cf.pdf).
 
 
-In order to produce recommendations using the ALS algorithm described above, the class *ImplicitCollaborativeRecommender* is implemented in a python script. The class was developed following the suggestions from the references mentioned above. The code is available here below. The class makes all the required data manipulations to the fed DataFrame in order to create the matrices required by the ALS algorithm. In order to produce recommendations, we take advantage of the methods already implemented around the ALS algorithm from the implicit python library. 
+In order to produce recommendations using the ALS algorithm described above, the class *ImplicitCollaborativeRecommender* is implemented in a python script. The class is developed following the suggestions from the references mentioned above. The code is available here below. The class makes all the required data manipulations to the fed DataFrame in order to create the matrices required by the ALS algorithm. In order to produce recommendations, we take advantage of the methods already implemented around the ALS algorithm from the implicit python library. 
 
 <script src="https://gist.github.com/g30rdan/d992457bf34607493c19341c96761387.js"></script>
 The collaborative recommender model is created using the training user dataset and the *ImplicitCollaborativeRecommender* class with the following lines of code.
@@ -201,7 +201,7 @@ It is to note that for some users, the model fails to produce recommendations. T
 
 #### c. Collaborative recommender with EM and SVD <a name="em"></a>
 
-Following the blog [Steam Game Recommendation](https://www.kaggle.com/danieloehm/steam-game-recommendations), we translate the codes to python. Here useing EM and SVD algorithm to make appropraite game recommendations.
+The work presented in this section follows the work and methodology described in the blog post ["Steam Game Recommendation"](https://www.kaggle.com/danieloehm/steam-game-recommendations) for the implementation of a recommender system, considering many of the suggestion mentioned therein. The mentioned blog uses R language to implement its code, we translated some of them into python for our project. Here, the goal is to use the EM and SVD algorithms to implement and appropriate game recommendation system.
 
 ##### EM Algorithm <a name="c_1"></a>
 
@@ -209,9 +209,11 @@ The Expectation-Maximization (EM) algorithm is an approach for maximum likelihoo
 
 In order to come up with a rating system (since the user dataset has implicit data), we decided to use the distributions of hours played for each game with the EM algorithm rather than using percentiles.
 
-For our recommender system, because users can refund the games if they play less than 2 hours, hours of games less then 2 hours are not considered. We create the rating system based on the distribution of hours played, this for each game available in the user dataset. We use 5 groups (equivalent to a 5 stars rating system) in order to define a rating users would give to a game they played based on the amount of hours each one played each game relative to that of everyone else.
+We create the rating system based on the distribution of hours played, this for each game available in the user dataset. We use 5 groups (equivalent to a 5 stars rating system) in order to define a rating users would give to a game they played based on the amount of hours each one played each game relative to that of everyone else.
 
-Folllowing codes is to show the plot of games hours throgh EM algorithm.
+Steam allows users to refund games they played for less than 2 hours. We decided to consider this fact for our recommender system. Thus, user-item interactions with less than 2 hours are not considered. 
+
+The following code is used to plot the EM algorithm output for a given game.
 ```python
 #EM Algorithm based on raw data
 def game_hrs_density(GAME, nclass, print_vals=True):
@@ -249,7 +251,7 @@ loghrs:game hours
 ```
 ![image alt ><](plots/EM_SingleAnalysis.png?raw=true)
 
-As we can see in the plot above for 'The Faalout 4', the EM algorithm does a great job finding groups (5) of people with similar gaming habits and that would potentially rate a game in a similar way. We can see several users played 'The Faalout 4' game for very few hours. It's possible these users lost their interest into the game after playing some hours, possibly requesting a refund for it. At the same time, it more distributs between 3-4 groups. So that it shows the majority users are interested in this game.
+As we can see in the plot above for 'The Fallout 4', the EM algorithm does a great job finding groups (5) of people with similar gaming habits and that would potentially rate a game in a similar way. We can see several users played 'The Fallout 4' game for very few hours. It's possible these users lost their interest into the game after playing some hours, possibly requesting a refund for it. At the same time, it more distributs between 3-4 groups. So that it shows the majority users are interested in this game.
 
 ##### Create User-Game Matrix <a name="c_2"></a>
 
@@ -722,7 +724,7 @@ As we can see, the collaborative recommender with ALS is the best one. The perfo
 All the related work used as reference for the development of our project are listed here below:
 
 - To understand what a recommender system is and the different types, we used the article ["How do Recommendation Engines work? And What are the Benefits?"](https://marutitech.com/recommendation-engine-benefits/).
-- - For the collaborative recommender using the ALS algorithm, we used the work presented in the following articles: ["ALS Implicit Collaborative Filtering"](https://medium.com/radon-dev/als-implicit-collaborative-filtering-5ed653ba39fe "ALS Implicit Collaborative Filtering") and ["A Gentle Introduction to Recommender Systems with Implicit Feedback"](https://jessesw.com/Rec-System/ "A Gentle Introduction to Recommender Systems with Implicit Feedback"). The ALS algorithm used correspond to that implemented in the [implicit](https://github.com/benfred/implicit) python library. As described on its documentation [here](https://implicit.readthedocs.io/en/latest/als.html), it uses the algorithms described in the paper [Collaborative Filtering for Implicit Feedback Datasets](http://yifanhu.net/PUB/cf.pdf) with performance optimizations described in [Applications of the Conjugate Gradient Method for Implicit Feedback Collaborative Filtering](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.379.6473&rep=rep1&type=pdf).
+- For the collaborative recommender using the ALS algorithm, we used the work presented in the following articles: ["ALS Implicit Collaborative Filtering"](https://medium.com/radon-dev/als-implicit-collaborative-filtering-5ed653ba39fe "ALS Implicit Collaborative Filtering") and ["A Gentle Introduction to Recommender Systems with Implicit Feedback"](https://jessesw.com/Rec-System/ "A Gentle Introduction to Recommender Systems with Implicit Feedback"). The ALS algorithm used correspond to that implemented in the [implicit](https://github.com/benfred/implicit) python library. As described on its documentation [here](https://implicit.readthedocs.io/en/latest/als.html), it uses the algorithms described in the paper [Collaborative Filtering for Implicit Feedback Datasets](http://yifanhu.net/PUB/cf.pdf) with performance optimizations described in [Applications of the Conjugate Gradient Method for Implicit Feedback Collaborative Filtering](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.379.6473&rep=rep1&type=pdf).
 - For the collaborative recommender using the EM algorithm we used the article ["Machine Learning with Python: Exception Maximization and Gaussian Mixture Models in Python"](https://www.python-course.eu/expectation_maximization_and_gaussian_mixture_models.php).
 - For the content-based recommender system we used some code from the blog post ["Recommender Systems in Python: Beginner Tutorial"](https://www.datacamp.com/community/tutorials/recommender-systems-python?fbclid=IwAR1fz9YLOgZ95KHwoLpgb-hTdV2MekujDGBngRTG3kYmBJYxwSK3UWvNJDg) to implement the function that produces recommendations for each game.
 - The KDD research paper ["Real-time Attention Based Look-alike Model for Recommender System"](https://www.kdd.org/kdd2019/accepted-papers/view/real-time-attention-based-look-alike-model-for-recommender-system)
