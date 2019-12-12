@@ -79,7 +79,7 @@ Each row in the reformatted user dataset represents then a unique interaction us
 
 Using our reformatted user dataset, we start exploring and analyzing the data stored within it. 
 
-We try to assess if the most purchased games correspond to the most played games. For each game, we compute the total number of users and the total time the game was played by all users. The results are displayed in the table below in decreasing order based on the number of users, this for the top 20 games with most users. 
+We try to assess if the most purchased games correspond to the most played games. For each game, we compute the total number of users and the total time of the game was played by all users. The results are displayed in the table below in decreasing order based on the number of users, this for the top 20 games with most users. 
 
 |                     game                     | user |   hrs    |
 | :------------------------------------------: | :--: | :------: |
