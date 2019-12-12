@@ -201,7 +201,7 @@ The Expectation-Maximization (EM) algorithm is an approach for maximum likelihoo
 
 In order to come up with a rating system (since the user dataset has implicit data), we decided to use the distributions of hours played for each game with the EM algorithm rather than using percentiles.
 
-We create the rating system based on the distribution of hours played, this for each game available in the user dataset. We use 5 groups (equivalent to a 5 stars rating system) in order to define a rating users would give to a game they played based on the amount of hours each one played each game relative to that of everyone else.
+We create the rating system based on the distribution of hours played, this for each game available in the user dataset. We use 5 groups (equivalent to a 5 stars rating system) in order to define a rating users would give to a game they played based on the hours each one played each game relative to that of everyone else.
 
 Steam allows users to refund games they played for less than 2 hours. We decided to consider this fact for our recommender system. Thus, user-item interactions with less than 2 hours are not considered. 
 
@@ -238,7 +238,7 @@ print(a)
 ```
 ![image alt ><](plots/EM_SingleAnalysis_new.png?raw=true)
 
-As we can see in the plot above for 'The Fallout 4', the EM algorithm does a great job finding groups (5) of people with similar gaming habits and that would potentially rate a game in a similar way. We can see few users played 'The Fallout 4' game for very few hours. It's possible some of these users lost their interest into the game shortly after starting playing it. The distribution is denser for groups 3 and 4. This shows that the majority of users are interested in this game.
+As we can see in the plot above for 'The Fallout 4', the EM algorithm does a great job finding groups (5) of people with similar gaming habits and that would potentially rate a game in a similar way. We can see few users played 'The Fallout 4' game for very few hours. It's possible some of these users lost their interest into the game shortly after starting playing it. The distribution is denser for groups 3 and 4. This shows that the majority of users are interested in this game. So the game like this would be highly rated.
 
 ##### User-Game Matrix Creation <a name="c_2"></a>
 
@@ -279,9 +279,9 @@ Dimensions of training user-item matrix:（8084，391)
 
 ##### SVD via Gradient Descent <a name="c_4"></a>
 
-According to our [reference](https://www.kaggle.com/danieloehm/steam-game-recommendations), a basic SVD algorithm implementation does not produce good enough recommendations based on our dataset. Hence, we decide to implement the SDV algorithm via a Gradient Descent approach, as proposed therein.
+According to our [reference](https://www.kaggle.com/danieloehm/steam-game-recommendations), a basic SVD algorithm implementation does not produce good enough recommendations based on our dataset. Hence, we decide to implement the SVD algorithm via a Gradient Descent approach, as proposed therein.
 
-We use the SVD algorithm to factorize the user-item matrix into singular vectors and singular values (similar to what the eigendecomposition does) and the gradient descent approach to deal with missing data. Gradient descent is a convex optimization method which we use to find optimal U and V matrices that represent the original user-item matrix, replacing the missing values by new ones estimated by using similar users and games.
+We use the SVD algorithm to factorize the user-item matrix into singular vectors and singular values (similar to what the eigendecomposition does) and the gradient descent approach to deal with missing data through predicating. Gradient descent is a convex optimization method which we use to find optimal U and V matrices that represent the original user-item matrix, replacing the missing values by new ones estimated by using similar users and games.
 
 Similar to what was done in our [reference](https://www.kaggle.com/danieloehm/steam-game-recommendations), we set the learning rate to *0.001* and the number of iteration to *200* while tracking the Root Mean Square Error (RMSE). The U and V matrices are initialized with random values draw from a [0, 0.01] normal distribution. The tracked function measures the RMSE between the actual values and the predicted values.
 
