@@ -123,7 +123,7 @@ X axis:number of users
 Y axis:game name
 colors:amount of hour
 ```
-When comparing this new plot against the previous one, we can see that some games fell down from the top 20 games based on the number of users. For example 'Counter-Strike Condition Zero', top 15 in the plot considering all users that purchased the game, does not appear in the top 20 of games considering only the users that actually played the game. An opposite example is that of 'Terraria' that appears in the second plot as top 11 while it's not listed in the first plot. As mentioned before, a possible explanations for this difference could  could be that several games were purchased as part of a game bundle. 
+When comparing this new plot against the previous one, we can see that some games fell down from the top 20 games based on the number of users. For example 'Counter-Strike Condition Zero', top 15 in the plot considering all users that purchased the game, does not appear in the top 20 of games considering only the users that actually played the game. An opposite example is that of 'Terraria' that appears in the second plot as top 11 while it's not listed in the first plot. As mentioned before, a possible explanations for this difference could be that several games were purchased as part of a game bundle. 
 
 In order to have a better understanding of the user data distribution and user's playing habits, a box plot is produced for the top 20 most played game, based in the total of hours played.
 
@@ -187,7 +187,7 @@ In the figure above, ***R*** is the original matrix user-items containing some k
 As mentioned before, for our project we use the ALS model implemented in the [implicit](https://github.com/benfred/implicit) python library, which uses two separate magnitudes (*preferences* and *confidence levels*) in order to express the user raw observations. For each user-item interaction within the data, an estimate is computed expressing whether the user likes of dislikes and item (i.e. preference) and couple this estimate with a confidence level, directly associated to the magnitude of raw implicit observations (higher the more a user has played a game). Further explanations can be found in the paper [Collaborative Filtering for Implicit Feedback Datasets](http://yifanhu.net/PUB/cf.pdf).
 
 
-In order to produce recommendations using the ALS algorithm described above, the class *ImplicitCollaborativeRecommender* is implemented in a python script. The class was developed following the suggestions from the references mentioned above. The code is available here below. The class makes all the required data manipulations to the fed DataFrame in order to create the matrices required by the ALS algorithm. In order to produce recommendations, we take advantage of the methods already implemented around the ALS algorithm from the implicit python library. 
+In order to produce recommendations using the ALS algorithm described above, the class *ImplicitCollaborativeRecommender* is implemented in a python script. The class is developed following the suggestions from the references mentioned above. The code is available here below. The class makes all the required data manipulations to the fed DataFrame in order to create the matrices required by the ALS algorithm. In order to produce recommendations, we take advantage of the methods already implemented around the ALS algorithm from the implicit python library. 
 
 <script src="https://gist.github.com/g30rdan/d992457bf34607493c19341c96761387.js"></script>
 The collaborative recommender model is created using the training user dataset and the *ImplicitCollaborativeRecommender* class with the following lines of code.
@@ -201,17 +201,19 @@ It is to note that for some users, the model fails to produce recommendations. T
 
 #### c. Collaborative recommender with EM and SVD <a name="em"></a>
 
-Following the blog [Steam Game Recommendation](https://www.kaggle.com/danieloehm/steam-game-recommendations), we translate the codes to python. Here useing EM and SVD algorithm to make appropraite game recommendations.
+The work presented in this section follows the work and methodology described in the blog post ["Steam Game Recommendation"](https://www.kaggle.com/danieloehm/steam-game-recommendations) for the implementation of a recommender system, considering many of the suggestions mentioned therein. The mentioned blog uses R language to implement its code, we translated some of them into python for our project. Here, the goal is to use the EM and SVD algorithms to implement and appropriate game recommendation system.
 
-##### EM Algorithm <a name="c_1"></a>
+##### EM Algorithm for game hours <a name="c_1"></a>
 
 The Expectation-Maximization (EM) algorithm is an approach for maximum likelihood estimation in the presence of latent variables. It is an appropriate approach to use to estimate the parameters of a given data distribution.
 
 In order to come up with a rating system (since the user dataset has implicit data), we decided to use the distributions of hours played for each game with the EM algorithm rather than using percentiles.
 
-For our recommender system, because users can refund the games if they play less than 2 hours, hours of games less then 2 hours are not considered. We create the rating system based on the distribution of hours played, this for each game available in the user dataset. We use 5 groups (equivalent to a 5 stars rating system) in order to define a rating users would give to a game they played based on the amount of hours each one played each game relative to that of everyone else.
+We create the rating system based on the distribution of hours played, this for each game available in the user dataset. We use 5 groups (equivalent to a 5 stars rating system) in order to define a rating users would give to a game they played based on the amount of hours each one played each game relative to that of everyone else.
 
-Folllowing codes is to show the plot of games hours throgh EM algorithm.
+Steam allows users to refund games they played for less than 2 hours. We decided to consider this fact for our recommender system. Thus, user-item interactions with less than 2 hours are not considered. 
+
+The following code is used to plot the EM algorithm output for a given game.
 ```python
 #EM Algorithm based on raw data
 def game_hrs_density(GAME, nclass, print_vals=True):
@@ -242,18 +244,13 @@ def game_hrs_density(GAME, nclass, print_vals=True):
 a = game_hrs_density('Fallout4', 5, True)
 print(a)
 ```
-```python
-gaussian:rating
-destiny:sparse or dense
-loghrs:game hours
-```
-![image alt ><](plots/EM_SingleAnalysis.png?raw=true)
+![image alt ><](plots/EM_SingleAnalysis_new.png?raw=true)
 
-As we can see in the plot above for 'The Faalout 4', the EM algorithm does a great job finding groups (5) of people with similar gaming habits and that would potentially rate a game in a similar way. We can see several users played 'The Faalout 4' game for very few hours. It's possible these users lost their interest into the game after playing some hours, possibly requesting a refund for it. At the same time, it more distributs between 3-4 groups. So that it shows the majority users are interested in this game.
+As we can see in the plot above for 'The Fallout 4', the EM algorithm does a great job finding groups (5) of people with similar gaming habits and that would potentially rate a game in a similar way. We can see several users played 'The Fallout 4' game for very few hours. It's possible these users lost their interest into the game after playing few hours. But the distribution is denser for groups 3 and 4. This shows that the majority of users are interested in this game.
 
 ##### Create User-Game Matrix <a name="c_2"></a>
 
-A user-item matrix is created with the users as rows and games as columns. The missing values are set to zero. The values stored in the matrix correspond to the `log(hours)` for each user-game combination. The data used to create the user-item matrix considers only games with more than 50 users and users that played a game for more than 2 hours. 
+A user-item matrix is created with the users as rows and games as columns. The missing values are set to zero. The values stored in the matrix correspond to the `log(hours)` for each user-game combination. Following the suggestions from the used reference, the data used to create the user-item matrix considers only games with more than 50 users and users that played a game for more than 2 hours.
 
 The following lines of code are used to create the user-item matrix.
 
@@ -261,7 +258,7 @@ The following lines of code are used to create the user-item matrix.
 # For train dataset
 # Only consider the games hrs more than 2 hrs
 steam_train = steam_traind[steam_traind['hrs'] > 2]
-print(steam_train)
+#print(steam_train)
 #Not consider the games that users less than 50
 steam_train_idx = steam_train['game1'].apply(lambda x: x in game_users['game1'].values)
 steam_train = steam_train[steam_train_idx]
@@ -285,14 +282,14 @@ print("Dimensions of training user-item matrix:", ui_train.shape)
 ```
 
 ```python
-Dimensions of training user-item matrix:（8206，492)
+Dimensions of training user-item matrix:（8084，391)
 ```
 
 ##### Basic SVD <a name="c_3"></a>
 
-We first use the basic SVD algorithm to factorize the user-item matrix into singular vectors and singular values, similar to what the eigendecomposition does . Since the missing values were set to zero, the factorization will try to recreate them, which is not something we want. We decided to simply replace the missing values with a mean value computed by using the observations considered.
+We first use the basic SVD algorithm to factorize the user-item matrix into singular vectors and singular values, similar to what the eigendecomposition does . Since the missing values were set to zero, the factorization will try to recreate them, which is not something we want. We decide to simply replace the missing values with a mean value computed by using the observations considered.
 
-Here we process the data through Basic SVD
+The following code is used to process our data through the Basic SVD algorithm.
 ```python
 # Basic svd
 Y = pd.DataFrame(ui_train).copy()
@@ -314,13 +311,13 @@ rmse(pred, test, True).head()
 ```python
 3.2785930374294123
 ```
-As we see the rmse above, it seems like the basic SVD approach does not give the best prediction for us, because the better performence of the SVD should come with the lower rmse. 
+The value shown above is the computed RMSE. It seems like the basic SVD approach would not give the best recommendations for us since the RMSE value is quite high. The SVD algorithm performance is better the lower the RMSE is. 
 
 ##### SVD via Gradient Descent <a name="c_4"></a>
 
-Because the SVD based on having a complete matrix. We decided to additionally consider a gradient descent approach in order to deal well with missing data. So gradient descent, a convex optimization method, to find optimal U and V matrices that can represent the missing values in the user-item matrix through similiar users and games.
+Because the basic SVD use mean value to fill the matix, it will influence the accuracy during the matrix decomposition.We decided to additionally consider a gradient descent approach in order to deal well with missing data. Gradient descent is a convex optimization method which we use to find optimal U and V matrices that represent the original user-item matrix, replacing the missing values by new ones estimated by using similar users and games.
 
-We set the learning rate to *0.001* and the number of iteration to *200* while tracking the Root Mean Square Error (RMSE). The U and V matrices are initialized with random values draw from a [0, 0.01] normal distribution. The tracked function measures the RMSE between the actual values and the predicted values.
+Similar to what was done in our reference, we set the learning rate to *0.001* and the number of iteration to *200* while tracking the Root Mean Square Error (RMSE). The U and V matrices are initialized with random values draw from a [0, 0.01] normal distribution. The tracked function measures the RMSE between the actual values and the predicted values.
 
 ```python
 #SVD via gradient descent
@@ -368,23 +365,18 @@ print(path1.tail(1))
 
 print(ggplot(path1gg, aes('itr', 'value', color = 'variable')) + geom_line())
 ```
-![image alt ><](plots/SVD_Compare.png?raw=true)
+![image alt ><](plots/SVD_Compare_new.png?raw=true)
 
-```python
-itr:iterations
-fobjp:the predicted values
-rmsep:actual observed values
-```
 We can see there is a large improvement using the SVD with gradient descent over the basic SVD approach. The plot shows that the after gradient descent SVD function converges to zero on the train dataset.
 
 Interestingly, we see that after the 75th iteration, the accuracy on the train dataset stops improving (the RMSE remains around the same value). The accuracy on the train data could be improved by using more leading components, the trade-off being more computation time required.
 
-For the data used, we could stop the computation after the *75* or *100* iterations since the accuracy on the test data set does not improve anymore. After all, it is the prediction of the unobserved which is the ultimate goal.
+Similar to the results obtained in our reference for this section, for the data used, we could stop the computation after the *75* or *100* iterations since the accuracy on the test data set does not improve anymore.
 
-##### EM Compare <a name="c_5"></a>
+##### EM Algorithm after gradient descent <a name="c_5"></a>
 With the predicted user-item matrix, let's look again at the distribution of hours for 'Fallout 4' game, and apply to it the EM algorithm in order to find a reasonable 1-5 star rating.
 
-We use EM algorithm to show the plot of relationship for one game with others in the folllowing codes.
+We use EM algorithm to show the plot of the hours distribution of game after gradient descent in the folllowing codes.
 
 ```python
 # Create a rating based on time played after gradient descent
@@ -427,7 +419,7 @@ destiny:sparse or dense
 game_data:similarity
 ```
 
-Although distributions 2-to-3 look like they fit the data fairly well. Perhaps not quite as appropriate, not alll the groups create a dense distribution.
+Although distributions 2-to-3 look like they fit the data fairly well. Perhaps not quite as appropriate, not all the groups create a dense distribution.
 
 
 ##### Output <a name="c_6"></a>
@@ -510,7 +502,7 @@ Top 20 recommended games for user 5250:
 
 The content-base recommender system gives recommendation based on the similarity between the game a user already has and other games.
 
-In order to build the recommender system, we need to prepare the data and build the algorithm. In order to do so, we first need to preprocess the game dataset described in [subsection II.b](#game) with all the useful information to give as input to the recommender algorithm, formatted in an simpler way. The percentage from the reviews are extracted since they are used. Then, we implement a function used to give game recommendations similar to another game. Lastly, we produce recommendations for all user based on the games users already posses.
+In order to build the recommender system, we need to prepare the data and build the algorithm. In order to do so, we first need to preprocess the game dataset described in [the dataset section](#game) with all the useful information to give as input to the recommender algorithm, formatted in an simpler way. The percentage from the reviews are extracted since they are used. Then, we implement a function used to give game recommendations similar to another game. Lastly, we produce recommendations for all user based on the games users already posses.
 
 To prepare the data for the content based recommender, we start by selecting the information we think would be the most useful to find similar games. We read the useful columns from the game dataset by using the following code.
 
@@ -533,7 +525,7 @@ for i, row in dataGames.iterrows():
 
 After this, we find all unique IDs from the user dataset and use them to filter the rows in the game dataset, keeping those where IDs match those from the user dataset. As a result, we obtain 3036 games from the game dataset that match some of the 5152 games from the user dataset. Initially, without the ID approach and using only the game titles, we obtained only 71 games from the game dataset that matched those from the user dataset. Since we have less games in the new game dataset compared to the user dataset, the recommender system will not be able to find recommendations for every game in the user dataset. This surely affects its performance. <a name="match_games"></a>
 
-With the new smaller game dataset, we remove the spaces from the useful columns we chose to use. By doing so, we ensure that, for example, 'Steam Achievement' and 'Steam Cloud' don't get a match because they  both contain 'Steam'. Therefore we apply the following function to all the columns that are used.
+With the new smaller game dataset, we remove the spaces from the useful columns we chose to use. By doing so, we ensure that, for example, 'Steam Achievement' and 'Steam Cloud' don't get a match because they  both contain 'Steam'. They will now each have the unique values 'SteamAchievement' and 'SteamCloud'. Therefore we apply the following function to all the columns that are used.
 
 ```python
 def clean_data(x):
@@ -678,18 +670,14 @@ def make_recommendation_for_user(user_id, game_list, game_user_have):
 ```
 In case the list of recommendations is empty (it could happen if none of the games the user already posses are in the game dataset) or not valid, a DataFrame without recommendations is returned. In case of a valid recommendation list, the returned DataFrame has the recommended game titles with their corresponding review (percentage of positive review). Games that the user already posses are removed (no need to recommend a game the user already purchased). 
 
-Subsequently, the recommendations are ordered according to their reviews, from best to worst. We decided to proceed this way since it's the easiest way to order the recommendations, particularly considering that it's not possible to produce recommendations for every game the user posses since games in both datasets do not match perfectly as mentioned previously [here](#match_games). If it weren't because of this mismatch, we considered taking into account the proportion of play time of each game relatively to the others a user played in order to recommend similar games to those that are most played. Using the reviews  to sort the recommendations still ensures that the recommended games are considered good in general by all users.
+Subsequently, the recommendations are ordered according to their reviews, from best to worst. We decided to proceed this way since it's the easiest way to order the recommendations, particularly considering that it's not possible to produce recommendations for every game the user possess since games in both datasets do not match perfectly as mentioned previously [here](#match_games). If it weren't because of this mismatch, we considered taking into account the proportion of play time of each game relatively to the others a user played in order to recommend similar games to those that are most played. Using the reviews to sort the recommendations still ensures that the recommended games are considered good in general by all users.
 
 If there are less recommendations than the desired number of recommendations requested, empty spaces fill in the rest of the columns. All the DataFrame rows produced by the function '*make_recommendation_for_user*' are combined and then outputted as a CSV file.
 
 
 ## IV. Evaluation & Analysis <a name="evaluation-analysis"></a>
 
-In order to compare the different algorithms used to produce recommendations, we create a script that calculates, for each user, the ratio of the number of games in the user test dataset that are among the top 20 recommendations over the total number of games in the user test dataset. The mean of the ratio from all users is then calculated. The ration is a bit low because whenever recommendations couldn't be produced for a given user, the computed ratio is set to 0. **TO COMPLETE**
-
-*Not too sure about this:**
-
-*The ratio is a bit low because for some user in the training dataset it was not possible to get the recommendations and some user don't have games in the test dataset, in those cases the ratio will be 0.*
+In order to compare the different algorithms used to produce recommendations, we create a script that calculates, for each user, the ratio of the number of games in the user test dataset that are among the top 20 recommendations over the total number of games in the user test dataset. The mean of the ratio from all users is then calculated. The ration is a bit low because whenever recommendations couldn't be produced for a given user, the computed ratio is set to 0.
 
 The idea of calculating the ratio this way was inspired by the precision at K metric used in the KDD research paper: [Real-time Attention Based Look-alike Model for Recommender System](https://www.kdd.org/kdd2019/accepted-papers/view/real-time-attention-based-look-alike-model-for-recommender-system).
 
@@ -712,7 +700,7 @@ We calculated the ratio for both collaborative filtering recommenders in the sam
 Algorithm| Ratio [10<sup>-2</sup>] | Number of Games User has in Test Dataset that are among Recommendations | Number of Games User has in Test Dataset 
 :----------: | :-----------: | :-----------: | :-----------:
 Collaborative with ALS| 9.3402 | 0.444216 | 4.414910
-Collaborative with EM and SVD | 0.4143 | 0.024372 | 2.909578
+Collaborative with EM and SVD | 0.4456 | 0.031705 | 4.414910
 Content-based (Genre, publisher & developer) | 1.8198 | 0.105782 | 2.190587
 
 As we can see, the collaborative recommender with ALS is the best one. The performance of the collaborative recommendation system with EM and SVD and the content-based recommender system are far behind it.
@@ -722,7 +710,7 @@ As we can see, the collaborative recommender with ALS is the best one. The perfo
 All the related work used as reference for the development of our project are listed here below:
 
 - To understand what a recommender system is and the different types, we used the article ["How do Recommendation Engines work? And What are the Benefits?"](https://marutitech.com/recommendation-engine-benefits/).
-- - For the collaborative recommender using the ALS algorithm, we used the work presented in the following articles: ["ALS Implicit Collaborative Filtering"](https://medium.com/radon-dev/als-implicit-collaborative-filtering-5ed653ba39fe "ALS Implicit Collaborative Filtering") and ["A Gentle Introduction to Recommender Systems with Implicit Feedback"](https://jessesw.com/Rec-System/ "A Gentle Introduction to Recommender Systems with Implicit Feedback"). The ALS algorithm used correspond to that implemented in the [implicit](https://github.com/benfred/implicit) python library. As described on its documentation [here](https://implicit.readthedocs.io/en/latest/als.html), it uses the algorithms described in the paper [Collaborative Filtering for Implicit Feedback Datasets](http://yifanhu.net/PUB/cf.pdf) with performance optimizations described in [Applications of the Conjugate Gradient Method for Implicit Feedback Collaborative Filtering](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.379.6473&rep=rep1&type=pdf).
+- For the collaborative recommender using the ALS algorithm, we used the work presented in the following articles: ["ALS Implicit Collaborative Filtering"](https://medium.com/radon-dev/als-implicit-collaborative-filtering-5ed653ba39fe "ALS Implicit Collaborative Filtering") and ["A Gentle Introduction to Recommender Systems with Implicit Feedback"](https://jessesw.com/Rec-System/ "A Gentle Introduction to Recommender Systems with Implicit Feedback"). The ALS algorithm used correspond to that implemented in the [implicit](https://github.com/benfred/implicit) python library. As described on its documentation [here](https://implicit.readthedocs.io/en/latest/als.html), it uses the algorithms described in the paper [Collaborative Filtering for Implicit Feedback Datasets](http://yifanhu.net/PUB/cf.pdf) with performance optimizations described in [Applications of the Conjugate Gradient Method for Implicit Feedback Collaborative Filtering](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.379.6473&rep=rep1&type=pdf).
 - For the collaborative recommender using the EM algorithm we used the article ["Machine Learning with Python: Exception Maximization and Gaussian Mixture Models in Python"](https://www.python-course.eu/expectation_maximization_and_gaussian_mixture_models.php).
 - For the content-based recommender system we used some code from the blog post ["Recommender Systems in Python: Beginner Tutorial"](https://www.datacamp.com/community/tutorials/recommender-systems-python?fbclid=IwAR1fz9YLOgZ95KHwoLpgb-hTdV2MekujDGBngRTG3kYmBJYxwSK3UWvNJDg) to implement the function that produces recommendations for each game.
 - The KDD research paper ["Real-time Attention Based Look-alike Model for Recommender System"](https://www.kdd.org/kdd2019/accepted-papers/view/real-time-attention-based-look-alike-model-for-recommender-system)
