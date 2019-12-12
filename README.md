@@ -123,7 +123,7 @@ X axis:number of users
 Y axis:game name
 colors:amount of hour
 ```
-When comparing this new plot against the previous one, we can see that some games fell down from the top 20 games based on the number of users. For example 'Counter-Strike Condition Zero', top 15 in the plot considering all users that purchased the game, does not appear in the top 20 of games considering only the users that actually played the game. An opposite example is that of 'Terraria' that appears in the second plot as top 11 while it's not listed in the first plot. As mentioned before, a possible explanations for this difference could  could be that several games were purchased as part of a game bundle. 
+When comparing this new plot against the previous one, we can see that some games fell down from the top 20 games based on the number of users. For example 'Counter-Strike Condition Zero', top 15 in the plot considering all users that purchased the game, does not appear in the top 20 of games considering only the users that actually played the game. An opposite example is that of 'Terraria' that appears in the second plot as top 11 while it's not listed in the first plot. As mentioned before, a possible explanations for this difference could be that several games were purchased as part of a game bundle. 
 
 In order to have a better understanding of the user data distribution and user's playing habits, a box plot is produced for the top 20 most played game, based in the total of hours played.
 
@@ -258,7 +258,7 @@ The following lines of code are used to create the user-item matrix.
 # For train dataset
 # Only consider the games hrs more than 2 hrs
 steam_train = steam_traind[steam_traind['hrs'] > 2]
-print(steam_train)
+#print(steam_train)
 #Not consider the games that users less than 50
 steam_train_idx = steam_train['game1'].apply(lambda x: x in game_users['game1'].values)
 steam_train = steam_train[steam_train_idx]
@@ -282,7 +282,7 @@ print("Dimensions of training user-item matrix:", ui_train.shape)
 ```
 
 ```python
-Dimensions of training user-item matrix:（8206，492)
+Dimensions of training user-item matrix:（8084，391)
 ```
 
 ##### Basic SVD <a name="c_3"></a>
