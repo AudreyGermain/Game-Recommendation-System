@@ -700,7 +700,7 @@ We calculated the ratio for both collaborative filtering recommenders in the sam
 Algorithm| Ratio [10<sup>-2</sup>] | Number of Games User has in Test Dataset that are among Recommendations | Number of Games User has in Test Dataset 
 :----------: | :-----------: | :-----------: | :-----------:
 Collaborative with ALS| 9.3402 | 0.444216 | 4.414910
-Collaborative with EM and SVD | 0.4143 | 0.024372 | 2.909578
+Collaborative with EM and SVD | 0.4456 | 0.031705 | 4.414910
 Content-based (Genre, publisher & developer) | 1.8198 | 0.105782 | 2.190587
 
 As we can see, the collaborative recommender with ALS is the best one. The performance of the collaborative recommendation system with EM and SVD and the content-based recommender system are far behind it.
