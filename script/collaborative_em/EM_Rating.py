@@ -25,17 +25,19 @@ game_freq = steam_traind.groupby(by='game').agg({'user': 'count', 'hrs': 'sum'})
 top20 = game_freq.sort_values(by='user',ascending=False)[:20].reset_index()
 #print(top20)
 steam_traind['user']=steam_traind['user'].astype(int)
-
+steam_clean['user']=steam_clean['user'].astype(int)
+steam_test['user']=steam_test['user'].astype(int)
 
 # Cleaning up the game columns. It doesn't like some of the special characters
-steam_clean['game1'] = steam_clean['game'].apply(lambda x: re.sub('[^a-zA-Z0-9]', '', x))
 steam_traind['game1'] = steam_traind['game'].apply(lambda x: re.sub('[^a-zA-Z0-9]', '', x))
+steam_clean['game1'] = steam_clean['game'].apply(lambda x: re.sub('[^a-zA-Z0-9]', '', x))
 #steam_clean.head()
 
 #EM Algorithm based on raw data
 def game_hrs_density(GAME, nclass, print_vals=True):
     #Ignore the game hrs less than 2 hrs
-    game_data = steam_clean[(steam_clean['game1'] == GAME) & (steam_clean['hrs'] > 2)]
+    #game_data = steam_clean[(steam_clean['game1'] == GAME) & (steam_clean['hrs'] > 2)]
+    game_data = steam_clean[(steam_clean['game1'] == GAME)&(steam_clean['hrs']>2)]
     #Log hrs
     game_data['loghrs'] = np.log(steam_clean['hrs'])
     #Calculate the mu,sigma to process Gaussian function
@@ -94,7 +96,7 @@ users_test = pd.DataFrame({'user': sorted(steam_test['user'].unique()), 'user_id
 # For train dataset
 # Only consider the games hrs more than 2 hrs
 steam_train = steam_traind[steam_traind['hrs'] > 2]
-print(steam_train)
+#print(steam_train)
 #Not consider the games that users less than 50
 steam_train_idx = steam_train['game1'].apply(lambda x: x in game_users['game1'].values)
 steam_train = steam_train[steam_train_idx]
@@ -138,6 +140,7 @@ for i, col in enumerate(Y.columns):
     Y[col] = Y[col].apply(lambda x: means[i] if x == 0 else x)
 U, D, V = np.linalg.svd(Y)
 p_df = pd.DataFrame({'x': range(1, len(D)+1), 'y': D/np.sum(D)})
+
 '''
 ggplot(p_df, aes(x='x', y='y')) + \
 geom_line() + \
@@ -175,7 +178,7 @@ N = 200
 alpha = 0.001
 pred = np.round(np.dot(U, V.T), decimals=2)
 fobj = [f(U, V)]
-#rmsej = [rmse(pred, test)]
+rmsej = [rmse(pred, test)]
 start = time.time()
 #process iteratively until we get to the bottom
 for i in tqdm(range(N)):
@@ -183,7 +186,6 @@ for i in tqdm(range(N)):
     V = V - alpha*dfv(V)
     fobj.append(f(U, V))
     pred = np.round(np.dot(U, V.T), 2)
-'''
     rmsej.append(rmse(pred, test))
 
 #print('Time difference of {} mins'.format((time.time() - start) / 60))
@@ -196,7 +198,7 @@ path1gg = pd.melt(path1[["itr", "fobjp", "rmsep"]], id_vars=['itr'])
 print(path1.tail(1))
 
 print(ggplot(path1gg, aes('itr', 'value', color = 'variable')) + geom_line())
-'''
+
 # Create a rating based on time played after gradient descent
 def game_hrs_density_p(pred, GAME=None, nclass=1, print_vals=True):
     game_dict = dict(games.values)
@@ -265,25 +267,24 @@ def top(n, user, print_value=True):
 
 top_N = 20
 result = []
-print(users_test['user'])
-print(users_train['user'])
-for idx, user in tqdm(enumerate(users_train['user'].values)):
-    print(user)
-    print(type(user))
-    if user in users_test['user']:
-      result.append(top(top_N, user, False))
-    print(result)
-    if idx>10:
-        break
+#print(users_test['user'])
+#print(users_train['user'])
+users_merge=pd.merge(users_test,users_train,on='user',how='inner')
+#print(users_merge)
+for idx, user in tqdm(enumerate(users_merge['user'].values)):
+    result.append(top(top_N, user, False))
 
-
+users_not=users_test[~users_test['user'].isin(users_merge['user'])]
+#print(users_not)
+for user in users_not['user']:
+    empty=[user]
+    for i in range(20):
+        empty.append(0)
+    result.append(empty)
 df = pd.DataFrame(result)
-columns = ['user'] + ['{}'.format(i+1) for i in range(top_N)]
-
-
+columns = ['user_id'] + ['{}'.format(i+1) for i in range(top_N)]
 df.columns = columns
 df.to_csv('D:/Game-Recommendation-System/data/output_data/Collaborative_EM_output.csv', index=None)
-
 
 
 
