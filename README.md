@@ -201,7 +201,7 @@ It is to note that for some users, the model fails to produce recommendations. T
 
 #### c. Collaborative recommender with EM and SVD <a name="em"></a>
 
-The work presented in this section follows the work and methodology described in the blog post ["Steam Game Recommendation"](https://www.kaggle.com/danieloehm/steam-game-recommendations) for the implementation of a recommender system, considering many of the suggestion mentioned therein. The mentioned blog uses R language to implement its code, we translated some of them into python for our project. Here, the goal is to use the EM and SVD algorithms to implement and appropriate game recommendation system.
+The work presented in this section follows the work and methodology described in the blog post ["Steam Game Recommendation"](https://www.kaggle.com/danieloehm/steam-game-recommendations) for the implementation of a recommender system, considering many of the suggestions mentioned therein. The mentioned blog uses R language to implement its code, we translated some of them into python for our project. Here, the goal is to use the EM and SVD algorithms to implement and appropriate game recommendation system.
 
 ##### EM Algorithm <a name="c_1"></a>
 
@@ -244,18 +244,13 @@ def game_hrs_density(GAME, nclass, print_vals=True):
 a = game_hrs_density('Fallout4', 5, True)
 print(a)
 ```
-```python
-gaussian:rating
-destiny:sparse or dense
-loghrs:game hours
-```
-![image alt ><](plots/EM_SingleAnalysis.png?raw=true)
+![image alt ><](plots/EM_SingleAnalysis_new.png?raw=true)
 
-As we can see in the plot above for 'The Fallout 4', the EM algorithm does a great job finding groups (5) of people with similar gaming habits and that would potentially rate a game in a similar way. We can see several users played 'The Fallout 4' game for very few hours. It's possible these users lost their interest into the game after playing some hours, possibly requesting a refund for it. At the same time, it more distributs between 3-4 groups. So that it shows the majority users are interested in this game.
+As we can see in the plot above for 'The Fallout 4', the EM algorithm does a great job finding groups (5) of people with similar gaming habits and that would potentially rate a game in a similar way. **We can see several users played 'The Fallout 4' game for very few hours. It's possible these users lost their interest into the game after playing some hours, possibly requesting a refund for it.** We can see the distribution is denser for groups 3 and 4. This shows that the majority of users are interested in this game.
 
 ##### Create User-Game Matrix <a name="c_2"></a>
 
-A user-item matrix is created with the users as rows and games as columns. The missing values are set to zero. The values stored in the matrix correspond to the `log(hours)` for each user-game combination. The data used to create the user-item matrix considers only games with more than 50 users and users that played a game for more than 2 hours. 
+A user-item matrix is created with the users as rows and games as columns. The missing values are set to zero. The values stored in the matrix correspond to the `log(hours)` for each user-game combination. Following the suggestions from the used reference, the data used to create the user-item matrix considers only games with more than 50 users and users that played a game for more than 2 hours.
 
 The following lines of code are used to create the user-item matrix.
 
@@ -292,9 +287,9 @@ Dimensions of training user-item matrix:（8206，492)
 
 ##### Basic SVD <a name="c_3"></a>
 
-We first use the basic SVD algorithm to factorize the user-item matrix into singular vectors and singular values, similar to what the eigendecomposition does . Since the missing values were set to zero, the factorization will try to recreate them, which is not something we want. We decided to simply replace the missing values with a mean value computed by using the observations considered.
+We first use the basic SVD algorithm to factorize the user-item matrix into singular vectors and singular values, similar to what the eigendecomposition does . Since the missing values were set to zero, the factorization will try to recreate them, which is not something we want. We decide to simply replace the missing values with a mean value computed by using the observations considered.
 
-Here we process the data through Basic SVD
+The following code is used to process our data through the Basic SVD algorithm.
 ```python
 # Basic svd
 Y = pd.DataFrame(ui_train).copy()
@@ -316,13 +311,15 @@ rmse(pred, test, True).head()
 ```python
 3.2785930374294123
 ```
-As we see the rmse above, it seems like the basic SVD approach does not give the best prediction for us, because the better performence of the SVD should come with the lower rmse. 
+The value shown above is the computed RMSE. It seems like the basic SVD approach would not give the best recommendations for us since the RMSE value is quite high. The SVD algorithm performance is better the lower the RMSE is. 
 
 ##### SVD via Gradient Descent <a name="c_4"></a>
 
-Because the SVD based on having a complete matrix. We decided to additionally consider a gradient descent approach in order to deal well with missing data. So gradient descent, a convex optimization method, to find optimal U and V matrices that can represent the missing values in the user-item matrix through similiar users and games.
+**Because the SVD based on having a complete matrix. (does that mean SVD requires a complete matrix - no missing data?)**
 
-We set the learning rate to *0.001* and the number of iteration to *200* while tracking the Root Mean Square Error (RMSE). The U and V matrices are initialized with random values draw from a [0, 0.01] normal distribution. The tracked function measures the RMSE between the actual values and the predicted values.
+We decided to additionally consider a gradient descent approach in order to deal well with missing data. Gradient descent is a convex optimization method which we use to find optimal U and V matrices that represent the original user-item matrix, replacing the missing values by new ones estimated by using similar users and games.
+
+Similar to what was done in our reference, we set the learning rate to *0.001* and the number of iteration to *200* while tracking the Root Mean Square Error (RMSE). The U and V matrices are initialized with random values draw from a [0, 0.01] normal distribution. The tracked function measures the RMSE between the actual values and the predicted values.
 
 ```python
 #SVD via gradient descent
@@ -370,18 +367,13 @@ print(path1.tail(1))
 
 print(ggplot(path1gg, aes('itr', 'value', color = 'variable')) + geom_line())
 ```
-![image alt ><](plots/SVD_Compare.png?raw=true)
+![image alt ><](plots/SVD_Compare_new.png?raw=true)
 
-```python
-itr:iterations
-fobjp:the predicted values
-rmsep:actual observed values
-```
 We can see there is a large improvement using the SVD with gradient descent over the basic SVD approach. The plot shows that the after gradient descent SVD function converges to zero on the train dataset.
 
 Interestingly, we see that after the 75th iteration, the accuracy on the train dataset stops improving (the RMSE remains around the same value). The accuracy on the train data could be improved by using more leading components, the trade-off being more computation time required.
 
-For the data used, we could stop the computation after the *75* or *100* iterations since the accuracy on the test data set does not improve anymore. After all, it is the prediction of the unobserved which is the ultimate goal.
+Similar to the results obtained in our reference for this section, for the data used, we could stop the computation after the *75* or *100* iterations since the accuracy on the test data set does not improve anymore.
 
 ##### EM Compare <a name="c_5"></a>
 With the predicted user-item matrix, let's look again at the distribution of hours for 'Fallout 4' game, and apply to it the EM algorithm in order to find a reasonable 1-5 star rating.
@@ -687,11 +679,7 @@ If there are less recommendations than the desired number of recommendations req
 
 ## IV. Evaluation & Analysis <a name="evaluation-analysis"></a>
 
-In order to compare the different algorithms used to produce recommendations, we create a script that calculates, for each user, the ratio of the number of games in the user test dataset that are among the top 20 recommendations over the total number of games in the user test dataset. The mean of the ratio from all users is then calculated. The ration is a bit low because whenever recommendations couldn't be produced for a given user, the computed ratio is set to 0. **TO COMPLETE**
-
-*Not too sure about this:**
-
-*The ratio is a bit low because for some user in the training dataset it was not possible to get the recommendations and some user don't have games in the test dataset, in those cases the ratio will be 0.*
+In order to compare the different algorithms used to produce recommendations, we create a script that calculates, for each user, the ratio of the number of games in the user test dataset that are among the top 20 recommendations over the total number of games in the user test dataset. The mean of the ratio from all users is then calculated. The ration is a bit low because whenever recommendations couldn't be produced for a given user, the computed ratio is set to 0.
 
 The idea of calculating the ratio this way was inspired by the precision at K metric used in the KDD research paper: [Real-time Attention Based Look-alike Model for Recommender System](https://www.kdd.org/kdd2019/accepted-papers/view/real-time-attention-based-look-alike-model-for-recommender-system).
 
