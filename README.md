@@ -13,7 +13,7 @@
   Department Of Information System, Hanyang University, ammissyouyou@gmail.com
   
 - Audrey Germain,
-  Computer Engineering, Department of Software Engineering and Computer Engineering, Polytechnique Montreal, [LinkedIn](www.linkedin.com/in/audrey-germain-ab6185164)
+  Computer Engineering, Department of Software Engineering and Computer Engineering, Polytechnique Montreal, [LinkedIn](https://www.linkedin.com/in/audrey-germain-ab6185164/)
   
 - Geordan Jove,
   Aerospace Engineering, Department of Mechanical Engineering, Polytechnique Montreal, [LinkedIn](https://www.linkedin.com/in/geordan-jove/)
