@@ -2,7 +2,7 @@
 
 # Recommendation System for Steam Game Store: An overview of recommender systems
 <p align="right">
-  <a href="https://youtu.be/B6_cj70Gd3w">Short Youtube Version</a>
+  <a href="https://youtu.be/c7KidBmQb84">Short Youtube Version</a>
 </p>
 <p align="right">
   <a href="https://youtu.be/B6_cj70Gd3w">Complete Youtube Version</a>
