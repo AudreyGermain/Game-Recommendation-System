@@ -1,3 +1,4 @@
+#Most of codes are translated according to the blog "Steam Game Recommendation"
 import pathlib
 import pandas as pd
 import numpy as np
