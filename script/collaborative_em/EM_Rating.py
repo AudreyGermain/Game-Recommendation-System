@@ -1,13 +1,11 @@
 import pathlib
 import pandas as pd
 import numpy as np
-import seaborn as sns
 import re
 from plotnine import *
 import scipy
 from tqdm import tqdm
 import time
-import matplotlib.pyplot as plt
 from sklearn.mixture import GaussianMixture
 
 
@@ -21,7 +19,6 @@ locationUsersFile_test=pathlib.Path(r'D:/Game-Recommendation-System/data/model_d
 steam_test = pd.read_csv(locationUsersFile_test, header=1, names=['user', 'game', 'hrs', 'purchase','play'])
 
 game_freq = steam_traind.groupby(by='game').agg({'user': 'count', 'hrs': 'sum'}).reset_index()
-#game_freq = steam_clean.groupby(by='game').agg({'user': 'count', 'hrs': 'sum'}).reset_index()
 top20 = game_freq.sort_values(by='user',ascending=False)[:20].reset_index()
 #print(top20)
 steam_traind['user']=steam_traind['user'].astype(int)
@@ -36,7 +33,6 @@ steam_clean['game1'] = steam_clean['game'].apply(lambda x: re.sub('[^a-zA-Z0-9]'
 #EM Algorithm based on raw data
 def game_hrs_density(GAME, nclass, print_vals=True):
     #Ignore the game hrs less than 2 hrs
-    #game_data = steam_clean[(steam_clean['game1'] == GAME) & (steam_clean['hrs'] > 2)]
     game_data = steam_clean[(steam_clean['game1'] == GAME)&(steam_clean['hrs']>2)]
     #Log hrs
     game_data['loghrs'] = np.log(steam_clean['hrs'])
@@ -128,9 +124,6 @@ def rmse(pred, test, data_frame=False):
         return pd.DataFrame({'test_pred': test_pred, 'loghrs': test['loghrs']})
     return np.sqrt(1/(len(test)-1)*np.sum((test_pred - test['loghrs']) ** 2))
 
-
-
-
 # Basic svd
 Y = pd.DataFrame(ui_train).copy()
 
@@ -141,17 +134,12 @@ for i, col in enumerate(Y.columns):
 U, D, V = np.linalg.svd(Y)
 p_df = pd.DataFrame({'x': range(1, len(D)+1), 'y': D/np.sum(D)})
 
-'''
-ggplot(p_df, aes(x='x', y='y')) + \
-geom_line() + \
-labs(x = "Leading component", y = "")
-'''
 #Set the latent factor as 60
 lc = 60
 pred = np.dot(np.dot(U[:, :lc], np.diag(D[:lc])), V[:lc, :])
 #Calculate rmse
-#print(rmse(pred, test))
-#rmse(pred, test, True).head()
+print(rmse(pred, test))
+rmse(pred, test, True).head()
 
 #SVD via gradient descent
 #Set the latent factor as 60
@@ -188,7 +176,7 @@ for i in tqdm(range(N)):
     pred = np.round(np.dot(U, V.T), 2)
     rmsej.append(rmse(pred, test))
 
-#print('Time difference of {} mins'.format((time.time() - start) / 60))
+print('Time difference of {} mins'.format((time.time() - start) / 60))
 #fojb predicted values
 fojb = np.array(fobj)
 #rmsej actual observed values
@@ -267,15 +255,11 @@ def top(n, user, print_value=True):
 
 top_N = 20
 result = []
-#print(users_test['user'])
-#print(users_train['user'])
 users_merge=pd.merge(users_test,users_train,on='user',how='inner')
-#print(users_merge)
 for idx, user in tqdm(enumerate(users_merge['user'].values)):
     result.append(top(top_N, user, False))
 
 users_not=users_test[~users_test['user'].isin(users_merge['user'])]
-#print(users_not)
 for user in users_not['user']:
     empty=[user]
     for i in range(20):

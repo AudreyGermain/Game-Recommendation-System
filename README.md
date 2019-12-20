@@ -256,7 +256,6 @@ The following lines of code are used to create the user-item matrix.
 # For train dataset
 # Only consider the games hrs more than 2 hrs
 steam_train = steam_traind[steam_traind['hrs'] > 2]
-#print(steam_train)
 #Not consider the games that users less than 50
 steam_train_idx = steam_train['game1'].apply(lambda x: x in game_users['game1'].values)
 steam_train = steam_train[steam_train_idx]
@@ -326,7 +325,7 @@ for i in tqdm(range(N)):
     fobj.append(f(U, V))
     pred = np.round(np.dot(U, V.T), 2)
     rmsej.append(rmse(pred, test))
-#print('Time difference of {} mins'.format((time.time() - start) / 60))
+print('Time difference of {} mins'.format((time.time() - start) / 60))
 #fojb predicted values
 fojb = np.array(fobj)
 #rmsej actual observed values 
@@ -422,7 +421,7 @@ def top(n, user, print_value=True):
         for i in range(n):
             result.append(reverse_game_dict[top_games[i]])
         return result
-#top(20, 5250)
+top(20, 5250)
 
 top_N = 20
 result = []
